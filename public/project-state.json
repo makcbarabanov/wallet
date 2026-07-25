@@ -46,10 +46,10 @@
     }
   ],
   "currentFocus": {
-    "status": "next_up",
-    "item": "Stable release checkpoint (git)",
+    "status": "ready_for_next_wave",
+    "item": "Choose the next major wave",
     "build": 58,
-    "note": "/logs accepted 2026-07-26; stabilize before major features"
+    "note": "Stable checkpoint v58 pushed to main on 2026-07-26"
   },
   "accepted": [
     {
@@ -119,6 +119,13 @@
       "status": "accepted",
       "date": "2026-07-26",
       "note": "User verified Valet learning admin page opens"
+    },
+    {
+      "item": "Stable checkpoint v58",
+      "status": "accepted",
+      "date": "2026-07-26",
+      "build": 58,
+      "note": "Settings, Valet report toggles, /logs pushed to main"
     }
   ],
   "inProgress": [
@@ -137,9 +144,9 @@
     "separate bridge project beyond this JSON"
   ],
   "nextActions": [
-    "Create the next stable release checkpoint (git)",
-    "Later: receipts as sourceOperation through LLM and Gateway",
-    "Later: merchantId / Assistant / full Valet — after checkpoint"
+    "Choose the next major wave: receipts via LLM, merchantId, or Assistant",
+    "Receipts as sourceOperation through LLM and Gateway",
+    "merchantId migration only after receipts flow is stable"
   ],
   "focus": "Do not add major new features; stabilize the current version first",
   "knownIssues": [],
