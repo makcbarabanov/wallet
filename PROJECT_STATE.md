@@ -5,7 +5,12 @@
 **Карта развития (визуальная):** [wallet_roadmap.html](./wallet_roadmap.html) · онлайн: <https://wallet.islanddream.ru/roadmap>
 (деплой-копия — `public/roadmap/index.html`; при правке roadmap обновлять обе).
 
-**Снимок:** 2026-07-25 · UI_BUILD **52** / schema 11. Git ✅ · Gateway NSP ✅ · Магазин v51 ✅. **Фаза 2 старт:** кнопки расхода в Личный/Бизнес через `createExpense()` (+ Объект/Заказчик). Private на GitHub — отклонено. Следующее: приёмка v52 → Настройки.
+**Машинный контекст для Ардена:** [project-state.json](./project-state.json) · онлайн: <https://wallet.islanddream.ru/project-state.json>
+(деплой-копия — `public/project-state.json`; контракт `contextVersion: 1`; секретов и финансовых данных внутри нет).
+
+**Контракт JSON:** `contextVersion`, `updatedAt`, `version`, `architectureRules[]` (жёсткие AD), `accepted` / `inProgress` / `nextActions`, `doNotDoNow`. Обновлять одновременно с этим файлом. Не копия roadmap — официальный машинный контекст.
+
+**Снимок:** 2026-07-25 · UI_BUILD **52** / schema 11 · contextVersion **1**. Git ✅ · Gateway NSP ✅ · Магазин v51 ✅. **Фаза 2 старт:** кнопки расхода в Личный/Бизнес через `createExpense()` (+ Объект/Заказчик). Private на GitHub — отклонено. Следующее: приёмка v52 → Настройки.
 
 ---
 
@@ -22,6 +27,7 @@
 | Git | ✅ init + push `main` · commit `aae4e1e` · [makcbarabanov/wallet](https://github.com/makcbarabanov/wallet) |
 | `.gitignore` | исключает `.env`, dumps, `wallet_review_v3*`, выписки, `backup/`, zip |
 | `wallet_roadmap.html` / `public/roadmap/index.html` | живая карта развития · идентичны · `/roadmap` = 200 |
+| `project-state.json` / `public/project-state.json` | официальный машинный контекст · `contextVersion: 1` · `/project-state.json` = 200 |
 
 **Вариант А выполнен:** сначала восстановлена Фаза 1, затем Gateway.
 
@@ -57,7 +63,7 @@
 - **Потеря файлов:** риск снят Git-ом (25.07.2026). Дампы/секреты по-прежнему локально. Репозиторий сейчас Public → лучше Private.
 - Модалка добавления расхода: **принято 25.07.2026 (v50)** — пользователь подтвердил на смартфоне.
 - Фонды: **принято 25.07.2026 (v50)** — «Тест», «Бизнес» 675 000, лимит 150 000 на смартфоне.
-- Поле «Магазин»: **улучшено в v51** (combobox) — ждёт проверки на смартфоне.
+- Поле «Магазин»: **принято 25.07.2026 (v51)**.
 - Yandex AI Studio: в локальном `.env` подготовлены `YANDEX_AI_STUDIO_API_KEY` / `FOLDER_ID` / `BASE_URL` / `MODEL` (учебный ключ; в Git не коммитится). Подключение в код API — ещё план.
 - `/logs`: nginx ищет `logs.html`, страница лежит как `public/logs/index.html` → 404.
 

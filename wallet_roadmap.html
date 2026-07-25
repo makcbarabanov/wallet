@@ -155,7 +155,7 @@ footer ul{padding-left:20px; margin:6px 0 0}
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
     <p class="sub">Живая карта развития: что сделано, что тестировать, что в планах. Только отражение текущего состояния — новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>25 июля 2026</b> · UI_BUILD 52 · расход из Личный/Бизнес</div>
+    <div class="updated">Обновлено: <b>25 июля 2026</b> · contextVersion 1 · project-state.json как контракт</div>
   </div>
 </header>
 
@@ -330,11 +330,12 @@ footer ul{padding-left:20px; margin:6px 0 0}
       <span class="lbl">Что сделано</span>
       <ul>
         <li>Канон: WALLET_PROJECT_BIBLE.md, ARCHITECTURE_DECISIONS.md (AD-001…AD-009a), PROJECT_STATE.md, WALLET_AI_LEARNING.md.</li>
+        <li>Официальный машинный контекст: <a href="/project-state.json"><span class="path">/project-state.json</span></a> · контракт <span class="path">contextVersion: 1</span> · блок <span class="path">architectureRules</span> из AD · без секретов.</li>
         <li>Проект и чеклист шлюза: WALLET_GATEWAY_DESIGN.md, GATEWAY_IMPLEMENTATION_CHECKLIST.md.</li>
         <li>Бэкап schema 9 с контрольными суммами: <span class="path">backup/20260724_gateway_pre_phase1_schema9/</span>.</li>
         <li>Проверки: <span class="path">scripts/test_gateway_regressions.py</span> — PASS, разбор JS без ошибок, 0 lint.</li>
       </ul>
-      <div class="check"><b>Как проверить</b>Эта страница и есть навигация по документам; при спорном вопросе канон — ARCHITECTURE_DECISIONS.md.</div>
+      <div class="check"><b>Как проверить</b>Открыть <a href="/project-state.json">project-state.json</a>; при спорном вопросе канон — ARCHITECTURE_DECISIONS.md.</div>
     </div>
 
   </div>

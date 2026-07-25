@@ -5,7 +5,9 @@ alwaysApply: true
 
 # Living Roadmap
 
-`wallet_roadmap.html` (деплой: `public/roadmap/index.html` → https://wallet.islanddream.ru/roadmap) — **живая карта** проекта. Держать на пульсе в каждой сессии, где меняется статус работы.
+`wallet_roadmap.html` (деплой: `public/roadmap/index.html` → https://wallet.islanddream.ru/roadmap) — **живая карта** проекта.
+`project-state.json` (деплой: `public/project-state.json` → https://wallet.islanddream.ru/project-state.json) — **официальный машинный контекст** для Ардена и других агентов.
+Держать оба источника на пульсе в каждой сессии, где меняется статус работы.
 
 ## Когда обновлять (обязательно)
 
@@ -13,7 +15,24 @@ alwaysApply: true
 - После приёмки пользователем («проверил, работает») — статус ✅ и дата приёмки.
 - Когда пользователь озвучил новую идею / баг / пожелание — добавить карточку со статусом 📋 или 🔴, даже если код ещё не пишем.
 - Когда план устарел или отменён — сменить статус или явно пометить как отменённый, не оставлять «серый план» без правды.
-- В конце заметной волны — синхронизировать дату «Обновлено», блок «Следующие действия», и краткий снимок в `PROJECT_STATE.md` со ссылкой на roadmap.
+- В конце заметной волны — синхронизировать дату «Обновлено», блок «Следующие действия», `PROJECT_STATE.md` и `project-state.json`.
+- В JSON не помещать секреты, финансовые суммы пользователя, персональные данные и содержимое `.env`; только имена переменных и статусы интеграций.
+
+## Контракт `project-state.json` (contextVersion)
+
+Это не копия roadmap, а машинный контекст. Обязательные поля `contextVersion: 1`:
+
+| Поле | Назначение |
+|------|------------|
+| `contextVersion` | версия формата контракта (сейчас `1`) |
+| `updatedAt` | дата снимка `YYYY-MM-DD` |
+| `version` | `uiBuild`, `schemaVersion`, `aiMode`, `activePhase` |
+| `architectureRules` | только жёсткие ограничения из AD (не пожелания) |
+| `accepted` / `inProgress` / `nextActions` | статус волны |
+| `doNotDoNow` | явные запреты на текущем этапе |
+| `links` / `precedence` | где читать дальше и что важнее чата |
+
+`architectureRules` обновлять только при новом/изменённом AD. JSON обновлять **одновременно** с `PROJECT_STATE.md`.
 
 ## Статусы карточек
 
@@ -32,7 +51,9 @@ alwaysApply: true
 
 ## Деплой копии
 
-При правке roadmap обновлять **оба** файла (`wallet_roadmap.html` и `public/roadmap/index.html`), чтобы /roadmap оставался актуальным.
+При правке roadmap обновлять **оба** файла (`wallet_roadmap.html` и `public/roadmap/index.html`).
+При правке машинного снимка обновлять **оба** файла (`project-state.json` и `public/project-state.json`).
+Проверять публичные URL `/roadmap` и `/project-state.json`.
 
 ## Не забывать
 

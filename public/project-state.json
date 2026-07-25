@@ -1,0 +1,141 @@
+{
+  "contextVersion": 1,
+  "project": "Wallet",
+  "updatedAt": "2026-07-25",
+  "role": "official_machine_context",
+  "description": "Canonical machine context for Arden and other AI tools. Not a visual roadmap copy: short contract of version, hard architecture rules, accepted work, and next actions.",
+  "version": {
+    "uiBuild": 52,
+    "schemaVersion": 11,
+    "serviceWorkerCache": "wallet-shell-v52",
+    "activePhase": "Phase 2",
+    "aiMode": "training"
+  },
+  "architectureRules": [
+    {
+      "id": "AD-009",
+      "rule": "createExpense() is the only production entry point for new expenses"
+    },
+    {
+      "id": "AD-009a",
+      "rule": "Training mode requires explicit user confirmation for every new expense; Assistant mode is not enabled"
+    },
+    {
+      "id": "AD-003",
+      "rule": "Ledger accounts are the source of truth for money on accounts; funds and plans are not reconciliation targets"
+    },
+    {
+      "id": "AD-002",
+      "rule": "Funds are allocation of own money, not accounts"
+    },
+    {
+      "id": "AD-001",
+      "rule": "Credit limit is not own money and is not a fund"
+    },
+    {
+      "id": "AD-004",
+      "rule": "fundId on an expense is optional"
+    },
+    {
+      "id": "AD-005",
+      "rule": "Personal and Business wallets remain separate ledgers with different fields"
+    },
+    {
+      "id": "AD-009",
+      "rule": "AI proposes and ranks; the user decides duplicates and confirmations"
+    }
+  ],
+  "currentFocus": {
+    "status": "acceptance_required",
+    "item": "Expense entry from Personal and Business",
+    "build": 52,
+    "acceptance": [
+      "Personal: Add expense creates one personal ledger row through createExpense()",
+      "Business: Add expense shows Object and Customer and creates one business ledger row",
+      "The selected account is debited exactly once"
+    ]
+  },
+  "accepted": [
+    {
+      "item": "Funds and credit limit",
+      "status": "accepted",
+      "date": "2026-07-25",
+      "refs": ["AD-001", "AD-002", "AD-007", "AD-008"]
+    },
+    {
+      "item": "Expense Gateway",
+      "status": "accepted",
+      "date": "2026-07-25",
+      "refs": ["AD-009", "AD-009a"]
+    },
+    {
+      "item": "NSP duplicate real flow",
+      "status": "accepted",
+      "date": "2026-07-25",
+      "refs": ["AD-009"]
+    },
+    {
+      "item": "Store searchable combobox and merchant learning prep",
+      "status": "accepted",
+      "date": "2026-07-25"
+    },
+    {
+      "item": "Git checkpoint",
+      "status": "accepted",
+      "date": "2026-07-25"
+    }
+  ],
+  "inProgress": [
+    {
+      "item": "Expense entry from Personal and Business",
+      "status": "implemented_waiting_acceptance",
+      "build": 52
+    },
+    {
+      "item": "Yandex AI Studio integration",
+      "status": "env_prepared_not_integrated",
+      "note": "Only env variable names exist locally; secrets are never published here"
+    }
+  ],
+  "doNotDoNow": [
+    "fund movement history",
+    "mandatory fund assignment",
+    "Assistant mode",
+    "merchantId migration",
+    "store-specific receipt parsers",
+    "separate bridge project beyond this JSON"
+  ],
+  "nextActions": [
+    "Accept UI_BUILD 52 on Personal and Business real flows",
+    "Implement the Settings tab with Assistant disabled",
+    "Fix the /logs route",
+    "Create the next stable release checkpoint",
+    "Later: receipts as sourceOperation through LLM and Gateway"
+  ],
+  "knownIssues": [
+    {
+      "item": "/logs route",
+      "severity": "minor",
+      "status": "open"
+    }
+  ],
+  "links": {
+    "roadmap": "https://wallet.islanddream.ru/roadmap",
+    "projectStateJson": "https://wallet.islanddream.ru/project-state.json",
+    "projectStateMd": "PROJECT_STATE.md",
+    "architectureDecisions": "ARCHITECTURE_DECISIONS.md",
+    "repository": "https://github.com/makcbarabanov/wallet"
+  },
+  "sync": {
+    "updateWith": ["PROJECT_STATE.md", "wallet_roadmap.html"],
+    "deployCopies": ["public/project-state.json"],
+    "forArden": "At the start of a Wallet discussion, fetch this JSON (contextVersion) and treat architectureRules as hard constraints. Use the roadmap for human detail. Chat never overrides this file."
+  },
+  "precedence": [
+    "application code",
+    "ARCHITECTURE_DECISIONS.md",
+    "this JSON + PROJECT_STATE.md",
+    "wallet_roadmap.html",
+    "chat messages"
+  ]
+}
