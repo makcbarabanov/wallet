@@ -5,7 +5,9 @@
 **Карта развития (визуальная):** [wallet_roadmap.html](./wallet_roadmap.html) · онлайн: <https://wallet.islanddream.ru/roadmap>
 (деплой-копия — `public/roadmap/index.html`; при правке roadmap обновлять обе).
 
-**Снимок:** 2026-07-25 · Фаза 1 + Gateway · UI_BUILD 51. **Приёмка v50 на смартфоне ✅** (фонды + скролл модалки). v51 (поле «Магазин») — ждёт проверки.
+**Снимок:** 2026-07-25 · UI_BUILD 51 / schema 11. **Git ✅** (`aae4e1e` → [github.com/makcbarabanov/wallet](https://github.com/makcbarabanov/wallet)). Приёмка v50 ✅. Следующее: приёмка Gateway (NSP на реальных данных).
+
+**Репозиторий:** remote `origin` = `git@github.com:makcbarabanov/wallet.git`. Сейчас на GitHub **Public** — рекомендуется Private.
 
 ---
 
@@ -19,7 +21,8 @@
 | дамп-страховка | `data/dumps/makc/250726/` · revision 269 · reason `pre_repair_wave` |
 | `WALLET_GATEWAY_DESIGN.md` | основа реализации — подтверждена |
 | `GATEWAY_IMPLEMENTATION_CHECKLIST.md` | подтверждён и выполнен |
-| schema 9 backup | `backup/20260724_gateway_pre_phase1_schema9/` + SHA256 |
+| Git | ✅ init + push `main` · commit `aae4e1e` · [makcbarabanov/wallet](https://github.com/makcbarabanov/wallet) |
+| `.gitignore` | исключает `.env`, dumps, `wallet_review_v3*`, выписки, `backup/`, zip |
 | `wallet_roadmap.html` / `public/roadmap/index.html` | живая карта развития · идентичны · `/roadmap` = 200 |
 
 **Вариант А выполнен:** сначала восстановлена Фаза 1, затем Gateway.

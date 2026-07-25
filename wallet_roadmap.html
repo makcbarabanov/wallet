@@ -155,7 +155,7 @@ footer ul{padding-left:20px; margin:6px 0 0}
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
     <p class="sub">Живая карта развития: что сделано, что тестировать, что в планах. Только отражение текущего состояния — новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>25 июля 2026 (v51)</b> · приёмка v50 на смартфоне ✅</div>
+    <div class="updated">Обновлено: <b>25 июля 2026</b> · Git: первый commit в GitHub ✅ · приёмка v50 ✅</div>
   </div>
 </header>
 
@@ -493,17 +493,18 @@ footer ul{padding-left:20px; margin:6px 0 0}
   <h3 class="wave">Git / Release</h3>
   <div class="grid two">
     <div class="card plan">
-      <h4>Восстановление истории <span class="badge">📋 план</span></h4>
+      <h4>Восстановление истории <span class="badge">✅ сделано</span></h4>
       <ul>
-        <li>Git-инициализация после стабильной контрольной точки, а не посреди перестройки.</li>
-        <li>Цель — прекратить потери файлов из дерева.</li>
+        <li>Git инициализирован 25.07.2026, первый commit на GitHub.</li>
+        <li>Потери файлов из дерева больше не «без страховки».</li>
       </ul>
     </div>
     <div class="card plan">
       <h4>Безопасные релизы <span class="badge">📋 план</span></h4>
       <ul>
-        <li>Проверить <span class="path">.gitignore</span>: исключить <span class="path">.env</span>, ключи Gemini, доступы Timeweb, дампы с реальными финансами.</li>
-        <li>Первый стабильный релиз, фиксация <span class="path">schemaVersion</span>, README по запуску.</li>
+        <li>Репозиторий сейчас Public → перевести в Private.</li>
+        <li>Первый стабильный релиз / тег после приёмки Gateway и Фазы 2.</li>
+        <li>README по запуску, фиксация <span class="path">schemaVersion</span>.</li>
       </ul>
     </div>
   </div>
@@ -534,6 +535,17 @@ footer ul{padding-left:20px; margin:6px 0 0}
       </ul>
     </div>
 
+    <div class="card ok">
+      <h4>Git / контрольная точка кода <span class="badge">✅ готово</span></h4>
+      <span class="lbl">Что сделано</span>
+      <ul>
+        <li>Локальный Git + remote <a href="https://github.com/makcbarabanov/wallet">github.com/makcbarabanov/wallet</a>, ветка <span class="path">main</span>, commit <span class="path">aae4e1e</span> (UI_BUILD 51 / schema 11).</li>
+        <li>Усиленный <span class="path">.gitignore</span>: <span class="path">.env</span>, дампы, <span class="path">wallet_review_v3*.json</span>, выписки CSV, <span class="path">backup/</span>, zip-архивы.</li>
+        <li>В репозитории есть код API, UI, docs, fixtures (включая NSP) — без реальных финансов.</li>
+      </ul>
+      <div class="check"><b>Осталось</b>Сделать репозиторий <b>Private</b> (сейчас Public). Дальше — обычные commit/push после волн.</div>
+    </div>
+
     <div class="card bad">
       <h4>Дубли: NSP снова появляется в Разборе <span class="badge">🔴 проверить</span></h4>
       <ul>
@@ -543,15 +555,13 @@ footer ul{padding-left:20px; margin:6px 0 0}
       <div class="check"><b>Как проверить</b>Импортировать NSP-фикстуру → ожидается вопрос с разбором совпадения (дата, сумма, счёт, похожий магазин) и одно списание после решения.</div>
     </div>
 
-    <div class="card bad">
-      <h4>Файлы пропадают из дерева проекта <span class="badge">🔴 главный риск</span></h4>
+    <div class="card ok">
+      <h4>Файлы пропадают из дерева проекта <span class="badge">✅ риск снят (Git)</span></h4>
       <ul>
-        <li>За текущую волну несколько раз терялись ключевые файлы: код UI, документы канона, а 25.07 обнаружилась потеря всего backend-кода в <span class="path">api/</span> (<span class="path">main.py</span>, парсер выписок, модули Валета, requirements).</li>
-        <li>API продолжал работать только потому, что запущен из образа, собранного 21.07: пересборка или пересоздание контейнера дали бы неработающий сервис.</li>
-        <li>Файлы восстановлены из работающего контейнера и проверены на компиляцию; ранее UI восстанавливали из архива review-pack, часть работы Фазы 1 делали заново.</li>
-        <li>Git всё ещё не инициализирован, единственная страховка — бэкапы в <span class="path">backup/</span> и дампы payload.</li>
+        <li>Было: пропадал UI и backend <span class="path">api/</span>; сервис жил на образе от 21.07.</li>
+        <li>25.07.2026: Git + GitHub. Код восстановлен и зафиксирован в <span class="path">aae4e1e</span>.</li>
+        <li>Дампы и секреты остаются локально (не в Git) — снимать дамп перед рискованными прогонами по-прежнему полезно.</li>
       </ul>
-      <div class="check"><b>Требуется</b>Поднять Git в приоритете, не дожидаясь конца волны. Условие безопасности: <span class="path">.env</span>, ключи Gemini, доступы Timeweb, дампы и реальные выписки в историю не попадают.</div>
     </div>
 
     <div class="card bad">
@@ -572,7 +582,7 @@ footer ul{padding-left:20px; margin:6px 0 0}
   <p class="sec-note">Согласовано 25.07.2026: стадия «закрепляем фундамент», не «добавляем фичи». Сначала страховка (Git), затем приёмка Gateway на реальных данных, только потом Фаза 2.</p>
   <ol class="steps">
     <li style="opacity:.55"><b>✅ Проверить v50 на смартфоне</b><span>Принято 25.07.2026: фонды и скролл модалки работают.</span></li>
-    <li><b>Git: init + первый стабильный commit</b><span>Проверить <span class="path">.gitignore</span> (исключить <span class="path">.env</span>, ключи Gemini, доступы Timeweb, дампы, персональные данные). Ближайшая техзадача: делаем ДО прогона Gateway на реальных данных, чтобы был откат.</span></li>
+    <li style="opacity:.55"><b>✅ Git: init + первый стабильный commit</b><span>25.07.2026 · <span class="path">aae4e1e</span> → <a href="https://github.com/makcbarabanov/wallet">github.com/makcbarabanov/wallet</a>. В истории нет <span class="path">.env</span>, дампов, выписок. <b>Внимание: репозиторий сейчас Public</b> — лучше сделать Private.</span></li>
     <li><b>Приёмка Gateway на реальном дубле NSP</b><span>Базовый расход уже в Ledger (21.07.26 14:59 · NSP · 10 511 ₽ · Т кредитка · Бады). Импорт той же операции → диалог дубля → путь «использовать существующую» → второго списания нет.</span></li>
     <li><b>Проверить v51: поле «Магазин»</b><span>Популярные / поиск / «Создать новый»; при импортной коррекции — появление aliases.</span></li>
     <li><b>Закрыть мелкие баги roadmap</b><span>Напр. <span class="path">/logs</span> 404 (nginx ищет <span class="path">logs.html</span>).</span></li>
