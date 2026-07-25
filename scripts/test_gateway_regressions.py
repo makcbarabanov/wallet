@@ -173,16 +173,42 @@ def live_payload_shape() -> dict:
 
 def assert_store_combobox(html: str) -> None:
     """Merchant Learning v1: searchable store field + prepared merchant structure."""
-    assert "function attachStoreCombobox(input" in html
-    assert "function storeMatchRank(item, query)" in html
+    assert "function smartMatchRank(item, query)" in html
     assert "function recordMerchantUsage(name)" in html
     assert "function learnMerchantAlias(canonName, rawName)" in html
     # New merchant fields are seeded on creation.
     assert "count: 0," in html and "aliases: []," in html
-    # Combobox is wired to the add-expense store field.
-    assert "attachStoreCombobox(document.getElementById('manExpStore'))" in html
     # Alias capture on import correction (raw bank name -> chosen canonical).
     assert "learnMerchantAlias(store, item.storeRaw)" in html
+
+
+def assert_smart_select(html: str) -> None:
+    """SmartSelect: one configurable component behind every reference field."""
+    assert "function attachSmartSelect(input, cfg = {})" in html
+    # The documented config contract.
+    for option in ("source", "searchFields", "displayField", "aliases",
+                   "popularity", "allowCreate", "onCreate", "onSelect"):
+        assert option in html, option
+    # Popularity is derived from the Ledger, so old data ranks correctly.
+    assert "function directoryUsage(field," in html
+    assert "function categorySmartItems(wallet)" in html
+    assert "function expenseSmartItems(category)" in html
+    assert "function bizSmartItems(field, fallback)" in html
+    # Long lists are capped instead of rendering thousands of rows.
+    assert "const SMART_MAX_ROWS" in html
+    # Reference fields are wired by config table, not by copied code.
+    wiring = html[html.index("Reference fields → SmartSelect"):html.index("manIncCancel')?.addEvent")]
+    assert "for (const form of ['manExp', 'editRow', 'modal', 'valetTeach'])" in wiring
+    for suffix in ("Store", "Category", "Expense", "Object", "Customer"):
+        assert f"byId('{suffix}')" in wiring, suffix
+    # Category is a SmartSelect input now, not a <select>, in every form.
+    for form in ("manExp", "editRow", "modal", "valetTeach"):
+        assert f'<select id="{form}Category">' not in html, form
+        assert f'<input id="{form}Category"' in html, form
+    # Creating a category from an expense form registers it in the directory.
+    assert "onCreate: (name) => ensureCategory(smartWalletOf(walletId), name)" in html
+    # Picking a row must behave like a manual edit for dependent fields.
+    assert "input.dispatchEvent(new Event('change', { bubbles: true }))" in html
 
 
 def assert_phase2_wallet_entry(html: str) -> None:
@@ -205,6 +231,7 @@ def main() -> None:
     assert_source_architecture(html)
     assert_allocation_repair(html)
     assert_store_combobox(html)
+    assert_smart_select(html)
     assert_phase2_wallet_entry(html)
 
     # Test 5: repair restores the lost fund and credit limit exactly once.
@@ -274,6 +301,7 @@ def main() -> None:
     print("- phase 1 repair restores lost fund/limit once, keeps deliberate deletions")
     print("- store combobox + merchant learning structure present and wired")
     print("- phase 2 personal/business expense entry uses createExpense")
+    print("- SmartSelect wired by config to store/category/expense/object/customer")
 
 
 if __name__ == "__main__":

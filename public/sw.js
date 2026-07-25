@@ -1,4 +1,4 @@
-const CACHE = 'wallet-shell-v52';
+const CACHE = 'wallet-shell-v53';
 const ASSETS = ['/manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {

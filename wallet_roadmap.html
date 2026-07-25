@@ -136,16 +136,16 @@ footer ul{padding-left:18px; margin:6px 0 0}
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
     <p class="sub">Короткий статус сверху. Нажми строку — откроются подробности. Новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>25 июля 2026</b> · UI_BUILD 52 · contextVersion 1</div>
+    <div class="updated">Обновлено: <b>25 июля 2026</b> · UI_BUILD 53 · contextVersion 1</div>
     <div class="stats">
-      <div class="stat"><div class="k">UI_BUILD</div><div class="v">52<small>Личный / Бизнес</small></div></div>
-      <div class="stat"><div class="k">schema</div><div class="v">11<small>sw v52</small></div></div>
+      <div class="stat"><div class="k">UI_BUILD</div><div class="v">53<small>SmartSelect</small></div></div>
+      <div class="stat"><div class="k">schema</div><div class="v">11<small>sw v53</small></div></div>
       <div class="stat"><div class="k">Фаза</div><div class="v" style="font-size:1rem">Фаза 2<small>стабилизация</small></div></div>
       <div class="stat"><div class="k">ИИ</div><div class="v" style="font-size:1rem">Training<small>Assistant позже</small></div></div>
     </div>
     <div class="focus">
       🔴 Сейчас главное — не добавлять новые функции, а стабилизировать текущую версию
-      <span>Принять v52 → мелкие баги → Настройки. Чеки, merchantId и Assistant — только после этого.</span>
+      <span>Принять v53 (SmartSelect) → мелкие баги → Настройки. Чеки, merchantId и Assistant — только после этого.</span>
     </div>
     <div class="legend">
       <span class="l-ok">✅ готово</span>
@@ -277,10 +277,10 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item wip" open>
+    <details class="item ok">
       <summary>
-        <span class="mark">🟡</span>
-        <span class="title">Добавление расходов из Личного / Бизнеса<small>ждёт приёмки · UI_BUILD 52</small></span>
+        <span class="mark">✅</span>
+        <span class="title">Добавление расходов из Личного / Бизнеса<small>принято 25.07.2026 · UI_BUILD 52</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
@@ -289,22 +289,40 @@ footer ul{padding-left:18px; margin:6px 0 0}
           <li>Та же модалка и <span class="path">createExpense()</span> — без отдельной логики.</li>
           <li>Для Бизнеса: Объект / Заказчик; кошельки не объединены.</li>
         </ul>
-        <div class="check"><b>Как проверить</b>Жёсткая перезагрузка → шапка v52 → Личный: добавить расход → запись в Личном; Бизнес: Объект/Заказчик видны → запись в Бизнесе; счёт списался один раз.</div>
       </div></div>
     </details>
 
-    <details class="item wip">
+    <details class="item wip" open>
       <summary>
         <span class="mark">🟡</span>
-        <span class="title">Универсальный SmartSelect для всех справочников<small>следующий шаг · UX</small></span>
+        <span class="title">Универсальный SmartSelect для всех справочников<small>ждёт приёмки · UI_BUILD 53</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
+        <span class="lbl">Цель</span>
         <ul>
-          <li>Сейчас combobox есть у «Магазин». Тот же паттерн — на категории, расходы, объект, заказчик и другие списки.</li>
-          <li>Один компонент поиска/выбора, без разрозненных dropdown.</li>
-          <li>Делаем после приёмки v52, в рамках стабилизации UX — не новая архитектура денег.</li>
+          <li>Пользователь не ищет элементы в длинных списках: одинаковое поведение у всех справочников.</li>
+          <li>Открытие поля — популярные сверху (по частоте использования); ввод — мгновенный поиск, без учёта регистра, по алиасам; нет значения — «Создать новый»; после выбора — учёт использования.</li>
         </ul>
+        <span class="lbl">Единый компонент</span>
+        <ul>
+          <li><span class="path">SmartSelect({ source, searchFields, displayField, aliases, popularity, allowCreate, onCreate, onSelect })</span> — новые справочники подключаются настройкой, а не копированием кода.</li>
+        </ul>
+        <span class="lbl">Переведённые поля (v53)</span>
+        <ul>
+          <li><b>Магазин</b> — эталон, поведение не изменилось; алиасы и кросс-алфавитный поиск на месте.</li>
+          <li><b>Категория</b> — был <span class="path">&lt;select&gt;</span>, стал поиск с подсказками во всех четырёх формах. Новую категорию можно создать прямо в форме: кошелёк текущий, цвет по умолчанию, через <span class="path">ensureCategory()</span>.</li>
+          <li><b>Расход / назначение</b> — фактические назначения внутри категории по частоте + пресеты.</li>
+          <li><b>Объект</b> и <b>Заказчик</b> — из бизнес-строк Ledger, по частоте.</li>
+          <li>Популярность считается по подтверждённым строкам Ledger, поэтому старые данные сразу ранжируются правильно и миграция не нужна.</li>
+          <li>Не переведены: категория и расход внутри карточек разбора (<span class="path">.as-cat</span>, <span class="path">.as-exp</span>) — короткие списки в перерисовываемых строках.</li>
+        </ul>
+        <span class="lbl">Границы</span>
+        <ul>
+          <li>SmartSelect отвечает только за UX выбора. <span class="path">createExpense()</span>, Gateway, Training mode, защита от дублей и структура Ledger не менялись.</li>
+        </ul>
+        <div class="check"><b>Как проверить</b>Жёсткая перезагрузка → шапка v53 → Магазин работает как раньше · Категория: «з» даёт Здоровье и Зоотовары, «зд» — только Здоровье · ввести новую категорию → «Создать категорию» → расход сохраняется · Бизнес: Объект/Заказчик подсказывают из истории · старые расходы открываются на редактирование без потери значений.</div>
+        <div class="check"><b>Сделано ещё</b>Раздел «UI Patterns → SmartSelect» в README (создан корневой README) · тест поведения <span class="path">scripts/test_smart_select.js</span> (поиск, популярность, алиасы, 20 000 строк) · структурные проверки в <span class="path">scripts/test_gateway_regressions.py</span>.</div>
       </div></div>
     </details>
 
@@ -400,8 +418,8 @@ footer ul{padding-left:18px; margin:6px 0 0}
   <p class="sec-note">Порядок стабилизации. Новые большие фичи — после приёмки текущей версии.</p>
   <ol class="steps">
     <li class="done"><b>✅ Фонды, Gateway, NSP, Магазин, Git</b><span>Принято 25.07.2026.</span></li>
-    <li><b>Принять v52: расход из Личный / Бизнес</b><span>Кнопки в разделах, Объект/Заказчик для бизнеса, один debit.</span></li>
-    <li><b>SmartSelect для справочников</b><span>Тот же searchable-паттерн, что у магазинов: категории, расходы, объект, заказчик.</span></li>
+    <li class="done"><b>✅ v52: расход из Личный / Бизнес</b><span>Принято 25.07.2026.</span></li>
+    <li><b>Принять v53: SmartSelect для справочников</b><span>Категория, расход, объект, заказчик — тот же паттерн, что у магазина.</span></li>
     <li><b>Вкладка «Настройки»</b><span>Training/Assistant (второй выключен), свободные деньги, фонды, лимиты.</span></li>
     <li><b>Починить /logs</b><span>Мелочь nginx.</span></li>
     <li class="done" style="opacity:.7"><b>Потом: чеки / merchantId / Assistant / Валет</b><span>Только после стабильной контрольной точки.</span></li>

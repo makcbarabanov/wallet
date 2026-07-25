@@ -1358,9 +1358,9 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Счёт списания</label>
     <select id="modalAccount"></select>
     <label>Категория</label>
-    <select id="modalCategory"></select>
+    <input id="modalCategory" placeholder="Начни вводить категорию" autocomplete="off"/>
     <label>Расход</label>
-    <input id="modalExpense" list="expenseList" placeholder="Например: Заруб, Хозтовары…"/>
+    <input id="modalExpense" placeholder="Например: Заруб, Хозтовары…" autocomplete="off"/>
     <datalist id="expenseList"></datalist>
     <label>Магазин</label>
     <input id="modalStore" placeholder="Как сохранить в таблице"/>
@@ -1370,11 +1370,9 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     </div>
     <div id="modalBusinessFields" hidden>
       <label>Объект</label>
-      <input id="modalObject" list="modalObjectList" placeholder="Гостевой 5×8"/>
-      <datalist id="modalObjectList"></datalist>
+      <input id="modalObject" placeholder="Гостевой 5×8" autocomplete="off"/>
       <label>Заказчик</label>
-      <input id="modalCustomer" list="modalCustomerList" placeholder="Феруз"/>
-      <datalist id="modalCustomerList"></datalist>
+      <input id="modalCustomer" placeholder="Феруз" autocomplete="off"/>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="modalCancel">Отмена</button>
@@ -1436,23 +1434,20 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Счёт списания</label>
     <select id="valetTeachAccount"></select>
     <label>Категория</label>
-    <select id="valetTeachCategory"></select>
+    <input id="valetTeachCategory" placeholder="Начни вводить категорию" autocomplete="off"/>
     <label>Расход</label>
-    <input id="valetTeachExpense" list="expenseList" placeholder="Например: Продукты"/>
+    <input id="valetTeachExpense" placeholder="Например: Продукты" autocomplete="off"/>
     <label>Магазин</label>
-    <input id="valetTeachStore" list="valetTeachStoreList" placeholder="Выбери или введи новый" autocomplete="off"/>
-    <datalist id="valetTeachStoreList"></datalist>
+    <input id="valetTeachStore" placeholder="Выбери или введи новый" autocomplete="off"/>
     <div id="valetTeachPersonalFields">
       <label>Комментарий</label>
       <textarea id="valetTeachNote" rows="2" placeholder="Необязательно"></textarea>
     </div>
     <div id="valetTeachBusinessFields" hidden>
       <label>Объект</label>
-      <input id="valetTeachObject" list="valetTeachObjectList" placeholder="Гостевой 5×8"/>
-      <datalist id="valetTeachObjectList"></datalist>
+      <input id="valetTeachObject" placeholder="Гостевой 5×8" autocomplete="off"/>
       <label>Заказчик</label>
-      <input id="valetTeachCustomer" list="valetTeachCustomerList" placeholder="Феруз"/>
-      <datalist id="valetTeachCustomerList"></datalist>
+      <input id="valetTeachCustomer" placeholder="Феруз" autocomplete="off"/>
     </div>
     <label class="vc-remember" for="valetTeachRemember">
       <input type="checkbox" id="valetTeachRemember" checked/>
@@ -1495,9 +1490,9 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Фонд <span class="hint">(необязательно)</span></label>
     <select id="manExpFund"></select>
     <label>Категория</label>
-    <select id="manExpCategory"></select>
+    <input id="manExpCategory" placeholder="Начни вводить категорию" autocomplete="off"/>
     <label>Расход</label>
-    <input id="manExpExpense" list="expenseList" placeholder="Например: Продукты"/>
+    <input id="manExpExpense" placeholder="Например: Продукты" autocomplete="off"/>
     <label>Магазин</label>
     <input id="manExpStore" placeholder="Где купили"/>
     <div id="manExpPersonalFields">
@@ -1506,11 +1501,9 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     </div>
     <div id="manExpBusinessFields" hidden>
       <label>Объект</label>
-      <input id="manExpObject" list="manExpObjectList" placeholder="Гостевой 5×8"/>
-      <datalist id="manExpObjectList"></datalist>
+      <input id="manExpObject" placeholder="Гостевой 5×8" autocomplete="off"/>
       <label>Заказчик</label>
-      <input id="manExpCustomer" list="manExpCustomerList" placeholder="Феруз"/>
-      <datalist id="manExpCustomerList"></datalist>
+      <input id="manExpCustomer" placeholder="Феруз" autocomplete="off"/>
     </div>
     <div class="modal-actions">
       <button type="button" class="btn btn-ghost" id="manExpCancel">Отмена</button>
@@ -1543,22 +1536,20 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Счёт</label>
     <select id="editRowAccount"></select>
     <label>Категория</label>
-    <select id="editRowCategory"></select>
+    <input id="editRowCategory" placeholder="Начни вводить категорию" autocomplete="off"/>
     <label>Расход</label>
-    <input id="editRowExpense" list="expenseList"/>
+    <input id="editRowExpense" autocomplete="off"/>
     <label>Магазин</label>
-    <input id="editRowStore"/>
+    <input id="editRowStore" autocomplete="off"/>
     <div id="editRowPersonalFields">
       <label>Комментарий</label>
       <textarea id="editRowNote" rows="2" placeholder="Необязательно"></textarea>
     </div>
     <div id="editRowBusinessFields" hidden>
       <label>Объект</label>
-      <input id="editRowObject" list="editRowObjectList" placeholder="Гостевой 5×8"/>
-      <datalist id="editRowObjectList"></datalist>
+      <input id="editRowObject" placeholder="Гостевой 5×8" autocomplete="off"/>
       <label>Заказчик</label>
-      <input id="editRowCustomer" list="editRowCustomerList" placeholder="Феруз"/>
-      <datalist id="editRowCustomerList"></datalist>
+      <input id="editRowCustomer" placeholder="Феруз" autocomplete="off"/>
     </div>
     <div class="modal-actions" style="flex-wrap:wrap">
       <button type="button" class="btn btn-ghost" id="editRowCancel">Отмена</button>
@@ -1595,7 +1586,7 @@ const LS_KEY = 'wallet_review_v3';
 /** Payload schema for migrations (accountant-safety layer = 4). */
 const SCHEMA_VERSION = 11;
 /** Visible UI build — bump +1 on every shipped UI change (badge next to «Разбор»). */
-const UI_BUILD = 52;
+const UI_BUILD = 53;
 /** Postgres is the source of truth; localStorage is a write-through cache. */
 const WALLET_USER = 'makc';
 const WALLET_API_STATE = `/api/v1/users/${WALLET_USER}/state`;
@@ -6374,9 +6365,25 @@ function storesByPopularity() {
   );
 }
 
-/* ===== Searchable store combobox (autocomplete + Merchant Learning v1) ===== */
-let _storeComboEl = null;
-const _storeComboState = { input: null, onPick: null, items: [], view: [], active: -1, dismiss: null };
+/* ===== SmartSelect — universal picker for reference data =====
+   One component for every directory field (store, category, expense, object,
+   customer). Config:
+     source       — array, or () => array, of items (objects or plain strings)
+     searchFields — extra fields (name or getter) to search in
+     displayField — field with the value that lands in the input (default 'name')
+     aliases      — field name or getter with search-only synonyms
+     popularity   — field name or getter with the usage count (higher = first)
+     allowCreate  — bool or () => bool: offer «Создать…» for unknown text
+     onCreate     — (value) => void, runs before the new value fills the input
+     onSelect     — (value, kind) => void, kind is 'item' | 'create'
+     createLabel  — wording of the create row, e.g. 'Создать категорию'
+   SmartSelect owns selection UX only: it never touches the Ledger, the expense
+   gateway or Training mode. Picking a row fires `change`, so field logic that
+   already listens to the input keeps working unchanged. */
+const SMART_MAX_ROWS = 60;      // cap rendered rows so huge directories stay fast
+const SMART_POPULAR_ROWS = 8;
+let _smartPopEl = null;
+const _smartState = { input: null, cfg: null, items: [], view: [], active: -1, dismiss: null };
 
 function normForSearch(value) {
   return String(value || '').toLowerCase().replace(/ё/g, 'е').trim();
@@ -6394,7 +6401,44 @@ function translitFold(value) {
   for (const ch of base) out += (ch in _TRANSLIT_MAP) ? _TRANSLIT_MAP[ch] : ch;
   return out;
 }
-/** Combobox rows: popularity (from ledger) + aliases (for search only). */
+function smartStrings(raw) {
+  const list = Array.isArray(raw) ? raw : [raw];
+  return list.map((v) => String(v == null ? '' : v).trim()).filter(Boolean);
+}
+function smartField(item, spec) {
+  if (typeof spec === 'function') return smartStrings(spec(item));
+  if (typeof spec === 'string') return smartStrings(item[spec]);
+  return [];
+}
+/** Normalize a config source into rows { value, count, targets }, popular first. */
+function smartItems(cfg) {
+  const raw = typeof cfg.source === 'function' ? cfg.source() : (cfg.source || []);
+  const displayField = cfg.displayField || 'name';
+  const rows = new Map();
+  for (const entry of raw || []) {
+    const item = entry && typeof entry === 'object' ? entry : { [displayField]: entry };
+    const value = smartField(item, displayField)[0] || '';
+    const key = normForSearch(value);
+    if (!value || rows.has(key)) continue;
+    const targets = new Set([value]);
+    for (const spec of [cfg.aliases, ...(cfg.searchFields || [])]) {
+      for (const extra of smartField(item, spec)) targets.add(extra);
+    }
+    let count = 0;
+    if (cfg.popularity) {
+      const used = typeof cfg.popularity === 'function' ? cfg.popularity(item) : item[cfg.popularity];
+      count = Number(used) || 0;
+    }
+    rows.set(key, { value, count, targets: [...targets] });
+  }
+  return [...rows.values()].sort(
+    (a, b) => b.count - a.count || a.value.localeCompare(b.value, 'ru')
+  );
+}
+function smartAllowCreate(cfg) {
+  return typeof cfg.allowCreate === 'function' ? !!cfg.allowCreate() : !!cfg.allowCreate;
+}
+/** Store rows: popularity (from ledger) + aliases (for search only). */
 function storeComboItems() {
   ensureLearnState();
   return storesByPopularity().map((r) => {
@@ -6403,12 +6447,12 @@ function storeComboItems() {
     return { name: r.name, count: r.count || 0, aliases: (m && Array.isArray(m.aliases)) ? m.aliases : [] };
   });
 }
-/** Match by prefix / word-start / substring across name + aliases; lower rank = better. */
-function storeMatchRank(item, query) {
+/** Match by prefix / word-start / substring across value + aliases; lower rank = better. */
+function smartMatchRank(item, query) {
   const q = translitFold(query);
   if (!q) return 3;
   let best = -1;
-  for (const target of [item.name, ...(item.aliases || [])]) {
+  for (const target of item.targets) {
     const n = translitFold(target);
     const idx = n.indexOf(q);
     if (idx === -1) continue;
@@ -6419,8 +6463,8 @@ function storeMatchRank(item, query) {
   }
   return best;
 }
-function ensureStoreComboEl() {
-  if (_storeComboEl) return _storeComboEl;
+function ensureSmartPopEl() {
+  if (_smartPopEl) return _smartPopEl;
   const el = document.createElement('div');
   el.className = 'combo-pop';
   el.setAttribute('role', 'listbox');
@@ -6428,68 +6472,74 @@ function ensureStoreComboEl() {
     const row = e.target.closest('[data-combo-idx]');
     if (!row) return;
     e.preventDefault(); // keep input focus so blur doesn't cancel the pick
-    pickStoreComboIndex(Number(row.dataset.comboIdx));
+    pickSmartIndex(Number(row.dataset.comboIdx));
   });
   document.body.appendChild(el);
-  _storeComboEl = el;
+  _smartPopEl = el;
   return el;
 }
-function storeComboRowHtml(name, count) {
-  const idx = _storeComboState.view.length;
-  _storeComboState.view.push({ type: 'item', name });
-  const badge = count > 0 ? `<span class="combo-count">${count}</span>` : '';
-  return `<div class="combo-item" role="option" data-combo-idx="${idx}"><span class="combo-name">${escapeHtml(name)}</span>${badge}</div>`;
+function smartRowHtml(item) {
+  const idx = _smartState.view.length;
+  _smartState.view.push({ type: 'item', value: item.value });
+  const badge = item.count > 0 ? `<span class="combo-count">${item.count}</span>` : '';
+  return `<div class="combo-item" role="option" data-combo-idx="${idx}"><span class="combo-name">${escapeHtml(item.value)}</span>${badge}</div>`;
 }
-function renderStoreCombo() {
-  const st = _storeComboState;
+function smartMoreHtml(rest) {
+  return `<div class="combo-group">…ещё ${rest} — уточните поиск</div>`;
+}
+function renderSmartSelect() {
+  const st = _smartState;
   if (!st.input) return;
+  const cfg = st.cfg || {};
   const query = (st.input.value || '').trim();
-  const el = ensureStoreComboEl();
+  const el = ensureSmartPopEl();
   st.view = [];
   st.active = -1;
   const parts = [];
   if (!query) {
-    const popular = st.items.filter((i) => i.count > 0).slice(0, 8);
-    const all = st.items.slice().sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+    const popular = st.items.filter((i) => i.count > 0).slice(0, SMART_POPULAR_ROWS);
+    const all = st.items.slice().sort((a, b) => a.value.localeCompare(b.value, 'ru'));
     if (popular.length) {
       parts.push('<div class="combo-group">Популярные</div>');
-      for (const it of popular) parts.push(storeComboRowHtml(it.name, it.count));
+      for (const it of popular) parts.push(smartRowHtml(it));
     }
     if (all.length) {
       parts.push('<div class="combo-group">Все</div>');
-      for (const it of all) parts.push(storeComboRowHtml(it.name, it.count));
+      for (const it of all.slice(0, SMART_MAX_ROWS)) parts.push(smartRowHtml(it));
+      if (all.length > SMART_MAX_ROWS) parts.push(smartMoreHtml(all.length - SMART_MAX_ROWS));
     }
   } else {
     const exact = st.items.some((i) =>
-      normForSearch(i.name) === normForSearch(query) ||
-      (i.aliases || []).some((a) => normForSearch(a) === normForSearch(query))
+      i.targets.some((t) => normForSearch(t) === normForSearch(query))
     );
-    if (!exact) {
+    if (!exact && smartAllowCreate(cfg)) {
       const idx = st.view.length;
-      st.view.push({ type: 'create', name: query });
-      parts.push(`<div class="combo-item combo-create" role="option" data-combo-idx="${idx}">Создать новый магазин: <b>${escapeHtml(query)}</b></div>`);
+      st.view.push({ type: 'create', value: query });
+      const label = cfg.createLabel || 'Создать новый';
+      parts.push(`<div class="combo-item combo-create" role="option" data-combo-idx="${idx}">${escapeHtml(label)}: <b>${escapeHtml(query)}</b></div>`);
     }
     const scored = [];
     for (const it of st.items) {
-      const rank = storeMatchRank(it, query);
+      const rank = smartMatchRank(it, query);
       if (rank >= 0) scored.push({ it, rank });
     }
     scored.sort((a, b) =>
-      a.rank - b.rank || b.it.count - a.it.count || a.it.name.localeCompare(b.it.name, 'ru')
+      a.rank - b.rank || b.it.count - a.it.count || a.it.value.localeCompare(b.it.value, 'ru')
     );
     if (scored.length) {
       parts.push('<div class="combo-group">Совпадения</div>');
-      for (const s of scored) parts.push(storeComboRowHtml(s.it.name, s.it.count));
+      for (const s of scored.slice(0, SMART_MAX_ROWS)) parts.push(smartRowHtml(s.it));
+      if (scored.length > SMART_MAX_ROWS) parts.push(smartMoreHtml(scored.length - SMART_MAX_ROWS));
     }
   }
-  if (!st.view.length) { closeStoreCombo(); return; }
+  if (!st.view.length) { closeSmartSelect(); return; }
   el.innerHTML = parts.join('');
-  positionStoreCombo();
+  positionSmartSelect();
   el.classList.add('show');
 }
-function positionStoreCombo() {
-  const st = _storeComboState;
-  const el = _storeComboEl;
+function positionSmartSelect() {
+  const st = _smartState;
+  const el = _smartPopEl;
   if (!el || !st.input) return;
   const r = st.input.getBoundingClientRect();
   el.style.width = r.width + 'px';
@@ -6505,113 +6555,148 @@ function positionStoreCombo() {
     el.style.maxHeight = Math.min(320, Math.max(spaceBelow - 8, 140)) + 'px';
   }
 }
-function moveStoreComboActive(delta) {
-  const st = _storeComboState;
+function moveSmartActive(delta) {
+  const st = _smartState;
   const n = st.view.length;
-  if (!n || !_storeComboEl) return;
+  if (!n || !_smartPopEl) return;
   st.active = (st.active + delta + n) % n;
-  _storeComboEl.querySelectorAll('[data-combo-idx]').forEach((row) => {
+  _smartPopEl.querySelectorAll('[data-combo-idx]').forEach((row) => {
     row.classList.toggle('active', Number(row.dataset.comboIdx) === st.active);
   });
-  const active = _storeComboEl.querySelector('[data-combo-idx].active');
+  const active = _smartPopEl.querySelector('[data-combo-idx].active');
   if (active) active.scrollIntoView({ block: 'nearest' });
 }
-function pickStoreComboIndex(i) {
-  const st = _storeComboState;
+function pickSmartIndex(i) {
+  const st = _smartState;
   const entry = st.view[i];
   if (!entry) return;
   const input = st.input;
-  const onPick = st.onPick;
-  if (entry.type === 'create') getMerchant(entry.name); // register new merchant in directory
-  if (input) input.value = entry.name;
-  closeStoreCombo();
-  if (typeof onPick === 'function') onPick(entry.name, entry.type);
+  const cfg = st.cfg || {};
+  if (entry.type === 'create' && typeof cfg.onCreate === 'function') cfg.onCreate(entry.value);
+  if (input) input.value = entry.value;
+  closeSmartSelect();
+  if (typeof cfg.onSelect === 'function') cfg.onSelect(entry.value, entry.type);
+  // Dependent fields listen to `change`, so a pick behaves like a manual edit.
+  if (input) input.dispatchEvent(new Event('change', { bubbles: true }));
 }
-function openStoreCombo(input, opts = {}) {
-  _storeComboState.input = input;
-  _storeComboState.onPick = opts.onPick || null;
-  _storeComboState.items = storeComboItems();
-  renderStoreCombo();
-  attachStoreComboDismiss();
+function openSmartSelect(input, cfg = {}) {
+  _smartState.input = input;
+  _smartState.cfg = cfg;
+  _smartState.items = smartItems(cfg);
+  renderSmartSelect();
+  attachSmartSelectDismiss();
 }
-function closeStoreCombo() {
-  if (_storeComboEl) _storeComboEl.classList.remove('show');
-  const d = _storeComboState.dismiss;
+function closeSmartSelect() {
+  if (_smartPopEl) _smartPopEl.classList.remove('show');
+  const d = _smartState.dismiss;
   if (d) {
     window.removeEventListener('scroll', d.reposition, true);
     window.removeEventListener('resize', d.reposition);
     document.removeEventListener('mousedown', d.outside, true);
-    _storeComboState.dismiss = null;
+    _smartState.dismiss = null;
   }
-  _storeComboState.input = null;
-  _storeComboState.view = [];
-  _storeComboState.active = -1;
+  _smartState.input = null;
+  _smartState.cfg = null;
+  _smartState.view = [];
+  _smartState.active = -1;
 }
-function attachStoreComboDismiss() {
-  if (_storeComboState.dismiss) return;
+function attachSmartSelectDismiss() {
+  if (_smartState.dismiss) return;
   const reposition = () => {
-    if (_storeComboEl && _storeComboEl.classList.contains('show')) positionStoreCombo();
+    if (_smartPopEl && _smartPopEl.classList.contains('show')) positionSmartSelect();
   };
   const outside = (e) => {
-    if (!_storeComboEl) return;
-    if (_storeComboEl.contains(e.target) || e.target === _storeComboState.input) return;
-    closeStoreCombo();
+    if (!_smartPopEl) return;
+    if (_smartPopEl.contains(e.target) || e.target === _smartState.input) return;
+    closeSmartSelect();
   };
   window.addEventListener('scroll', reposition, true);
   window.addEventListener('resize', reposition);
   document.addEventListener('mousedown', outside, true);
-  _storeComboState.dismiss = { reposition, outside };
+  _smartState.dismiss = { reposition, outside };
 }
-function onStoreComboKeydown(e) {
-  const st = _storeComboState;
+function onSmartSelectKeydown(e) {
+  const st = _smartState;
   if (st.input !== e.target) return;
-  const open = _storeComboEl && _storeComboEl.classList.contains('show');
+  const open = _smartPopEl && _smartPopEl.classList.contains('show');
   if (!open) {
-    if (e.key === 'ArrowDown') { openStoreCombo(e.target, { onPick: st.onPick }); e.preventDefault(); }
+    if (e.key === 'ArrowDown') { openSmartSelect(e.target, e.target._smartSelect || {}); e.preventDefault(); }
     return;
   }
-  if (e.key === 'ArrowDown') { moveStoreComboActive(1); e.preventDefault(); }
-  else if (e.key === 'ArrowUp') { moveStoreComboActive(-1); e.preventDefault(); }
+  if (e.key === 'ArrowDown') { moveSmartActive(1); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { moveSmartActive(-1); e.preventDefault(); }
   else if (e.key === 'Enter') {
-    if (st.active >= 0) { pickStoreComboIndex(st.active); e.preventDefault(); }
-    else if (st.view[0] && st.view[0].type === 'create') { pickStoreComboIndex(0); e.preventDefault(); }
-    else closeStoreCombo();
-  } else if (e.key === 'Escape') { closeStoreCombo(); }
+    if (st.active >= 0) { pickSmartIndex(st.active); e.preventDefault(); }
+    else if (st.view[0] && st.view[0].type === 'create') { pickSmartIndex(0); e.preventDefault(); }
+    else closeSmartSelect();
+  } else if (e.key === 'Escape') { closeSmartSelect(); }
 }
-/** Turn a plain store text input into a searchable dropdown with autocomplete. */
-function attachStoreCombobox(input, opts = {}) {
-  if (!input || input._storeCombo) return;
-  input._storeCombo = true;
+/** Turn a plain text input into a searchable directory dropdown. */
+function attachSmartSelect(input, cfg = {}) {
+  if (!input || input._smartSelect) return;
+  input._smartSelect = cfg;
   input.setAttribute('autocomplete', 'off');
-  input.addEventListener('focus', () => openStoreCombo(input, opts));
+  input.addEventListener('focus', () => openSmartSelect(input, cfg));
   input.addEventListener('input', () => {
-    if (_storeComboState.input === input) renderStoreCombo();
-    else openStoreCombo(input, opts);
+    if (_smartState.input === input) renderSmartSelect();
+    else openSmartSelect(input, cfg);
   });
-  input.addEventListener('keydown', onStoreComboKeydown);
+  input.addEventListener('keydown', onSmartSelectKeydown);
   input.addEventListener('blur', () => {
-    setTimeout(() => { if (_storeComboState.input === input) closeStoreCombo(); }, 120);
+    setTimeout(() => { if (_smartState.input === input) closeSmartSelect(); }, 120);
   });
 }
 
-function fillValetTeachStoreList(selected) {
-  const list = document.getElementById('valetTeachStoreList');
-  const input = document.getElementById('valetTeachStore');
-  if (!list || !input) return;
-  const prefer = String(selected || '').trim();
-  const rows = storesByPopularity();
-  const seen = new Set(rows.map((r) => storeKey(r.name)));
-  if (prefer && !seen.has(storeKey(prefer))) {
-    rows.unshift({ name: prefer, count: 0 });
+/* --- Directory sources: popularity comes from confirmed Ledger rows, so old
+       data ranks correctly and every saved expense updates the statistics. --- */
+/** Usage counts of a reference field, keyed by normalized value. */
+function directoryUsage(field, { rows, category } = {}) {
+  const source = rows || [...(state.personal || []), ...(state.business || [])];
+  const wanted = category ? normForSearch(category) : '';
+  const counts = new Map();
+  for (const r of source) {
+    if (wanted && normForSearch(r.category) !== wanted) continue;
+    const value = String(r[field] || '').trim();
+    if (!value) continue;
+    const key = normForSearch(value);
+    const prev = counts.get(key);
+    if (prev) prev.count += 1;
+    else counts.set(key, { name: value, count: 1 });
   }
-  list.innerHTML = rows
-    .slice(0, 400)
-    .map((r) => {
-      const label = r.count > 0 ? `${r.name} (${r.count})` : r.name;
-      return `<option value="${escapeAttr(r.name)}">${escapeHtml(label)}</option>`;
-    })
-    .join('');
-  input.value = prefer || (rows[0] && rows[0].name) || '';
+  return counts;
+}
+/** Categories of the wallet, most used first. */
+function categorySmartItems(wallet) {
+  const usage = directoryUsage('category');
+  return catsForWallet(wallet).map((c) => ({
+    name: c.name,
+    count: (usage.get(normForSearch(c.name)) || {}).count || 0,
+  }));
+}
+/** Expense purposes: what was really used in this category + its presets. */
+function expenseSmartItems(category) {
+  const items = [...directoryUsage('expense', { category }).values()]
+    .map((u) => ({ name: u.name, count: u.count }));
+  const seen = new Set(items.map((i) => normForSearch(i.name)));
+  const presets = (DATA.expensePresets && DATA.expensePresets[category])
+    || (category ? [category] : []);
+  for (const preset of presets) {
+    const name = String(preset || '').trim();
+    if (!name || seen.has(normForSearch(name))) continue;
+    seen.add(normForSearch(name));
+    items.push({ name, count: 0 });
+  }
+  return items;
+}
+/** Business object / customer from the business ledger, default kept available. */
+function bizSmartItems(field, fallback) {
+  const items = [...directoryUsage(field, { rows: state.business || [] }).values()]
+    .map((u) => ({ name: u.name, count: u.count }));
+  const def = String(fallback || '').trim();
+  if (def && !items.some((i) => normForSearch(i.name) === normForSearch(def))) {
+    items.push({ name: def, count: 0 });
+  }
+  return items;
 }
 
 function merchantAmbiguity(store) {
@@ -7285,17 +7370,7 @@ async function rejectTutorItem(item, card, { advance = true } = {}) {
 }
 
 function fillValetTeachCategories(wallet, selected) {
-  const cats = catsForWallet(wallet);
-  const sel = document.getElementById('valetTeachCategory');
-  if (!sel) return;
-  const prefer = selected && cats.some((c) => c.name === selected) ? selected : cats[0] && cats[0].name;
-  sel.innerHTML = cats
-    .map(
-      (c) =>
-        `<option value="${escapeAttr(c.name)}" ${c.name === prefer ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
-    )
-    .join('');
-  return prefer;
+  return setCategoryField('valetTeachCategory', wallet, selected);
 }
 
 function openValetTeachModal(item, cardEl) {
@@ -7324,7 +7399,6 @@ function openValetTeachModal(item, cardEl) {
   fillExpenseList(cat);
   const expEl = document.getElementById('valetTeachExpense');
   if (expEl) expEl.value = g.expense || ((DATA.expensePresets && DATA.expensePresets[cat]) || [])[0] || '';
-  fillValetTeachStoreList(item.storeRaw || storeName);
   const storeInput = document.getElementById('valetTeachStore');
   if (storeInput) storeInput.value = String(item.storeRaw || storeName || '').trim();
   const noteEl = document.getElementById('valetTeachNote');
@@ -8840,52 +8914,27 @@ function ensureCategory(wallet, name, color) {
     color: color || (w === 'business' ? '#64748B' : '#3B82F6'),
   });
 }
-function fillEditRowCategories(wallet, selected) {
-  ensureCategory(wallet, selected);
+/** Preselect a category in a SmartSelect field: keep the given one, else the first. */
+function setCategoryField(inputId, wallet, selected) {
+  const el = document.getElementById(inputId);
+  if (!el) return '';
   const cats = catsForWallet(wallet);
-  const sel = document.getElementById('editRowCategory');
-  if (!sel) return;
-  const prefer =
-    selected && cats.some((c) => c.name === selected)
-      ? selected
-      : (cats[0] && cats[0].name) || '';
-  sel.innerHTML = cats
-    .map(
-      (c) =>
-        `<option value="${escapeAttr(c.name)}" ${c.name === prefer ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
-    )
-    .join('');
-  if (prefer) sel.value = prefer;
+  const prefer = selected && cats.some((c) => c.name === selected)
+    ? selected
+    : (cats[0] && cats[0].name) || '';
+  el.value = prefer;
   return prefer;
 }
-function fillBizObjectCustomerLists(objListId, custListId, selectedObject, selectedCustomer) {
-  const objList = document.getElementById(objListId);
-  const custList = document.getElementById(custListId);
-  const objects = new Set();
-  const customers = new Set();
-  for (const r of state.business || []) {
-    if (r.object) objects.add(String(r.object).trim());
-    if (r.customer) customers.add(String(r.customer).trim());
-  }
-  objects.add('Гостевой 5×8');
-  customers.add('Феруз');
-  if (selectedObject) objects.add(selectedObject);
-  if (selectedCustomer) customers.add(selectedCustomer);
-  if (objList) {
-    objList.innerHTML = [...objects]
-      .filter(Boolean)
-      .map((v) => `<option value="${escapeAttr(v)}"></option>`)
-      .join('');
-  }
-  if (custList) {
-    custList.innerHTML = [...customers]
-      .filter(Boolean)
-      .map((v) => `<option value="${escapeAttr(v)}"></option>`)
-      .join('');
-  }
+function fillEditRowCategories(wallet, selected) {
+  ensureCategory(wallet, selected);
+  return setCategoryField('editRowCategory', wallet, selected);
 }
-function fillEditRowBizLists(selectedObject, selectedCustomer) {
-  fillBizObjectCustomerLists('editRowObjectList', 'editRowCustomerList', selectedObject, selectedCustomer);
+/** Business object/customer defaults; the value lists come from SmartSelect. */
+function fillBizDefaults(objId, custId) {
+  const objEl = document.getElementById(objId);
+  const custEl = document.getElementById(custId);
+  if (objEl && !objEl.value.trim()) objEl.value = 'Гостевой 5×8';
+  if (custEl && !custEl.value.trim()) custEl.value = 'Феруз';
 }
 function syncWalletSectionFields(wallet, { personalId, businessId }) {
   const isBiz = wallet === 'business';
@@ -8908,45 +8957,17 @@ function syncAssignModalWalletFields(wallet) {
     personalId: 'modalPersonalFields',
     businessId: 'modalBusinessFields',
   });
-  if (wallet === 'business') {
-    const objEl = document.getElementById('modalObject');
-    const custEl = document.getElementById('modalCustomer');
-    fillBizObjectCustomerLists(
-      'modalObjectList',
-      'modalCustomerList',
-      objEl?.value,
-      custEl?.value
-    );
-    if (objEl && !objEl.value.trim()) objEl.value = 'Гостевой 5×8';
-    if (custEl && !custEl.value.trim()) custEl.value = 'Феруз';
-  }
+  if (wallet === 'business') fillBizDefaults('modalObject', 'modalCustomer');
 }
 function syncValetTeachWalletFields(wallet) {
   syncWalletSectionFields(wallet, {
     personalId: 'valetTeachPersonalFields',
     businessId: 'valetTeachBusinessFields',
   });
-  if (wallet === 'business') {
-    const objEl = document.getElementById('valetTeachObject');
-    const custEl = document.getElementById('valetTeachCustomer');
-    fillBizObjectCustomerLists(
-      'valetTeachObjectList',
-      'valetTeachCustomerList',
-      objEl?.value,
-      custEl?.value
-    );
-    if (objEl && !objEl.value.trim()) objEl.value = 'Гостевой 5×8';
-    if (custEl && !custEl.value.trim()) custEl.value = 'Феруз';
-  }
+  if (wallet === 'business') fillBizDefaults('valetTeachObject', 'valetTeachCustomer');
 }
 function fillModalCategories(wallet, selected) {
-  const cats = catsForWallet(wallet);
-  const sel = document.getElementById('modalCategory');
-  const prefer = selected && cats.some(c => c.name === selected) ? selected : (cats[0] && cats[0].name);
-  sel.innerHTML = cats.map(c =>
-    `<option value="${escapeAttr(c.name)}" ${c.name === prefer ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
-  ).join('');
-  return prefer;
+  return setCategoryField('modalCategory', wallet, selected);
 }
 function openAssignModal({ mode, sec, g, cardEl, opId }) {
   const op = mode === 'op' ? g.ops.find(o => o.id === opId) : null;
@@ -9009,7 +9030,9 @@ document.getElementById('modalSave').addEventListener('click', async () => {
   const wallet = document.getElementById('modalWallet').value;
   const accountId = document.getElementById('modalAccount').value;
   if (!accountId) { toast('Выберите счёт списания'); return; }
-  const category = document.getElementById('modalCategory').value;
+  const category = document.getElementById('modalCategory').value.trim();
+  if (!category) { toast('Выберите категорию'); return; }
+  ensureCategory(wallet, category);
   const expense = document.getElementById('modalExpense').value.trim() || category;
   const store = document.getElementById('modalStore').value.trim() || (modalCtx.op ? modalCtx.op.store : modalCtx.g.name);
   const note = wallet === 'personal' ? document.getElementById('modalNote').value.trim() : '';
@@ -11580,32 +11603,14 @@ function todayDisplayDate() {
   return `${dd}.${mm}.${yy}`;
 }
 function fillManExpCategories(wallet, selected) {
-  const cats = catsForWallet(wallet);
-  const sel = document.getElementById('manExpCategory');
-  if (!sel) return;
-  const prefer = selected && cats.some(c => c.name === selected) ? selected : (cats[0] && cats[0].name);
-  sel.innerHTML = cats.map(c =>
-    `<option value="${escapeAttr(c.name)}" ${c.name === prefer ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
-  ).join('');
-  return prefer;
+  return setCategoryField('manExpCategory', wallet, selected);
 }
 function syncManExpWalletFields(wallet) {
   syncWalletSectionFields(wallet, {
     personalId: 'manExpPersonalFields',
     businessId: 'manExpBusinessFields',
   });
-  if (wallet === 'business') {
-    const objEl = document.getElementById('manExpObject');
-    const custEl = document.getElementById('manExpCustomer');
-    fillBizObjectCustomerLists(
-      'manExpObjectList',
-      'manExpCustomerList',
-      objEl?.value,
-      custEl?.value
-    );
-    if (objEl && !objEl.value.trim()) objEl.value = 'Гостевой 5×8';
-    if (custEl && !custEl.value.trim()) custEl.value = 'Феруз';
-  }
+  if (wallet === 'business') fillBizDefaults('manExpObject', 'manExpCustomer');
 }
 function openManualExpenseModal(opts = {}) {
   const wallet = opts.wallet === 'business' ? 'business' : 'personal';
@@ -11640,10 +11645,58 @@ document.getElementById('addPersonalExpenseBtn')?.addEventListener('click', () =
 document.getElementById('addBusinessExpenseBtn')?.addEventListener('click', () => openManualExpenseModal({ wallet: 'business' }));
 document.getElementById('manExpCancel')?.addEventListener('click', closeManualExpenseModal);
 bindModalBackdropClose('manualExpenseModal', closeManualExpenseModal);
-// Store field → searchable dropdown (autocomplete + Merchant Learning).
-attachStoreCombobox(document.getElementById('manExpStore'));
-attachStoreCombobox(document.getElementById('editRowStore'));
-attachStoreCombobox(document.getElementById('modalStore'));
+/* ===== Reference fields → SmartSelect =====
+   Every directory field is wired by config, not by copied code. A new directory
+   needs one more entry here plus a source function. */
+const SMART_STORE_CFG = {
+  source: storeComboItems,
+  displayField: 'name',
+  searchFields: ['name'],
+  aliases: 'aliases',
+  popularity: 'count',
+  allowCreate: true,
+  createLabel: 'Создать новый магазин',
+  onCreate: (name) => { getMerchant(name); }, // register in the merchant directory
+};
+function smartWalletOf(walletId) {
+  return document.getElementById(walletId)?.value === 'business' ? 'business' : 'personal';
+}
+function smartCategoryCfg(walletId) {
+  return {
+    source: () => categorySmartItems(smartWalletOf(walletId)),
+    displayField: 'name',
+    popularity: 'count',
+    allowCreate: true,
+    createLabel: 'Создать категорию',
+    onCreate: (name) => ensureCategory(smartWalletOf(walletId), name),
+  };
+}
+function smartExpenseCfg(categoryId) {
+  return {
+    source: () => expenseSmartItems(document.getElementById(categoryId)?.value || ''),
+    displayField: 'name',
+    popularity: 'count',
+    allowCreate: true,
+    createLabel: 'Создать расход',
+  };
+}
+function smartBizCfg(field, fallback, label) {
+  return {
+    source: () => bizSmartItems(field, fallback),
+    displayField: 'name',
+    popularity: 'count',
+    allowCreate: true,
+    createLabel: label,
+  };
+}
+for (const form of ['manExp', 'editRow', 'modal', 'valetTeach']) {
+  const byId = (suffix) => document.getElementById(form + suffix);
+  attachSmartSelect(byId('Store'), SMART_STORE_CFG);
+  attachSmartSelect(byId('Category'), smartCategoryCfg(form + 'Wallet'));
+  attachSmartSelect(byId('Expense'), smartExpenseCfg(form + 'Category'));
+  attachSmartSelect(byId('Object'), smartBizCfg('object', 'Гостевой 5×8', 'Создать объект'));
+  attachSmartSelect(byId('Customer'), smartBizCfg('customer', 'Феруз', 'Создать заказчика'));
+}
 document.getElementById('manIncCancel')?.addEventListener('click', closeManualIncomeModal);
 bindModalBackdropClose('manualIncomeModal', closeManualIncomeModal);
 document.getElementById('manIncSave')?.addEventListener('click', () => {
@@ -11690,8 +11743,9 @@ document.getElementById('manExpSave')?.addEventListener('click', async () => {
   if (!accountId) { toast('Выберите счёт списания'); return; }
   const amount = Number(document.getElementById('manExpAmount')?.value);
   if (!(amount > 0)) { toast('Укажите сумму'); return; }
-  const category = document.getElementById('manExpCategory')?.value || '';
+  const category = (document.getElementById('manExpCategory')?.value || '').trim();
   if (!category) { toast('Выберите категорию'); return; }
+  ensureCategory(wallet, category);
   const expense = (document.getElementById('manExpExpense')?.value || '').trim() || category;
   const store = (document.getElementById('manExpStore')?.value || '').trim() || expense;
   const note = wallet === 'personal'
@@ -11772,7 +11826,6 @@ function openEditRow(wallet, opId) {
   const noteEl = document.getElementById('editRowNote');
   if (noteEl) noteEl.value = row.note || row.comment || '';
   if (wallet === 'business') {
-    fillEditRowBizLists(row.object, row.customer);
     const objEl = document.getElementById('editRowObject');
     const custEl = document.getElementById('editRowCustomer');
     if (objEl) objEl.value = row.object || 'Гостевой 5×8';
@@ -11794,12 +11847,7 @@ document.getElementById('editRowWallet')?.addEventListener('change', (e) => {
   const prevCat = document.getElementById('editRowCategory')?.value || '';
   const cat = fillEditRowCategories(wallet, prevCat);
   fillExpenseList(cat);
-  if (wallet === 'business') {
-    fillEditRowBizLists(
-      document.getElementById('editRowObject')?.value,
-      document.getElementById('editRowCustomer')?.value
-    );
-  }
+  if (wallet === 'business') fillBizDefaults('editRowObject', 'editRowCustomer');
 });
 document.getElementById('editRowCategory')?.addEventListener('change', (e) => {
   fillExpenseList(e.target.value);
@@ -11813,7 +11861,7 @@ document.getElementById('editRowSave')?.addEventListener('click', () => {
   const row = list[idx];
   const newWallet = document.getElementById('editRowWallet').value || 'personal';
   const accountId = document.getElementById('editRowAccount').value;
-  const category = document.getElementById('editRowCategory').value;
+  const category = document.getElementById('editRowCategory').value.trim();
   const expense = document.getElementById('editRowExpense').value.trim() || category;
   const store = document.getElementById('editRowStore').value.trim() || row.store;
   const note = (document.getElementById('editRowNote')?.value || '').trim();
@@ -12038,8 +12086,9 @@ document.getElementById('valetTeachSave')?.addEventListener('click', async () =>
   const wallet = document.getElementById('valetTeachWallet')?.value || 'personal';
   const accountId = document.getElementById('valetTeachAccount')?.value || '';
   if (!accountId) { toast('Выберите счёт'); return; }
-  const category = document.getElementById('valetTeachCategory')?.value || '';
+  const category = (document.getElementById('valetTeachCategory')?.value || '').trim();
   if (!category) { toast('Выберите категорию'); return; }
+  ensureCategory(wallet, category);
   const expense = (document.getElementById('valetTeachExpense')?.value || '').trim() || category;
   const store = (document.getElementById('valetTeachStore')?.value || '').trim();
   if (!store) { toast('Укажи магазин'); return; }

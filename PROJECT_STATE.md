@@ -10,7 +10,7 @@
 
 **Контракт JSON:** `contextVersion`, `updatedAt`, `version`, `architectureRules[]` (жёсткие AD), `accepted` / `inProgress` / `nextActions`, `doNotDoNow`. Обновлять одновременно с этим файлом. Не копия roadmap — официальный машинный контекст.
 
-**Снимок:** 2026-07-25 · UI_BUILD **52** / schema 11 · contextVersion **1**. Roadmap — компактный аккордеон. **Фокус: стабилизация, не новые фичи.** Ждёт приёмки: расход из Личный/Бизнес. Следом: SmartSelect справочников → Настройки.
+**Снимок:** 2026-07-25 · UI_BUILD **53** / schema 11 · contextVersion **1**. Roadmap — компактный аккордеон. **Фокус: стабилизация, не новые фичи.** Ждёт приёмки: SmartSelect на справочниках (категория, расход, объект, заказчик). Следом: Настройки → мелкий баг `/logs`.
 
 ---
 
@@ -18,8 +18,9 @@
 
 | Файл | Статус |
 |------|--------|
-| `review_categorization.html` / `public/index.html` | UI_BUILD **52** · schema **11** · идентичны |
-| `public/sw.js` | `wallet-shell-v52` |
+| `review_categorization.html` / `public/index.html` | UI_BUILD **53** · schema **11** · идентичны |
+| `public/sw.js` | `wallet-shell-v53` |
+| `README.md` | создан: запуск, тесты, карта документации, раздел «UI Patterns → SmartSelect» |
 | `api/` | восстановлен из контейнера 2026-07-25 (`main.py`, `statement_parse.py`, `critical_alerts.py`, `valet_*.py`, `requirements.txt`) |
 | дамп-страховка | `data/dumps/makc/250726/` · revision 269 · reason `pre_repair_wave` |
 | `WALLET_GATEWAY_DESIGN.md` | основа реализации — подтверждена |
@@ -46,6 +47,7 @@
 - NSP fixture: `data/fixtures/tbank/05_nsp_duplicate_candidate.csv`.
 - Store combobox (v51): поле «Магазин» — searchable dropdown (популярные + алфавит, поиск по началу/части слова, кросс-алфавит translit, «Создать новый»). Подключено к `manExpStore` / `editRowStore` / `modalStore`.
 - Merchant Learning (структура, v51): `count` / `lastUsed` / `aliases[]` на merchant; `recordMerchantUsage` в `recordOutcome`; `learnMerchantAlias` при импортной коррекции. Дедуп пока не меняется (алиасы — только поиск/подсказка).
+- SmartSelect (v53): комбобокс магазина выделен в универсальный `attachSmartSelect(input, cfg)` с настройками `source / searchFields / displayField / aliases / popularity / allowCreate / onCreate / onSelect`. Подключены Магазин, Категория, Расход, Объект, Заказчик во всех четырёх формах (`manExp*`, `editRow*`, `modal*`, `valetTeach*`). Категория была `<select>` → стала поиск с подсказками; создание новой идёт через `ensureCategory()`. Популярность считается по строкам Ledger (`directoryUsage`), поэтому старые данные ранжируются без миграции. Выбор строки шлёт `change`, зависимая логика форм не тронута. Не переведены `.as-cat` / `.as-exp` в карточках разбора.
 
 ---
 
@@ -53,6 +55,7 @@
 
 - Миграция Фазы 1: повторный запуск не меняет payload; нет дублей funds/creditLimits; legacy сохранён; personal/business не изменены.
 - `scripts/test_gateway_regressions.py`: PASS.
+- `scripts/test_smart_select.js`: PASS (поиск, популярность из Ledger, алиасы и кросс-алфавит, 20 000 строк — сборка и поиск ~0,4 с). Запуск: `docker run --rm -v "$PWD":/w -w /w node:20-alpine node scripts/test_smart_select.js` (node на хосте не установлен).
 - JavaScript parse (tree-sitter) для source/public: 0 ошибок.
 - IDE lints: 0.
 
@@ -64,12 +67,12 @@
 - Модалка добавления расхода: **принято 25.07.2026 (v50)** — пользователь подтвердил на смартфоне.
 - Фонды: **принято 25.07.2026 (v50)** — «Тест», «Бизнес» 675 000, лимит 150 000 на смартфоне.
 - Поле «Магазин»: **принято 25.07.2026 (v51)**.
+- Расход из Личного / Бизнеса: **принято 25.07.2026 (v52)**.
 - Yandex AI Studio: в локальном `.env` подготовлены `YANDEX_AI_STUDIO_API_KEY` / `FOLDER_ID` / `BASE_URL` / `MODEL` (учебный ключ; в Git не коммитится). Подключение в код API — ещё план.
 - `/logs`: nginx ищет `logs.html`, страница лежит как `public/logs/index.html` → 404.
 
 ## Следующий шаг
 
-1. **Стабилизация:** приёмка v52 (расход из Личный / Бизнес).
-2. Универсальный SmartSelect для справочников (как у магазинов).
-3. Вкладка «Настройки» (Assistant выключен).
-4. Мелкий баг `/logs`.
+1. **Стабилизация:** приёмка v53 (SmartSelect на категории, расходе, объекте, заказчике).
+2. Вкладка «Настройки» (Assistant выключен).
+3. Мелкий баг `/logs`.

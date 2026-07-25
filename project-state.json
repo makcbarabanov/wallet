@@ -5,9 +5,9 @@
   "role": "official_machine_context",
   "description": "Canonical machine context for Arden and other AI tools. Not a visual roadmap copy: short contract of version, hard architecture rules, accepted work, and next actions.",
   "version": {
-    "uiBuild": 52,
+    "uiBuild": 53,
     "schemaVersion": 11,
-    "serviceWorkerCache": "wallet-shell-v52",
+    "serviceWorkerCache": "wallet-shell-v53",
     "activePhase": "Phase 2",
     "aiMode": "training"
   },
@@ -47,12 +47,15 @@
   ],
   "currentFocus": {
     "status": "acceptance_required",
-    "item": "Expense entry from Personal and Business",
-    "build": 52,
+    "item": "SmartSelect on all reference fields",
+    "build": 53,
     "acceptance": [
-      "Personal: Add expense creates one personal ledger row through createExpense()",
-      "Business: Add expense shows Object and Customer and creates one business ledger row",
-      "The selected account is debited exactly once"
+      "Store behaves exactly as before, aliases and cross-alphabet search intact",
+      "Category searches and suggests while typing, list depends on the wallet",
+      "A new category, expense purpose, object or customer can be created from the form",
+      "Popularity follows real usage from the Ledger",
+      "Long directories stay responsive",
+      "Old expenses open for editing without losing values"
     ]
   },
   "accepted": [
@@ -83,18 +86,31 @@
       "item": "Git checkpoint",
       "status": "accepted",
       "date": "2026-07-25"
+    },
+    {
+      "item": "Expense entry from Personal and Business",
+      "status": "accepted",
+      "date": "2026-07-25",
+      "build": 52,
+      "refs": ["AD-005", "AD-009"]
     }
   ],
   "inProgress": [
     {
-      "item": "Expense entry from Personal and Business",
-      "status": "implemented_waiting_acceptance",
-      "build": 52
-    },
-    {
       "item": "Universal SmartSelect for directories",
-      "status": "planned_next",
-      "note": "Reuse store combobox pattern for category, expense, object, customer"
+      "status": "implemented_waiting_acceptance",
+      "build": 53,
+      "note": "attachSmartSelect(input, {source, searchFields, displayField, aliases, popularity, allowCreate, onCreate, onSelect}); UX only, createExpense, Gateway, Training mode, duplicate protection and Ledger untouched. Picking a row dispatches `change`, so existing field logic keeps working.",
+      "fields": [
+        "store (reference implementation, behaviour unchanged)",
+        "category (was <select> in manExp/modal/editRow/valetTeach, now searchable; create goes through ensureCategory)",
+        "expense purpose (usage inside the category plus presets)",
+        "business object and customer (from business ledger rows)"
+      ],
+      "popularitySource": "confirmed Ledger rows via directoryUsage(), so old data ranks correctly and no migration is needed",
+      "notConverted": ".as-cat and .as-exp inside proposal cards (short lists in re-rendered rows)",
+      "docs": "README section UI Patterns -> SmartSelect",
+      "tests": ["scripts/test_smart_select.js", "scripts/test_gateway_regressions.py"]
     },
     {
       "item": "Settings tab",
@@ -108,7 +124,7 @@
     }
   ],
   "doNotDoNow": [
-    "new major features before v52 acceptance",
+    "new major features before v53 acceptance",
     "fund movement history",
     "mandatory fund assignment",
     "Assistant mode",
@@ -117,8 +133,7 @@
     "separate bridge project beyond this JSON"
   ],
   "nextActions": [
-    "Stabilize current version: accept UI_BUILD 52 on Personal and Business",
-    "Universal SmartSelect for directories (same pattern as store combobox)",
+    "Stabilize current version: accept UI_BUILD 53 (SmartSelect on category, expense, object, customer)",
     "Implement the Settings tab with Assistant disabled",
     "Fix the /logs route",
     "Create the next stable release checkpoint",
