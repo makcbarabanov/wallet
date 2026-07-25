@@ -546,13 +546,13 @@ footer ul{padding-left:20px; margin:6px 0 0}
       <div class="check"><b>Осталось</b>Сделать репозиторий <b>Private</b> (сейчас Public). Дальше — обычные commit/push после волн.</div>
     </div>
 
-    <div class="card bad">
-      <h4>Дубли: NSP снова появляется в Разборе <span class="badge">🔴 проверить</span></h4>
+    <div class="card ok">
+      <h4>Дубли: NSP на реальном потоке <span class="badge">✅ принято</span></h4>
       <ul>
-        <li>Матчер Strong и диалог подтверждения реализованы, автотест проходит, но на реальном импорте это ещё не проверено.</li>
-        <li>Важно: появление строки в Разборе теперь нормально — в Training туда попадают все строки. Ошибкой считается второй расход и второе списание счёта.</li>
+        <li>25.07.2026: импорт «Сервисный центр НСП» при существующем NSP 10 511 ₽ → пользователь выбрал связать с существующим.</li>
+        <li>В payload: один расход <span class="path">NSP</span> · 10 511; sourceOp <span class="path">duplicateResolution = linked_existing</span>; <span class="path">proposalLog</span> записан.</li>
+        <li>Второго списания со счёта нет (rev 282).</li>
       </ul>
-      <div class="check"><b>Как проверить</b>Импортировать NSP-фикстуру → ожидается вопрос с разбором совпадения (дата, сумма, счёт, похожий магазин) и одно списание после решения.</div>
     </div>
 
     <div class="card ok">
