@@ -5,7 +5,7 @@
 **Карта развития (визуальная):** [wallet_roadmap.html](./wallet_roadmap.html) · онлайн: <https://wallet.islanddream.ru/roadmap>
 (деплой-копия — `public/roadmap/index.html`; при правке roadmap обновлять обе).
 
-**Снимок:** 2026-07-25 · UI_BUILD 51 / schema 11. **Git ✅** (`aae4e1e` → [github.com/makcbarabanov/wallet](https://github.com/makcbarabanov/wallet)). Приёмка v50 ✅. Следующее: приёмка Gateway (NSP на реальных данных).
+**Снимок:** 2026-07-25 · UI_BUILD 51 / schema 11. **Git ✅**. **Приёмка Gateway NSP ✅** (`linked_existing`, один расход 10 511, без второго списания, rev 282). Следующее: Private на GitHub → проверка v51 (Магазин) → Фаза 2.
 
 **Репозиторий:** remote `origin` = `git@github.com:makcbarabanov/wallet.git`. Сейчас на GitHub **Public** — рекомендуется Private.
 
@@ -60,7 +60,7 @@
 - Модалка добавления расхода: **принято 25.07.2026 (v50)** — пользователь подтвердил на смартфоне.
 - Фонды: **принято 25.07.2026 (v50)** — «Тест», «Бизнес» 675 000, лимит 150 000 на смартфоне.
 - Поле «Магазин»: **улучшено в v51** (combobox) — ждёт проверки на смартфоне.
-- NSP: матчер и диалог есть, автотест PASS, но приёмка на реальном импорте не пройдена.
+- NSP: **принято 25.07.2026** на реальном потоке — `duplicateResolution=linked_existing`, в Ledger один NSP 10 511 ₽.
 - `/logs`: nginx ищет `logs.html`, страница лежит как `public/logs/index.html` → 404.
 
 ## Следующий шаг

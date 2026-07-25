@@ -583,8 +583,8 @@ footer ul{padding-left:20px; margin:6px 0 0}
   <ol class="steps">
     <li style="opacity:.55"><b>✅ Проверить v50 на смартфоне</b><span>Принято 25.07.2026: фонды и скролл модалки работают.</span></li>
     <li style="opacity:.55"><b>✅ Git: init + первый стабильный commit</b><span>25.07.2026 · <span class="path">aae4e1e</span> → <a href="https://github.com/makcbarabanov/wallet">github.com/makcbarabanov/wallet</a>. В истории нет <span class="path">.env</span>, дампов, выписок. <b>Внимание: репозиторий сейчас Public</b> — лучше сделать Private.</span></li>
-    <li><b>Приёмка Gateway на реальном дубле NSP</b><span>Базовый расход уже в Ledger (21.07.26 14:59 · NSP · 10 511 ₽ · Т кредитка · Бады). Импорт той же операции → диалог дубля → путь «использовать существующую» → второго списания нет.</span></li>
-    <li><b>Проверить v51: поле «Магазин»</b><span>Популярные / поиск / «Создать новый»; при импортной коррекции — появление aliases.</span></li>
+    <li style="opacity:.55"><b>✅ Приёмка Gateway на реальном дубле NSP</b><span>25.07.2026: «Верно» → диалог → <span class="path">linked_existing</span>. В Ledger один NSP 10 511 ₽; второго списания нет (rev 282).</span></li>
+    <li><b>Проверить v51: поле «Магазин»</b><span>Популярные / поиск / «Создать новый»; при импортной коррекции — появление aliases. Сейчас в UI ещё может светиться v50 — жёсткая перезагрузка.</span></li>
     <li><b>Закрыть мелкие баги roadmap</b><span>Напр. <span class="path">/logs</span> 404 (nginx ищет <span class="path">logs.html</span>).</span></li>
     <li><b>Фаза 2 · Добавить расход из Личный / Бизнес</b><span>Кнопка в каждом разделе через <span class="path">createExpense()</span>. Для «Бизнес» — добавить поля Объект/Заказчик в модалку (сейчас их там нет). Кошельки не объединять.</span></li>
     <li><b>Фаза 2 · Вкладка «Настройки»</b><span>Режим ИИ (Assistant выключен), правила свободных денег, управление фондами и лимитами.</span></li>
