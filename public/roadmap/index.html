@@ -155,7 +155,7 @@ footer ul{padding-left:20px; margin:6px 0 0}
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
     <p class="sub">Живая карта развития: что сделано, что тестировать, что в планах. Только отражение текущего состояния — новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>25 июля 2026</b> · NSP ✅ · Git ✅ · Yandex AI Studio keys в .env</div>
+    <div class="updated">Обновлено: <b>25 июля 2026</b> · UI_BUILD 52 · расход из Личный/Бизнес</div>
   </div>
 </header>
 
@@ -176,7 +176,7 @@ footer ul{padding-left:20px; margin:6px 0 0}
 <section>
   <h2 id="v"><span class="n">1</span> Текущая версия</h2>
   <div class="stats">
-    <div class="stat"><div class="k">UI_BUILD</div><div class="v">51<small>поиск магазина + Merchant Learning</small></div></div>
+    <div class="stat"><div class="k">UI_BUILD</div><div class="v">52<small>расход из Личный/Бизнес</small></div></div>
     <div class="stat"><div class="k">schemaVersion</div><div class="v">11<small>backup schema 9 сохранён</small></div></div>
     <div class="stat"><div class="k">Активная фаза</div><div class="v" style="font-size:1.05rem">Фаза 1 + Gateway<small>код готов, идёт приёмка UI</small></div></div>
     <div class="stat"><div class="k">Режим ИИ</div><div class="v" style="font-size:1.05rem">Training<small>Assistant не реализуется</small></div></div>
@@ -188,7 +188,7 @@ footer ul{padding-left:20px; margin:6px 0 0}
     <span class="l-bad">красный — проблема</span>
   </div>
   <p class="sec-note" style="margin-top:12px">
-    Service worker: <span class="path">wallet-shell-v51</span> · миграции хранятся в payload (<span class="path">_migrations</span>) ·
+    Service worker: <span class="path">wallet-shell-v52</span> · миграции хранятся в payload (<span class="path">_migrations</span>) ·
     режим ИИ жёстко нормализуется к <span class="path">settings.aiMode = 'training'</span>: любое создание расхода требует подтверждения.
   </p>
 </section>
@@ -405,12 +405,14 @@ footer ul{padding-left:20px; margin:6px 0 0}
   <h3 class="wave">Фаза 2 · UI и UX</h3>
   <div class="grid two">
     <div class="card plan">
-      <h4>Добавление расхода из Личный / Бизнес <span class="badge">📋 план</span></h4>
+      <h4>Добавление расхода из Личный / Бизнес <span class="badge">🔄 в v52, проверить</span></h4>
       <ul>
-        <li>Кнопка «Добавить расход» прямо в кошельке, без захода в Разбор.</li>
-        <li>Обязательно через <span class="path">createExpense()</span>: проверка дублей и подтверждение сохраняются.</li>
-        <li>Кошельки не объединять: разные таблицы (<span class="path">personal</span> / <span class="path">business</span>) и поля. Для «Бизнес» добавить в модалку Объект/Заказчик (сейчас их нет).</li>
+        <li>Кнопки «Добавить расход» в разделах Личный и Бизнес.</li>
+        <li>Та же модалка и <span class="path">createExpense()</span> — дедуп, sourceOperation, обучение сохраняются.</li>
+        <li>Кошельки не объединены: при Бизнес показываются Объект/Заказчик; при Личный — комментарий.</li>
+        <li>Из Разбора кнопка по-прежнему открывает ту же форму (кошелёк по умолчанию Личный).</li>
       </ul>
+      <div class="check"><b>Как проверить</b>Личный → Добавить расход → сохранить; Бизнес → Добавить расход → Объект/Заказчик видны → сохранить. Запись появляется в нужном разделе, счёт списывается один раз.</div>
     </div>
     <div class="card plan">
       <h4>Улучшение UX ввода <span class="badge">📋 план</span></h4>
@@ -606,9 +608,10 @@ footer ul{padding-left:20px; margin:6px 0 0}
     <li style="opacity:.55"><b>✅ Проверить v50 на смартфоне</b><span>Принято 25.07.2026: фонды и скролл модалки работают.</span></li>
     <li style="opacity:.55"><b>✅ Git: init + первый стабильный commit</b><span>25.07.2026 · <span class="path">aae4e1e</span> → <a href="https://github.com/makcbarabanov/wallet">github.com/makcbarabanov/wallet</a>. В истории нет <span class="path">.env</span>, дампов, выписок. <b>Внимание: репозиторий сейчас Public</b> — лучше сделать Private.</span></li>
     <li style="opacity:.55"><b>✅ Приёмка Gateway на реальном дубле NSP</b><span>25.07.2026: «Верно» → диалог → <span class="path">linked_existing</span>. В Ledger один NSP 10 511 ₽; второго списания нет (rev 282).</span></li>
-    <li><b>Проверить v51: поле «Магазин»</b><span>Популярные / поиск / «Создать новый»; при импортной коррекции — появление aliases. Сейчас в UI ещё может светиться v50 — жёсткая перезагрузка.</span></li>
+    <li style="opacity:.55"><b>✅ Проверить v51: поле «Магазин»</b><span>Пользователь подтвердил 25.07.2026.</span></li>
+    <li style="opacity:.55"><b>⏭ Репозиторий Private</b><span>Отклонено пользователем 25.07.2026 — оставляем Public.</span></li>
+    <li><b>Проверить v52: расход из Личный / Бизнес</b><span>Кнопки в разделах, бизнес-поля Объект/Заказчик, путь через <span class="path">createExpense()</span>.</span></li>
     <li><b>Закрыть мелкие баги roadmap</b><span>Напр. <span class="path">/logs</span> 404 (nginx ищет <span class="path">logs.html</span>).</span></li>
-    <li><b>Фаза 2 · Добавить расход из Личный / Бизнес</b><span>Кнопка в каждом разделе через <span class="path">createExpense()</span>. Для «Бизнес» — добавить поля Объект/Заказчик в модалку (сейчас их там нет). Кошельки не объединять.</span></li>
     <li><b>Фаза 2 · Вкладка «Настройки»</b><span>Режим ИИ (Assistant выключен), правила свободных денег, управление фондами и лимитами.</span></li>
     <li><b>Контрольная точка / первый релиз</b><span>Тег версии, фиксация <span class="path">schemaVersion</span>, README по запуску.</span></li>
     <li style="opacity:.7"><b>Потом: Чеки как источник</b><span>Фото → LLM извлекает структуру → предложение расхода → подтверждение → через Gateway. Чек = ещё один <span class="path">sourceOperation</span>, без парсера под каждый магазин.</span></li>

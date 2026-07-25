@@ -1001,6 +1001,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
         <button type="button" data-personal-view="pivot">сводная</button>
         <button type="button" data-personal-view="plan">план</button>
       </div>
+      <button type="button" class="btn btn-ok" id="addPersonalExpenseBtn">Добавить расход</button>
     </div>
     <p class="sub" id="personalSub">Подтверждённые расходы личного кошелька · клик по заголовку колонки — фильтр</p>
     <div class="panel" id="personalPanel">
@@ -1040,7 +1041,10 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     </div>
   </section>
   <section class="view" id="view-business">
-    <h1>Бизнес</h1>
+    <div class="h1-row">
+      <h1>Бизнес</h1>
+      <button type="button" class="btn btn-ok" id="addBusinessExpenseBtn">Добавить расход</button>
+    </div>
     <p class="sub">Объект: <b>Гостевой 5×8</b> · Заказчик: <b>Феруз</b> · клик по заголовку — фильтр</p>
     <div class="panel" id="businessPanel">
       <table>
@@ -1496,8 +1500,18 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <input id="manExpExpense" list="expenseList" placeholder="Например: Продукты"/>
     <label>Магазин</label>
     <input id="manExpStore" placeholder="Где купили"/>
-    <label>Комментарий</label>
-    <textarea id="manExpNote" rows="2" placeholder="Необязательно"></textarea>
+    <div id="manExpPersonalFields">
+      <label>Комментарий</label>
+      <textarea id="manExpNote" rows="2" placeholder="Необязательно"></textarea>
+    </div>
+    <div id="manExpBusinessFields" hidden>
+      <label>Объект</label>
+      <input id="manExpObject" list="manExpObjectList" placeholder="Гостевой 5×8"/>
+      <datalist id="manExpObjectList"></datalist>
+      <label>Заказчик</label>
+      <input id="manExpCustomer" list="manExpCustomerList" placeholder="Феруз"/>
+      <datalist id="manExpCustomerList"></datalist>
+    </div>
     <div class="modal-actions">
       <button type="button" class="btn btn-ghost" id="manExpCancel">Отмена</button>
       <button type="button" class="btn btn-ok" id="manExpSave">Сохранить</button>
@@ -1581,7 +1595,7 @@ const LS_KEY = 'wallet_review_v3';
 /** Payload schema for migrations (accountant-safety layer = 4). */
 const SCHEMA_VERSION = 11;
 /** Visible UI build — bump +1 on every shipped UI change (badge next to «Разбор»). */
-const UI_BUILD = 51;
+const UI_BUILD = 52;
 /** Postgres is the source of truth; localStorage is a write-through cache. */
 const WALLET_USER = 'makc';
 const WALLET_API_STATE = `/api/v1/users/${WALLET_USER}/state`;
@@ -11575,28 +11589,55 @@ function fillManExpCategories(wallet, selected) {
   ).join('');
   return prefer;
 }
-function openManualExpenseModal() {
+function syncManExpWalletFields(wallet) {
+  syncWalletSectionFields(wallet, {
+    personalId: 'manExpPersonalFields',
+    businessId: 'manExpBusinessFields',
+  });
+  if (wallet === 'business') {
+    const objEl = document.getElementById('manExpObject');
+    const custEl = document.getElementById('manExpCustomer');
+    fillBizObjectCustomerLists(
+      'manExpObjectList',
+      'manExpCustomerList',
+      objEl?.value,
+      custEl?.value
+    );
+    if (objEl && !objEl.value.trim()) objEl.value = 'Гостевой 5×8';
+    if (custEl && !custEl.value.trim()) custEl.value = 'Феруз';
+  }
+}
+function openManualExpenseModal(opts = {}) {
+  const wallet = opts.wallet === 'business' ? 'business' : 'personal';
   const dateEl = document.getElementById('manExpDate');
   if (dateEl) dateEl.value = todayDisplayDate();
   const amountEl = document.getElementById('manExpAmount');
   if (amountEl) amountEl.value = '';
   const walletEl = document.getElementById('manExpWallet');
-  if (walletEl) walletEl.value = 'personal';
+  if (walletEl) walletEl.value = wallet;
   document.getElementById('manExpAccount').innerHTML = accountOptionsHtml(preferAccountId(''));
   const fundEl = document.getElementById('manExpFund');
   if (fundEl) fundEl.innerHTML = fundOptionsHtml('');
-  const cat = fillManExpCategories('personal');
+  const cat = fillManExpCategories(wallet);
   fillExpenseList(cat);
   document.getElementById('manExpExpense').value = '';
   document.getElementById('manExpStore').value = '';
-  document.getElementById('manExpNote').value = '';
+  const noteEl = document.getElementById('manExpNote');
+  if (noteEl) noteEl.value = '';
+  const objEl = document.getElementById('manExpObject');
+  const custEl = document.getElementById('manExpCustomer');
+  if (objEl) objEl.value = wallet === 'business' ? 'Гостевой 5×8' : '';
+  if (custEl) custEl.value = wallet === 'business' ? 'Феруз' : '';
+  syncManExpWalletFields(wallet);
   document.getElementById('manualExpenseModal')?.classList.add('show');
 }
 function closeManualExpenseModal() {
   document.getElementById('manualExpenseModal')?.classList.remove('show');
 }
 document.getElementById('addIncomeBtn')?.addEventListener('click', openManualIncomeModal);
-document.getElementById('addExpenseBtn')?.addEventListener('click', openManualExpenseModal);
+document.getElementById('addExpenseBtn')?.addEventListener('click', () => openManualExpenseModal({ wallet: 'personal' }));
+document.getElementById('addPersonalExpenseBtn')?.addEventListener('click', () => openManualExpenseModal({ wallet: 'personal' }));
+document.getElementById('addBusinessExpenseBtn')?.addEventListener('click', () => openManualExpenseModal({ wallet: 'business' }));
 document.getElementById('manExpCancel')?.addEventListener('click', closeManualExpenseModal);
 bindModalBackdropClose('manualExpenseModal', closeManualExpenseModal);
 // Store field → searchable dropdown (autocomplete + Merchant Learning).
@@ -11631,10 +11672,12 @@ document.getElementById('manIncSave')?.addEventListener('click', () => {
   toast(`Доход +${fmtRub(row.amount)} ₽`);
 });
 document.getElementById('manExpWallet')?.addEventListener('change', (e) => {
-  const cat = fillManExpCategories(e.target.value);
+  const wallet = e.target.value === 'business' ? 'business' : 'personal';
+  const cat = fillManExpCategories(wallet);
   fillExpenseList(cat);
   const presets = (DATA.expensePresets && DATA.expensePresets[cat]) || [];
   if (presets.length) document.getElementById('manExpExpense').value = presets[0];
+  syncManExpWalletFields(wallet);
 });
 document.getElementById('manExpCategory')?.addEventListener('change', (e) => {
   fillExpenseList(e.target.value);
@@ -11651,7 +11694,15 @@ document.getElementById('manExpSave')?.addEventListener('click', async () => {
   if (!category) { toast('Выберите категорию'); return; }
   const expense = (document.getElementById('manExpExpense')?.value || '').trim() || category;
   const store = (document.getElementById('manExpStore')?.value || '').trim() || expense;
-  const note = (document.getElementById('manExpNote')?.value || '').trim();
+  const note = wallet === 'personal'
+    ? ((document.getElementById('manExpNote')?.value || '').trim())
+    : '';
+  const object = wallet === 'business'
+    ? ((document.getElementById('manExpObject')?.value || '').trim() || 'Гостевой 5×8')
+    : undefined;
+  const customer = wallet === 'business'
+    ? ((document.getElementById('manExpCustomer')?.value || '').trim() || 'Феруз')
+    : undefined;
   const date = (document.getElementById('manExpDate')?.value || '').trim() || todayDisplayDate();
   const fundId = (document.getElementById('manExpFund')?.value || '').trim();
   if (DATA.expensePresets) {
@@ -11674,6 +11725,8 @@ document.getElementById('manExpSave')?.addEventListener('click', async () => {
     expense,
     store,
     note,
+    object,
+    customer,
     fundId: fundId || undefined,
     confirmedByUser: true,
   }));
@@ -11688,6 +11741,8 @@ document.getElementById('manExpSave')?.addEventListener('click', async () => {
     category,
     expense,
     store,
+    object,
+    customer,
   });
   saveState();
   closeManualExpenseModal();

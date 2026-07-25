@@ -185,11 +185,27 @@ def assert_store_combobox(html: str) -> None:
     assert "learnMerchantAlias(store, item.storeRaw)" in html
 
 
+def assert_phase2_wallet_entry(html: str) -> None:
+    """Phase 2: expense entry from Personal/Business uses the same createExpense gateway."""
+    assert 'id="addPersonalExpenseBtn"' in html
+    assert 'id="addBusinessExpenseBtn"' in html
+    assert "openManualExpenseModal({ wallet: 'personal' })" in html
+    assert "openManualExpenseModal({ wallet: 'business' })" in html
+    assert 'id="manExpBusinessFields"' in html
+    assert 'id="manExpObject"' in html and 'id="manExpCustomer"' in html
+    assert "function syncManExpWalletFields(wallet)" in html
+    # Business fields must reach createExpense, not a side path.
+    man_save = html[html.index("manExpSave')?.addEventListener"): html.index("let editRowCtx")]
+    assert "createExpenseBatch" in man_save
+    assert "object," in man_save and "customer," in man_save
+
+
 def main() -> None:
     html = HTML.read_text(encoding="utf-8")
     assert_source_architecture(html)
     assert_allocation_repair(html)
     assert_store_combobox(html)
+    assert_phase2_wallet_entry(html)
 
     # Test 5: repair restores the lost fund and credit limit exactly once.
     payload = live_payload_shape()
@@ -257,6 +273,7 @@ def main() -> None:
     print("- allowed_duplicate and manual source paths present")
     print("- phase 1 repair restores lost fund/limit once, keeps deliberate deletions")
     print("- store combobox + merchant learning structure present and wired")
+    print("- phase 2 personal/business expense entry uses createExpense")
 
 
 if __name__ == "__main__":

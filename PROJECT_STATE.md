@@ -5,9 +5,7 @@
 **Карта развития (визуальная):** [wallet_roadmap.html](./wallet_roadmap.html) · онлайн: <https://wallet.islanddream.ru/roadmap>
 (деплой-копия — `public/roadmap/index.html`; при правке roadmap обновлять обе).
 
-**Снимок:** 2026-07-25 · UI_BUILD 51 / schema 11. **Git ✅**. **Приёмка Gateway NSP ✅** (`linked_existing`, один расход 10 511, без второго списания, rev 282). Следующее: Private на GitHub → проверка v51 (Магазин) → Фаза 2.
-
-**Репозиторий:** remote `origin` = `git@github.com:makcbarabanov/wallet.git`. Сейчас на GitHub **Public** — рекомендуется Private.
+**Снимок:** 2026-07-25 · UI_BUILD **52** / schema 11. Git ✅ · Gateway NSP ✅ · Магазин v51 ✅. **Фаза 2 старт:** кнопки расхода в Личный/Бизнес через `createExpense()` (+ Объект/Заказчик). Private на GitHub — отклонено. Следующее: приёмка v52 → Настройки.
 
 ---
 
@@ -15,8 +13,8 @@
 
 | Файл | Статус |
 |------|--------|
-| `review_categorization.html` / `public/index.html` | UI_BUILD **51** · schema **11** · идентичны |
-| `public/sw.js` | `wallet-shell-v51` |
+| `review_categorization.html` / `public/index.html` | UI_BUILD **52** · schema **11** · идентичны |
+| `public/sw.js` | `wallet-shell-v52` |
 | `api/` | восстановлен из контейнера 2026-07-25 (`main.py`, `statement_parse.py`, `critical_alerts.py`, `valet_*.py`, `requirements.txt`) |
 | дамп-страховка | `data/dumps/makc/250726/` · revision 269 · reason `pre_repair_wave` |
 | `WALLET_GATEWAY_DESIGN.md` | основа реализации — подтверждена |
@@ -65,6 +63,6 @@
 
 ## Следующий шаг
 
-1. Сделать репозиторий Private на GitHub.
-2. Проверить v51 (поле «Магазин») — жёсткая перезагрузка, если ещё светится v50.
-3. Фаза 2: кнопки расхода в Личный/Бизнес → Настройки.
+1. Приёмка v52: кнопки «Добавить расход» в Личный и Бизнес (бизнес — с Объект/Заказчик).
+2. Фаза 2 · вкладка «Настройки».
+3. Мелкий баг `/logs` при удобном случае.
