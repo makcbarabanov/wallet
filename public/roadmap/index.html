@@ -155,7 +155,7 @@ footer ul{padding-left:20px; margin:6px 0 0}
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
     <p class="sub">Живая карта развития: что сделано, что тестировать, что в планах. Только отражение текущего состояния — новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>25 июля 2026</b> · Git: первый commit в GitHub ✅ · приёмка v50 ✅</div>
+    <div class="updated">Обновлено: <b>25 июля 2026</b> · NSP ✅ · Git ✅ · Yandex AI Studio keys в .env</div>
   </div>
 </header>
 
@@ -448,6 +448,28 @@ footer ul{padding-left:20px; margin:6px 0 0}
 
   <h3 class="wave">AI Learning</h3>
   <div class="grid two">
+    <div class="card ok">
+      <h4>Yandex AI Studio: ключи в окружении <span class="badge">✅ готово (локально)</span></h4>
+      <ul>
+        <li>В локальном <span class="path">.env</span> (не в Git) добавлены:
+          <span class="path">YANDEX_AI_STUDIO_API_KEY</span>,
+          <span class="path">YANDEX_AI_STUDIO_FOLDER_ID</span>,
+          <span class="path">YANDEX_AI_STUDIO_BASE_URL</span>,
+          <span class="path">YANDEX_AI_STUDIO_MODEL</span>.</li>
+        <li>Сейчас учебный ключ; перед продом заменить на секретный.</li>
+        <li><span class="path">FOLDER_ID</span> пока пустой — заполнить при первом подключении к API.</li>
+        <li>В коде Valet/парсера эти переменные ещё <b>не читаются</b> (Timeweb / OpenRouter остаются текущими провайдерами).</li>
+      </ul>
+      <div class="check"><b>Не публиковать</b>Значение ключа ни в roadmap, ни в Git, ни в скриншотах. Только имена переменных.</div>
+    </div>
+    <div class="card plan">
+      <h4>Подключить Yandex AI Studio в API <span class="badge">📋 план</span></h4>
+      <ul>
+        <li>Провайдер в <span class="path">valet_llm.py</span> / распознавании выписок и чеков.</li>
+        <li>Проброс переменных в <span class="path">docker-compose.yml</span> для контейнера <span class="path">wallet-api</span>.</li>
+        <li>Переключение через <span class="path">VALET_LLM_PROVIDER</span> (или отдельный флаг), без ломки Timeweb/OpenRouter.</li>
+      </ul>
+    </div>
     <div class="card plan">
       <h4>Статистика угадывания <span class="badge">📋 план</span></h4>
       <ul>
