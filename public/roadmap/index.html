@@ -59,6 +59,7 @@ h1{margin:0 0 6px; font-size:1.55rem; letter-spacing:-.01em}
   font-size:.78rem; border-radius:999px; padding:3px 10px; border:1px solid var(--line); background:var(--card);
 }
 .legend .l-ok{background:var(--ok-soft); color:var(--ok); border-color:var(--ok-line)}
+.legend .l-check{background:#e8f0ff; color:#2a4f8f; border-color:#c5d4ef}
 .legend .l-wip{background:var(--wip-soft); color:var(--wip); border-color:var(--wip-line)}
 .legend .l-plan{background:var(--plan-soft); color:var(--plan)}
 .legend .l-bad{background:var(--bad-soft); color:var(--bad); border-color:var(--bad-line)}
@@ -67,12 +68,14 @@ h2{font-size:1.05rem; margin:26px 0 10px; scroll-margin-top:12px}
 .sec-note{margin:0 0 10px; color:var(--muted); font-size:.9rem}
 
 /* accordion */
-.acc{display:flex; flex-direction:column; gap:8px}
+.acc{display:flex; flex-direction:column; gap:8px; counter-reset:rm}
 details.item{
   background:var(--card); border:1px solid var(--line); border-left-width:4px;
   border-radius:12px; box-shadow:var(--shadow); overflow:hidden;
+  counter-increment:rm;
 }
 details.item.ok{border-left-color:var(--ok)}
+details.item.checked{border-left-color:#2a4f8f}
 details.item.wip{border-left-color:var(--wip)}
 details.item.plan{border-left-color:#b9b0a2}
 details.item.bad{border-left-color:var(--bad)}
@@ -81,6 +84,17 @@ details.item summary{
   padding:12px 14px; user-select:none; -webkit-user-select:none;
 }
 details.item summary::-webkit-details-marker{display:none}
+details.item summary .num{
+  flex:0 0 auto; width:1.55em; height:1.55em; margin-top:1px;
+  border-radius:50%; background:var(--ink); color:var(--card);
+  font-size:.72rem; font-weight:700; line-height:1.55em; text-align:center;
+}
+details.item.checked summary .num{background:#2a4f8f}
+details.item.ok summary .num{background:var(--ok)}
+details.item.wip summary .num{background:var(--wip)}
+details.item.bad summary .num{background:var(--bad)}
+details.item.plan summary .num{background:#9a9185}
+details.item summary .num::before{content:counter(rm)}
 details.item summary .mark{
   flex:0 0 auto; font-size:1.05rem; line-height:1.35; width:1.4em; text-align:center;
 }
@@ -136,23 +150,25 @@ footer ul{padding-left:18px; margin:6px 0 0}
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
     <p class="sub">Короткий статус сверху. Нажми строку — откроются подробности. Новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>25 июля 2026</b> · UI_BUILD 53 · contextVersion 1</div>
+    <div class="updated">Обновлено: <b>26 июля 2026</b> · UI_BUILD 58 · contextVersion 1</div>
     <div class="stats">
-      <div class="stat"><div class="k">UI_BUILD</div><div class="v">53<small>SmartSelect</small></div></div>
-      <div class="stat"><div class="k">schema</div><div class="v">11<small>sw v53</small></div></div>
+      <div class="stat"><div class="k">UI_BUILD</div><div class="v">58<small>Отчёт Валета</small></div></div>
+      <div class="stat"><div class="k">schema</div><div class="v">11<small>sw v58</small></div></div>
       <div class="stat"><div class="k">Фаза</div><div class="v" style="font-size:1rem">Фаза 2<small>стабилизация</small></div></div>
       <div class="stat"><div class="k">ИИ</div><div class="v" style="font-size:1rem">Training<small>Assistant позже</small></div></div>
     </div>
     <div class="focus">
       🔴 Сейчас главное — не добавлять новые функции, а стабилизировать текущую версию
-      <span>Принять v53 (SmartSelect) → мелкие баги → Настройки. Чеки, merchantId и Assistant — только после этого.</span>
+      <span>Следующее: стабильная контрольная точка (git). Чеки, merchantId и Assistant — потом.</span>
     </div>
     <div class="legend">
+      <span class="l-check">✔️ Проверил</span>
       <span class="l-ok">✅ готово</span>
       <span class="l-wip">🟡 сейчас / следующий</span>
       <span class="l-plan">⚪ потом</span>
-      <span class="l-bad">🔴 фокус</span>
+      <span class="l-bad">🔴 фокус / баг</span>
     </div>
+    <p class="sec-note" style="margin:10px 0 0"><b>Проверил</b> — ты лично проверил на устройстве и одобрил. Не путать с «код есть».</p>
   </div>
 </header>
 
@@ -166,6 +182,7 @@ footer ul{padding-left:18px; margin:6px 0 0}
 
     <details class="item ok">
       <summary>
+        <span class="num" aria-hidden="true"></span>
         <span class="mark">✅</span>
         <span class="title">Архитектура денег (Ledger, фонды, кредит)<small>готово · AD-001…008</small></span>
         <span class="chev">›</span>
@@ -182,10 +199,11 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item ok">
+    <details class="item checked">
       <summary>
-        <span class="mark">✅</span>
-        <span class="title">Фонды и кредитный лимит<small>готово · принято 25.07.2026</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Фонды и кредитный лимит<small>Проверил · 25.07.2026</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
@@ -202,10 +220,11 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item ok">
+    <details class="item checked">
       <summary>
-        <span class="mark">✅</span>
-        <span class="title">Gateway расходов через createExpense()<small>готово · фундамент AD-009</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Gateway расходов через createExpense()<small>Проверил · фундамент AD-009</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
@@ -217,10 +236,11 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item ok">
+    <details class="item checked">
       <summary>
-        <span class="mark">✅</span>
-        <span class="title">Защита от дублей<small>готово · NSP принят на реальном потоке</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Защита от дублей<small>Проверил · NSP на реальном потоке · 25.07.2026</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
@@ -234,6 +254,7 @@ footer ul{padding-left:18px; margin:6px 0 0}
 
     <details class="item ok">
       <summary>
+        <span class="num" aria-hidden="true"></span>
         <span class="mark">✅</span>
         <span class="title">Training mode ИИ<small>готово · Assistant не включаем</small></span>
         <span class="chev">›</span>
@@ -247,10 +268,11 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item ok">
+    <details class="item checked">
       <summary>
-        <span class="mark">✅</span>
-        <span class="title">Магазины: поиск, автодополнение, алиасы<small>готово · v51 принято</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Магазины: поиск, автодополнение, алиасы<small>Проверил · v51 · 25.07.2026</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
@@ -262,10 +284,11 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item ok">
+    <details class="item checked">
       <summary>
-        <span class="mark">✅</span>
-        <span class="title">Git и контрольная точка<small>готово · GitHub main</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Git и контрольная точка<small>Проверил · GitHub main · 25.07.2026</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
@@ -277,10 +300,11 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item ok">
+    <details class="item checked">
       <summary>
-        <span class="mark">✅</span>
-        <span class="title">Добавление расходов из Личного / Бизнеса<small>принято 25.07.2026 · UI_BUILD 52</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Добавление расходов из Личного / Бизнеса<small>Проверил · UI_BUILD 52 · 25.07.2026</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
@@ -292,10 +316,11 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item wip" open>
+    <details class="item checked">
       <summary>
-        <span class="mark">🟡</span>
-        <span class="title">Универсальный SmartSelect для всех справочников<small>ждёт приёмки · UI_BUILD 53</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Универсальный SmartSelect для всех справочников<small>Проверил · UI_BUILD 54 · 25.07.2026</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
@@ -308,40 +333,39 @@ footer ul{padding-left:18px; margin:6px 0 0}
         <ul>
           <li><span class="path">SmartSelect({ source, searchFields, displayField, aliases, popularity, allowCreate, onCreate, onSelect })</span> — новые справочники подключаются настройкой, а не копированием кода.</li>
         </ul>
-        <span class="lbl">Переведённые поля (v53)</span>
+        <span class="lbl">Переведённые поля</span>
         <ul>
-          <li><b>Магазин</b> — эталон, поведение не изменилось; алиасы и кросс-алфавитный поиск на месте.</li>
-          <li><b>Категория</b> — был <span class="path">&lt;select&gt;</span>, стал поиск с подсказками во всех четырёх формах. Новую категорию можно создать прямо в форме: кошелёк текущий, цвет по умолчанию, через <span class="path">ensureCategory()</span>.</li>
-          <li><b>Расход / назначение</b> — фактические назначения внутри категории по частоте + пресеты.</li>
-          <li><b>Объект</b> и <b>Заказчик</b> — из бизнес-строк Ledger, по частоте.</li>
-          <li>Популярность считается по подтверждённым строкам Ledger, поэтому старые данные сразу ранжируются правильно и миграция не нужна.</li>
-          <li>Не переведены: категория и расход внутри карточек разбора (<span class="path">.as-cat</span>, <span class="path">.as-exp</span>) — короткие списки в перерисовываемых строках.</li>
+          <li><b>Магазин</b> — эталон; алиасы и кросс-алфавитный поиск на месте.</li>
+          <li><b>Категория</b> — поиск с подсказками; в «Добавить расход» без значения по умолчанию (полный список по клику).</li>
+          <li><b>Расход / назначение</b>, <b>Объект</b>, <b>Заказчик</b> — по частоте из Ledger.</li>
+          <li>Фикс v54: «з» не цепляет «Жура» через транслит ж→zh; «оз»→Ozon сохранён.</li>
         </ul>
         <span class="lbl">Границы</span>
         <ul>
-          <li>SmartSelect отвечает только за UX выбора. <span class="path">createExpense()</span>, Gateway, Training mode, защита от дублей и структура Ledger не менялись.</li>
+          <li>Только UX выбора. <span class="path">createExpense()</span>, Gateway, Training mode, дубли и Ledger не менялись.</li>
         </ul>
-        <div class="check"><b>Как проверить</b>Жёсткая перезагрузка → шапка v53 → Магазин работает как раньше · Категория: «з» даёт Здоровье и Зоотовары, «зд» — только Здоровье · ввести новую категорию → «Создать категорию» → расход сохраняется · Бизнес: Объект/Заказчик подсказывают из истории · старые расходы открываются на редактирование без потери значений.</div>
-        <div class="check"><b>Сделано ещё</b>Раздел «UI Patterns → SmartSelect» в README (создан корневой README) · тест поведения <span class="path">scripts/test_smart_select.js</span> (поиск, популярность, алиасы, 20 000 строк) · структурные проверки в <span class="path">scripts/test_gateway_regressions.py</span>.</div>
       </div></div>
     </details>
 
-    <details class="item wip">
+    <details class="item checked">
       <summary>
-        <span class="mark">🟡</span>
-        <span class="title">Настройки Wallet<small>следующий шаг · Фаза 2</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Настройки Wallet<small>Проверил · UI_BUILD 58 · 26.07.2026</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
         <ul>
-          <li>Отдельная вкладка: режим ИИ (Assistant выключен), свободные деньги, фонды, лимиты.</li>
-          <li>Галочка Assistant сама по себе режим не включает — нужен отдельный AD после метрик.</li>
+          <li>Вкладка <b>Настр.</b>: AI (Training), отчёт Валета с переключателями, свободные деньги, фонды и кредитные лимиты.</li>
+          <li>LLM-доклад при входе выключен — только приветствие; включается переключателем.</li>
+          <li><b>Журнал сверки</b> в отчёте: N дней с последней сверки и дата; отдельный переключатель.</li>
         </ul>
       </div></div>
     </details>
 
     <details class="item plan">
       <summary>
+        <span class="num" aria-hidden="true"></span>
         <span class="mark">⚪</span>
         <span class="title">Чеки через LLM → sourceOperation → Gateway<small>потом</small></span>
         <span class="chev">›</span>
@@ -356,6 +380,7 @@ footer ul{padding-left:18px; margin:6px 0 0}
 
     <details class="item plan">
       <summary>
+        <span class="num" aria-hidden="true"></span>
         <span class="mark">⚪</span>
         <span class="title">MerchantId и глубокое обучение магазинов<small>потом</small></span>
         <span class="chev">›</span>
@@ -370,6 +395,7 @@ footer ul{padding-left:18px; margin:6px 0 0}
 
     <details class="item plan">
       <summary>
+        <span class="num" aria-hidden="true"></span>
         <span class="mark">⚪</span>
         <span class="title">Assistant mode ИИ<small>только после статистики обучения</small></span>
         <span class="chev">›</span>
@@ -384,6 +410,7 @@ footer ul{padding-left:18px; margin:6px 0 0}
 
     <details class="item plan">
       <summary>
+        <span class="num" aria-hidden="true"></span>
         <span class="mark">⚪</span>
         <span class="title">Полноценный Валет (память, советы, алерты)<small>позже · Фаза 3+</small></span>
         <span class="chev">›</span>
@@ -396,16 +423,18 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item bad">
+    <details class="item checked">
       <summary>
-        <span class="mark">🔴</span>
-        <span class="title">Мелкий баг: /logs<small>открыт · не блокирует</small></span>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">✔️</span>
+        <span class="title">Страница /logs (обучение Валета)<small>Проверил · 26.07.2026</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
         <ul>
-          <li>nginx ищет <span class="path">logs.html</span>, страница лежит как <span class="path">public/logs/index.html</span>.</li>
-          <li>На модель денег не влияет; закрыть при удобном случае.</li>
+          <li>Админ-страница: логи чата Валета, открытые вопросы («не знаю»), база знаний.</li>
+          <li>Фикс: symlink <span class="path">public/logs.html</span> → <span class="path">logs/index.html</span>; nginx.conf → <span class="path">/logs/index.html</span>.</li>
+          <li>URL: <a href="https://wallet.islanddream.ru/logs">wallet.islanddream.ru/logs</a></li>
         </ul>
       </div></div>
     </details>
@@ -417,11 +446,11 @@ footer ul{padding-left:18px; margin:6px 0 0}
   <h2 id="next">Следующие действия</h2>
   <p class="sec-note">Порядок стабилизации. Новые большие фичи — после приёмки текущей версии.</p>
   <ol class="steps">
-    <li class="done"><b>✅ Фонды, Gateway, NSP, Магазин, Git</b><span>Принято 25.07.2026.</span></li>
-    <li class="done"><b>✅ v52: расход из Личный / Бизнес</b><span>Принято 25.07.2026.</span></li>
-    <li><b>Принять v53: SmartSelect для справочников</b><span>Категория, расход, объект, заказчик — тот же паттерн, что у магазина.</span></li>
-    <li><b>Вкладка «Настройки»</b><span>Training/Assistant (второй выключен), свободные деньги, фонды, лимиты.</span></li>
-    <li><b>Починить /logs</b><span>Мелочь nginx.</span></li>
+    <li class="done"><b>✔️ Проверил: Фонды, Gateway, NSP, Магазин, Git, v52</b><span>Ты проверил и одобрил · 25.07.2026.</span></li>
+    <li class="done"><b>✔️ Проверил: SmartSelect v54</b><span>Пустая категория, «з» ≠ «Жура», «оз» → Ozon · 25.07.2026.</span></li>
+    <li class="done"><b>✔️ Проверил: Настройки v58</b><span>Отчёт Валета, журнал сверки, фонды/лимиты · 26.07.2026.</span></li>
+    <li class="done"><b>✔️ Проверил: /logs</b><span>Админка обучения Валета · 26.07.2026.</span></li>
+    <li><b>Стабильная контрольная точка</b><span>Git checkpoint текущей стабильной волны.</span></li>
     <li class="done" style="opacity:.7"><b>Потом: чеки / merchantId / Assistant / Валет</b><span>Только после стабильной контрольной точки.</span></li>
   </ol>
 </section>

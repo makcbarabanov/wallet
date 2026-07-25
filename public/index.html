@@ -380,6 +380,71 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
 .cash-reserve-list .cr-amt{font-variant-numeric:tabular-nums; font-weight:600}
 .cash-dds-line{margin:8px 0 0; font-size:.92rem; line-height:1.45}
 .cash-dds-line .dds-warn{color:#b42318; font-weight:600}
+/* Settings tab */
+.settings-stack{display:flex; flex-direction:column; gap:14px; max-width:720px}
+.settings-card{
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  box-shadow:var(--shadow); padding:14px 16px;
+}
+.settings-card h2{margin:0 0 6px; font-size:1.05rem}
+.settings-card .hint{margin:0 0 12px}
+.settings-summary{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:0 0 12px;
+}
+@media (max-width:520px){ .settings-summary{grid-template-columns:1fr} }
+.settings-stat{
+  background:#f7f3ec; border:1px solid var(--line); border-radius:10px; padding:10px 12px;
+}
+.settings-stat .k{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:600}
+.settings-stat .v{font-size:1.1rem; font-weight:700; font-variant-numeric:tabular-nums; margin-top:2px}
+.settings-choice{display:flex; flex-direction:column; gap:8px; margin:0 0 4px}
+.settings-choice label{
+  display:flex; gap:10px; align-items:flex-start; padding:10px 12px;
+  border:1px solid var(--line); border-radius:10px; cursor:pointer; background:#fffcf7;
+}
+.settings-choice label:has(input:checked){border-color:var(--ok); background:var(--accent-soft)}
+.settings-choice label.is-locked{opacity:.72; cursor:not-allowed; background:#efeae2}
+.settings-choice label .choice-body{flex:1; min-width:0}
+.settings-choice label .choice-title{font-weight:650; display:block}
+.settings-choice label .choice-note{font-size:.85rem; color:var(--muted); margin-top:2px}
+.settings-choice input{margin-top:3px; accent-color:var(--ok)}
+.settings-list{list-style:none; margin:0 0 12px; padding:0}
+.settings-list li{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  padding:10px 0; border-bottom:1px solid #efeae2;
+}
+.settings-list li:last-child{border-bottom:0}
+.settings-list .cr-title{flex:1; min-width:140px; font-weight:600}
+.settings-list .cr-meta{width:100%; font-size:.82rem; color:var(--muted)}
+.settings-list .cr-amt{font-variant-numeric:tabular-nums; font-weight:650}
+.settings-list .cr-actions{display:flex; gap:4px}
+/* Animated switches (Valet report sections) */
+.settings-toggle-list{list-style:none; margin:0; padding:0}
+.settings-toggle-list li{
+  display:flex; align-items:center; gap:12px;
+  padding:11px 0; border-bottom:1px solid #efeae2;
+}
+.settings-toggle-list li:last-child{border-bottom:0}
+.settings-toggle-list .tg-body{flex:1; min-width:0}
+.settings-toggle-list .tg-title{display:block; font-weight:650}
+.settings-toggle-list .tg-note{display:block; font-size:.84rem; color:var(--muted); margin-top:2px}
+.sw{
+  appearance:none; position:relative; flex:0 0 auto;
+  width:46px; height:28px; border:0; border-radius:999px;
+  background:#d5cfc4; cursor:pointer; padding:0;
+  transition:background .2s ease;
+}
+.sw:focus-visible{outline:2px solid var(--ok); outline-offset:2px}
+.sw[aria-checked="true"]{background:var(--ok)}
+.sw::after{
+  content:""; position:absolute; top:3px; left:3px;
+  width:22px; height:22px; border-radius:50%; background:#fff;
+  box-shadow:0 1px 3px rgba(26,23,20,.18);
+  transition:transform .22s cubic-bezier(.2,.85,.25,1);
+}
+.sw[aria-checked="true"]::after{transform:translateX(18px)}
+.sw:active::after{width:24px}
+.sw[aria-checked="true"]:active::after{transform:translateX(16px)}
 .income-list .num{text-align:right; font-variant-numeric:tabular-nums}
 .acc-log-wrap{margin-top:28px}
 .acc-log-wrap h2{font-size:1.15rem; margin:0 0 8px}
@@ -952,6 +1017,10 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
       <img class="nav-ico" src="/ico/stores.png" alt="" width="22" height="22"/>
       <span class="nav-label">Магаз.</span>
     </button>
+    <button type="button" class="navbtn" data-view="settings" title="Настройки">
+      <img class="nav-ico" src="/ico/settings.svg" alt="" width="22" height="22"/>
+      <span class="nav-label">Настр.</span>
+    </button>
     <div class="spacer"></div>
   </div>
 </header>
@@ -971,7 +1040,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     </div>
     <div class="cash-reserve-panel" id="cashReservePanel" hidden>
       <h2>Фонды и распределение</h2>
-      <p class="hint" style="margin-top:0">Свободные собственные = Касса − фонды − активный legacy. Кредитные лимиты показываются отдельно.</p>
+      <p class="hint" style="margin-top:0">Свободные собственные = Касса − фонды − активный legacy. Кредитные лимиты отдельно. Полное управление — вкладка <b>Настройки</b>.</p>
       <ul class="cash-reserve-list" id="cashReserveList"></ul>
       <div class="form-row">
         <input id="cashReserveTitle" placeholder="Название фонда (бизнес, налоги…)"/>
@@ -1310,7 +1379,102 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <div id="storeGrid"></div>
   </section>
 
-  
+  <section class="view" id="view-settings">
+    <div class="h1-row"><h1>Настройки</h1></div>
+    <p class="sub" style="margin-top:0">Режим ИИ, отчёт Валета, свободные деньги, фонды и лимиты</p>
+    <div class="settings-stack">
+
+      <div class="settings-card" id="settingsSummaryCard">
+        <h2>Сводка</h2>
+        <p class="hint">Касса — сумма счетов. Свободные собственные по AD-008 не включают кредитный лимит.</p>
+        <div class="settings-summary" id="settingsSummary"></div>
+      </div>
+
+      <div class="settings-card">
+        <h2>AI режим</h2>
+        <p class="hint">Сейчас доступен только Training. Assistant — после метрик качества и отдельного AD (галочка в UI сама режим не включает).</p>
+        <div class="settings-choice" id="settingsAiMode">
+          <label>
+            <input type="radio" name="settingsAiMode" value="training" checked/>
+            <span class="choice-body">
+              <span class="choice-title">Training</span>
+              <span class="choice-note">Каждый новый расход требует твоего подтверждения. ИИ предлагает — ты решаешь.</span>
+            </span>
+          </label>
+          <label class="is-locked" title="Недоступно: нужен отдельный AD после метрик">
+            <input type="radio" name="settingsAiMode" value="assistant" disabled/>
+            <span class="choice-body">
+              <span class="choice-title">Assistant <span class="hint">(недоступен)</span></span>
+              <span class="choice-note">Авто-принятие выше порога уверенности. Включится только отдельным архитектурным решением.</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h2>Отчёт Валета</h2>
+        <p class="hint">Что показывать в сводке на вкладке Валет. Выключи пункт — строка исчезнет из отчёта.</p>
+        <ul class="settings-toggle-list" id="settingsValetReport"></ul>
+        <ul class="settings-toggle-list" id="settingsValetGreeting" style="margin-top:8px;border-top:1px solid #efeae2;padding-top:4px">
+          <li>
+            <span class="tg-body">
+              <span class="tg-title">Интеллектуальный доклад при входе</span>
+              <span class="tg-note">LLM пересказывает сводку в чате. Сейчас выключен — остаётся только приветствие; вопросы по-прежнему идут к Валету.</span>
+            </span>
+            <button type="button" class="sw" role="switch" aria-checked="false"
+              id="settingsValetLlmGreeting"
+              aria-label="Интеллектуальный доклад при входе"></button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="settings-card">
+        <h2>Свободные деньги</h2>
+        <p class="hint">Как показывать «доступно к тратам». Свободные собственные всегда = Касса − фонды (лимит не свои деньги).</p>
+        <div class="settings-choice" id="settingsFreeCashMode">
+          <label>
+            <input type="radio" name="settingsFreeCashMode" value="own"/>
+            <span class="choice-body">
+              <span class="choice-title">Только собственные</span>
+              <span class="choice-note">Доступно = свободные собственные. Кредитный лимит виден отдельно.</span>
+            </span>
+          </label>
+          <label>
+            <input type="radio" name="settingsFreeCashMode" value="own_plus_credit"/>
+            <span class="choice-body">
+              <span class="choice-title">Собственные + кредитный лимит</span>
+              <span class="choice-note">В сводке «доступно» = свободные собственные + сумма лимитов. Лимит по-прежнему не фонд.</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h2>Фонды</h2>
+        <p class="hint">Распределение своих денег (не счета). Назначить фонду расход можно опционально при создании.</p>
+        <ul class="settings-list" id="settingsFundsList"></ul>
+        <div class="form-row" style="margin-bottom:0">
+          <input id="settingsFundTitle" placeholder="Название фонда" autocomplete="off"/>
+          <input id="settingsFundAmount" placeholder="Сумма" type="number" step="1" min="0"/>
+          <button type="button" class="btn btn-ok" id="settingsFundAdd">Добавить</button>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h2>Кредитные лимиты</h2>
+        <p class="hint">Не свои деньги и не фонд. Можно привязать к счёту (необязательно).</p>
+        <ul class="settings-list" id="settingsCreditList"></ul>
+        <div class="form-row" style="margin-bottom:0;align-items:flex-end">
+          <input id="settingsCreditTitle" placeholder="Название лимита" autocomplete="off"/>
+          <input id="settingsCreditAmount" placeholder="Сумма" type="number" step="1" min="0"/>
+          <select id="settingsCreditAccount" style="flex:1;min-width:140px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit"></select>
+          <button type="button" class="btn btn-ok" id="settingsCreditAdd">Добавить</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <section class="view" id="view-valet">
     <h1>Валет</h1>
     <p class="valet-hint">Навигатор плана · можно прислать скрин или PDF выписки для распознавания</p>
@@ -1490,7 +1654,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Фонд <span class="hint">(необязательно)</span></label>
     <select id="manExpFund"></select>
     <label>Категория</label>
-    <input id="manExpCategory" placeholder="Начни вводить категорию" autocomplete="off"/>
+    <input id="manExpCategory" placeholder="Выбери или начни вводить" autocomplete="off"/>
     <label>Расход</label>
     <input id="manExpExpense" placeholder="Например: Продукты" autocomplete="off"/>
     <label>Магазин</label>
@@ -1586,7 +1750,7 @@ const LS_KEY = 'wallet_review_v3';
 /** Payload schema for migrations (accountant-safety layer = 4). */
 const SCHEMA_VERSION = 11;
 /** Visible UI build — bump +1 on every shipped UI change (badge next to «Разбор»). */
-const UI_BUILD = 53;
+const UI_BUILD = 58;
 /** Postgres is the source of truth; localStorage is a write-through cache. */
 const WALLET_USER = 'makc';
 const WALLET_API_STATE = `/api/v1/users/${WALLET_USER}/state`;
@@ -1635,6 +1799,39 @@ function ensureAccounts(raw) {
     amount: rub(a.amount),
   }));
 }
+/** Sections of the Valet brief the user can toggle in Settings. Default: all on. */
+const VALET_REPORT_SECTIONS = [
+  { id: 'asOf', title: 'Дата среза', note: 'На какую дату собрана сводка' },
+  { id: 'planFact', title: 'План и факт расходов', note: 'Суммы и % к календарному темпу' },
+  { id: 'paceDelta', title: 'Отклонение от темпа', note: 'Больше / меньше плана на сегодня' },
+  { id: 'attention', title: 'Обратить внимание', note: 'Перерасход и категории под особым контролем' },
+  { id: 'cash', title: 'Касса и счета', note: 'Итого и разбивка по счетам' },
+  { id: 'accountReconciliation', title: 'Журнал сверки', note: 'Сколько дней прошло и дата последней сверки' },
+  { id: 'reserved', title: 'Отложено', note: 'Сумма фондов / распределения' },
+  { id: 'freeMoney', title: 'Свободные деньги', note: 'Свободные собственные' },
+  { id: 'remainingPlan', title: 'Остаток плана', note: 'Запланированные расходы до конца месяца' },
+  { id: 'freeAfterPlan', title: 'Прогноз после плана', note: 'Сколько останется или не хватит' },
+  { id: 'drawer', title: 'Ящик', note: 'Сколько операций ждёт разбора' },
+  { id: 'systemStatus', title: 'Статус системы', note: 'Служебные строки API, если есть' },
+];
+function defaultValetReport() {
+  const out = {};
+  for (const s of VALET_REPORT_SECTIONS) out[s.id] = true;
+  return out;
+}
+function normalizeValetReport(raw) {
+  const base = defaultValetReport();
+  const src = raw && typeof raw === 'object' ? raw : {};
+  for (const s of VALET_REPORT_SECTIONS) {
+    if (typeof src[s.id] === 'boolean') base[s.id] = src[s.id];
+  }
+  return base;
+}
+function valetReportOn(id) {
+  ensureSettings();
+  const report = state.settings.valetReport || defaultValetReport();
+  return report[id] !== false;
+}
 function normalizeSettings(raw) {
   const settings = raw && typeof raw === 'object' ? { ...raw } : {};
   if (settings.freeCashMode !== 'own' && settings.freeCashMode !== 'own_plus_credit') {
@@ -1642,6 +1839,9 @@ function normalizeSettings(raw) {
   }
   // Assistant mode is not implemented; unknown/legacy values safely fall back to Training.
   if (settings.aiMode !== 'training') settings.aiMode = 'training';
+  settings.valetReport = normalizeValetReport(settings.valetReport);
+  // Intellectual LLM briefing on Valet open — off by default (duplicates the technical brief).
+  if (typeof settings.valetLlmGreeting !== 'boolean') settings.valetLlmGreeting = false;
   return settings;
 }
 function normalizeCashReserve(raw) {
@@ -6447,19 +6647,36 @@ function storeComboItems() {
     return { name: r.name, count: r.count || 0, aliases: (m && Array.isArray(m.aliases)) ? m.aliases : [] };
   });
 }
-/** Match by prefix / word-start / substring across value + aliases; lower rank = better. */
+/** Match by prefix / word-start / substring across value + aliases; lower rank = better.
+ * Native alphabet first (so «з» matches «Бензин» / «Заруб», but not «Жура»).
+ * Translit only for cross-script pairs («оз» → Ozon): otherwise «ж»→«zh» falsely
+ * contains «z» from query «з». */
 function smartMatchRank(item, query) {
-  const q = translitFold(query);
-  if (!q) return 3;
+  const qNative = normForSearch(query);
+  if (!qNative) return 3;
+  const qFold = translitFold(query);
+  const qHasCyr = /[а-я]/i.test(qNative);
+  const qHasLat = /[a-z]/i.test(qNative);
   let best = -1;
   for (const target of item.targets) {
-    const n = translitFold(target);
-    const idx = n.indexOf(q);
-    if (idx === -1) continue;
-    let rank = 2;
-    if (idx === 0) rank = 0;
-    else if (n.split(/[\s\-]+/).some((w) => w.startsWith(q))) rank = 1;
-    if (best === -1 || rank < best) best = rank;
+    const tNative = normForSearch(target);
+    const candidates = [tNative];
+    const tHasCyr = /[а-я]/i.test(tNative);
+    const tHasLat = /[a-z]/i.test(tNative);
+    // Cross-script only: Cyrillic query vs Latin name, or the other way around.
+    if ((qHasCyr && tHasLat) || (qHasLat && tHasCyr)) {
+      candidates.push(translitFold(target));
+    }
+    for (let i = 0; i < candidates.length; i++) {
+      const n = candidates[i];
+      const q = i === 0 ? qNative : qFold;
+      const idx = n.indexOf(q);
+      if (idx === -1) continue;
+      let rank = 2;
+      if (idx === 0) rank = 0;
+      else if (n.split(/[\s\-]+/).some((w) => w.startsWith(q))) rank = 1;
+      if (best === -1 || rank < best) best = rank;
+    }
   }
   return best;
 }
@@ -7929,6 +8146,7 @@ function goView(view, { activateNav = true } = {}) {
   if (view === 'accounts') renderAccounts();
   if (view === 'categories') renderCategories();
   if (view === 'stores') renderStores();
+  if (view === 'settings') renderSettings();
   if (view === 'install') prepareInstallScreen();
   if (view === 'proposals') renderProposals();
   if (view === 'valet') openValetScreen();
@@ -7964,29 +8182,49 @@ function valetWatchTitle(row) {
   if (!row) return '';
   return row.expense ? `${row.category} — ${row.expense}` : String(row.category || '');
 }
+function latestAccountReconciliation() {
+  const rows = Array.isArray(state.accountLog) ? state.accountLog : [];
+  if (!rows.length) return null;
+  const latest = [...rows]
+    .filter((row) => row && row.date)
+    .sort((a, b) => String(b.date).localeCompare(String(a.date)))[0];
+  if (!latest) return null;
+  const match = String(latest.date).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return { date: String(latest.date), days: null };
+  const checked = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.max(0, Math.floor((today.getTime() - checked.getTime()) / 86400000));
+  return { date: latest.date, days };
+}
+let _lastValetSummary = null;
 function renderValetBrief(summary) {
   const el = document.getElementById('valetBrief');
-  if (!el || !summary) return;
+  if (!el) return;
+  if (summary) _lastValetSummary = summary;
+  const data = summary || _lastValetSummary;
+  if (!data) return;
+  const on = valetReportOn;
   const lines = [];
-  lines.push(summary.as_of_display || summary.as_of || '—');
-  const planRub = summary.total_plan;
-  const factRub = summary.total_fact_to_date;
-  const spentPct = summary.month_budget_spent_pct;
-  const expPct = summary.expected_spent_pct_by_calendar;
-  if (planRub != null && spentPct != null && expPct != null) {
+  if (on('asOf')) lines.push(data.as_of_display || data.as_of || '—');
+  const planRub = data.total_plan;
+  const factRub = data.total_fact_to_date;
+  const spentPct = data.month_budget_spent_pct;
+  const expPct = data.expected_spent_pct_by_calendar;
+  if (on('planFact') && planRub != null && spentPct != null && expPct != null) {
     lines.push(`Расходы план ${fmtValetRubPlain(planRub)}, ${expPct}%`);
     lines.push(`Расходы факт ${fmtValetRubPlain(factRub)}, ${spentPct}%`);
   }
-  const dRub = summary.delta_vs_expected_rub;
-  const dPct = summary.delta_vs_expected_pct;
-  if (dRub != null && dPct != null) {
+  const dRub = data.delta_vs_expected_rub;
+  const dPct = data.delta_vs_expected_pct;
+  if (on('paceDelta') && dRub != null && dPct != null) {
     if (dRub > 0) lines.push(`На ${fmtValetRubPlain(dRub)} и ${Math.abs(dPct)}% больше плана`);
     else if (dRub < 0) lines.push(`На ${fmtValetRubPlain(Math.abs(dRub))} и ${Math.abs(dPct)}% меньше плана`);
     else lines.push('Ровно по календарному темпу плана');
   }
-  const alerts = summary.overspend_alerts || [];
-  const watched = summary.watched || [];
-  if (alerts.length || watched.length) {
+  const alerts = data.overspend_alerts || [];
+  const watched = data.watched || [];
+  if (on('attention') && (alerts.length || watched.length)) {
     lines.push('');
     lines.push('Обратить внимание:');
     let n = 1;
@@ -8020,33 +8258,63 @@ function renderValetBrief(summary) {
       n += 1;
     }
   }
-  lines.push('');
-  lines.push(`Касса: ${fmtValetRubPlain(summary.kassa)} из них`);
-  for (const acc of (summary.cash_accounts || [])) {
-    lines.push(`${acc.name || 'Счёт'} — ${fmtValetRubPlain(acc.amount)}`);
+  if (on('cash')) {
+    lines.push('');
+    lines.push(`Касса: ${fmtValetRubPlain(data.kassa)} из них`);
+    for (const acc of (data.cash_accounts || [])) {
+      lines.push(`${acc.name || 'Счёт'} — ${fmtValetRubPlain(acc.amount)}`);
+    }
   }
-  lines.push('');
-  lines.push(`Отложено ${fmtValetRubPlain(summary.reserved)}`);
-  lines.push(`Свободных денег ${fmtValetRubPlain(summary.free_money)}`);
-  lines.push('');
-  lines.push(`Остаток запланированных расходов до конца месяца ${fmtValetRubPlain(summary.remaining_planned_expenses)}`);
-  const after = summary.free_after_plan;
-  if (after != null) {
-    if (after >= 0) lines.push(`С учётом свободных денег останется ${fmtValetRubPlain(after)}`);
-    else lines.push(`С учётом свободных денег не хватает ${fmtValetRubPlain(Math.abs(after))}`);
+  if (on('accountReconciliation')) {
+    const reconciliation = latestAccountReconciliation();
+    lines.push('');
+    lines.push('Журнал сверки:');
+    if (reconciliation) {
+      lines.push(reconciliation.days == null
+        ? 'Не удалось определить давность последней сверки'
+        : `${reconciliation.days} дней с последней сверки`);
+      lines.push(`${isoToDisplay(reconciliation.date)} — дата последней сверки`);
+    } else {
+      lines.push('Сверка ещё не проводилась');
+      lines.push('— дата последней сверки');
+    }
   }
-  const drawerN =
-    summary.drawer_count != null
-      ? Number(summary.drawer_count)
-      : Number(summary.gaps?.drawer_ops || 0);
-  lines.push('');
-  lines.push(`В ящике: ${Number.isFinite(drawerN) ? drawerN : 0}`);
-  const sys = summary.system_status;
-  if (sys && Array.isArray(sys.lines) && sys.lines.length) {
+  if (on('reserved')) {
+    lines.push('');
+    lines.push(`Отложено ${fmtValetRubPlain(data.reserved)}`);
+  }
+  if (on('freeMoney')) {
+    if (!on('reserved')) lines.push('');
+    lines.push(`Свободных денег ${fmtValetRubPlain(data.free_money)}`);
+  }
+  if (on('remainingPlan') || on('freeAfterPlan')) {
+    lines.push('');
+    if (on('remainingPlan')) {
+      lines.push(`Остаток запланированных расходов до конца месяца ${fmtValetRubPlain(data.remaining_planned_expenses)}`);
+    }
+    if (on('freeAfterPlan')) {
+      const after = data.free_after_plan;
+      if (after != null) {
+        if (after >= 0) lines.push(`С учётом свободных денег останется ${fmtValetRubPlain(after)}`);
+        else lines.push(`С учётом свободных денег не хватает ${fmtValetRubPlain(Math.abs(after))}`);
+      }
+    }
+  }
+  if (on('drawer')) {
+    const drawerN =
+      data.drawer_count != null
+        ? Number(data.drawer_count)
+        : Number(data.gaps?.drawer_ops || 0);
+    lines.push('');
+    lines.push(`В ящике: ${Number.isFinite(drawerN) ? drawerN : 0}`);
+  }
+  const sys = data.system_status;
+  if (on('systemStatus') && sys && Array.isArray(sys.lines) && sys.lines.length) {
     lines.push('');
     for (const ln of sys.lines) lines.push(String(ln));
   }
-  el.textContent = lines.join('\n');
+  el.textContent = lines.filter((ln, i, arr) => !(ln === '' && (i === 0 || arr[i - 1] === ''))).join('\n').trim()
+    || 'Все пункты отчёта выключены — включи нужные во вкладке Настройки.';
 }
 function appendValetMsg(role, text, meta, opts = {}) {
   const log = document.getElementById('valetLog');
@@ -8290,8 +8558,27 @@ async function openValetScreen() {
     }, 20000);
   }
   if (log && !log.children.length) {
-    await valetAsk({ greeting: true });
+    // Temporary: no LLM «доклад» on enter — it duplicated the technical brief.
+    // Only a short welcome; full answers still go through valetAsk on user questions.
+    ensureSettings();
+    if (state.settings.valetLlmGreeting === true) {
+      await valetAsk({ greeting: true });
+    } else {
+      appendValetMsg('assistant', valetWelcomeText(), 'приветствие', {
+        allowRating: false,
+      });
+    }
   }
+}
+function valetUserFirstName() {
+  ensureSettings();
+  const custom = String(state.settings.displayName || '').trim();
+  if (custom) return custom;
+  if (WALLET_USER === 'makc') return 'Макс';
+  return WALLET_USER;
+}
+function valetWelcomeText() {
+  return `Привет, ${valetUserFirstName()}. Что хочешь сегодня узнать о твоём финансовом положении?`;
 }
 document.getElementById('valetSend')?.addEventListener('click', () => {
   const input = document.getElementById('valetInput');
@@ -8914,14 +9201,15 @@ function ensureCategory(wallet, name, color) {
     color: color || (w === 'business' ? '#64748B' : '#3B82F6'),
   });
 }
-/** Preselect a category in a SmartSelect field: keep the given one, else the first. */
-function setCategoryField(inputId, wallet, selected) {
+/** Preselect a category in a SmartSelect field.
+ * emptyDefault: leave the field blank so focus shows the full list (add-expense form). */
+function setCategoryField(inputId, wallet, selected, { emptyDefault = false } = {}) {
   const el = document.getElementById(inputId);
   if (!el) return '';
   const cats = catsForWallet(wallet);
-  const prefer = selected && cats.some((c) => c.name === selected)
-    ? selected
-    : (cats[0] && cats[0].name) || '';
+  let prefer = '';
+  if (selected && cats.some((c) => c.name === selected)) prefer = selected;
+  else if (!emptyDefault) prefer = (cats[0] && cats[0].name) || '';
   el.value = prefer;
   return prefer;
 }
@@ -11107,9 +11395,16 @@ function reserveTotal() {
   ensureCashReserves();
   return allocatedOwnTotal();
 }
-/** Свободные собственные = Касса − фонды − активный legacy. Credit limits are separate. */
+/** Свободные собственные = Касса − фонды − активный legacy. Credit limits are separate (AD-008). */
 function freeCash() {
   return kassaTotal() - allocatedOwnTotal();
+}
+/** How much is shown as «доступно» in Settings: own only, or own + credit limits. */
+function availableToSpend() {
+  ensureSettings();
+  const own = freeCash();
+  if (state.settings.freeCashMode === 'own_plus_credit') return own + creditLimitTotal();
+  return own;
 }
 /**
  * Остаток по плану (ОПП):
@@ -11173,11 +11468,16 @@ function renderCashReserves() {
   list.innerHTML = fundLines + legacyLines + creditLines
     || '<li class="hint">Пока нет фондов или лимитов</li>';
   if (sumEl) {
+    const avail = availableToSpend();
+    const mode = (ensureSettings().freeCashMode === 'own_plus_credit') ? 'own_plus_credit' : 'own';
     sumEl.textContent =
       `Касса ${fmtRub(kassaTotal())} ₽ · фонды ${fmtRub(fundsSum)} ₽`
       + (legacySum ? ` · legacy ${fmtRub(legacySum)} ₽` : '')
       + ` · свободных собственных ${fmtRub(free)} ₽`
-      + (creditLimitTotal() ? ` · лимит ${fmtRub(creditLimitTotal())} ₽ (отдельно)` : '');
+      + (creditLimitTotal() ? ` · лимит ${fmtRub(creditLimitTotal())} ₽ (отдельно)` : '')
+      + (mode === 'own_plus_credit' && creditLimitTotal()
+        ? ` · доступно ${fmtRub(avail)} ₽ (свои+лимит)`
+        : '');
   }
   if (ddsEl) {
     const saldoCls = saldo < 0 ? ' class="dds-warn"' : '';
@@ -11212,7 +11512,255 @@ document.getElementById('cashReserveAdd')?.addEventListener('click', () => {
   document.getElementById('cashReserveAmount').value = '';
   saveState();
   renderCashReserves();
+  if (document.getElementById('view-settings')?.classList.contains('active')) renderSettings();
   toast('Фонд добавлен');
+});
+
+/* ===== Settings tab ===== */
+function settingsAccountOptionsHtml(selected) {
+  const value = String(selected || '');
+  const opts = (state.accounts || []).map((a) =>
+    `<option value="${escapeAttr(a.id)}" ${String(a.id) === value ? 'selected' : ''}>${escapeHtml(a.name || a.id)}</option>`
+  );
+  return `<option value="">— без привязки к счёту —</option>${opts.join('')}`;
+}
+function renderSettings() {
+  ensureSettings();
+  ensureFunds();
+  ensureCreditLimits();
+  const free = freeCash();
+  const credit = creditLimitTotal();
+  const avail = availableToSpend();
+  const mode = state.settings.freeCashMode === 'own_plus_credit' ? 'own_plus_credit' : 'own';
+
+  const summary = document.getElementById('settingsSummary');
+  if (summary) {
+    summary.innerHTML = `
+      <div class="settings-stat"><div class="k">Касса</div><div class="v">${fmtRub(kassaTotal())} ₽</div></div>
+      <div class="settings-stat"><div class="k">Фонды</div><div class="v">${fmtRub(fundTotal())} ₽</div></div>
+      <div class="settings-stat"><div class="k">Свободные собственные</div><div class="v">${fmtRub(free)} ₽</div></div>
+      <div class="settings-stat"><div class="k">${mode === 'own_plus_credit' ? 'Доступно (свои+лимит)' : 'Кредитный лимит'}</div>
+        <div class="v">${mode === 'own_plus_credit' ? fmtRub(avail) : fmtRub(credit)} ₽</div></div>`;
+  }
+
+  // AI: always Training; Assistant control stays disabled (AD-009a).
+  state.settings.aiMode = 'training';
+  document.querySelectorAll('input[name="settingsAiMode"]').forEach((el) => {
+    el.checked = el.value === 'training';
+  });
+
+  document.querySelectorAll('input[name="settingsFreeCashMode"]').forEach((el) => {
+    el.checked = el.value === mode;
+  });
+
+  const reportList = document.getElementById('settingsValetReport');
+  if (reportList) {
+    const report = state.settings.valetReport || defaultValetReport();
+    reportList.innerHTML = VALET_REPORT_SECTIONS.map((s) => {
+      const on = report[s.id] !== false;
+      return `<li>
+        <span class="tg-body">
+          <span class="tg-title">${escapeHtml(s.title)}</span>
+          <span class="tg-note">${escapeHtml(s.note)}</span>
+        </span>
+        <button type="button" class="sw" role="switch" aria-checked="${on ? 'true' : 'false'}"
+          data-valet-report="${escapeAttr(s.id)}"
+          aria-label="${escapeAttr(s.title)}"></button>
+      </li>`;
+    }).join('');
+  }
+  const llmGreet = document.getElementById('settingsValetLlmGreeting');
+  if (llmGreet) {
+    llmGreet.setAttribute('aria-checked', state.settings.valetLlmGreeting === true ? 'true' : 'false');
+  }
+
+  const fundsList = document.getElementById('settingsFundsList');
+  if (fundsList) {
+    fundsList.innerHTML = state.funds.length
+      ? state.funds.map((fund) => `<li>
+          <span class="cr-title">${escapeHtml(fund.title)}</span>
+          <span class="cr-amt">${fmtRub(fund.amount)} ₽</span>
+          <span class="cr-actions">
+            <button type="button" class="dict-ico" data-edit-fund="${escapeAttr(fund.id)}" title="Изменить">✎</button>
+            <button type="button" class="dict-ico danger" data-del-fund="${escapeAttr(fund.id)}" title="Удалить">✕</button>
+          </span>
+        </li>`).join('')
+      : '<li class="hint">Пока нет фондов</li>';
+    fundsList.querySelectorAll('[data-edit-fund]').forEach((btn) => {
+      btn.addEventListener('click', () => editSettingsFund(btn.dataset.editFund));
+    });
+    fundsList.querySelectorAll('[data-del-fund]').forEach((btn) => {
+      btn.addEventListener('click', () => deleteSettingsFund(btn.dataset.delFund));
+    });
+  }
+
+  const creditList = document.getElementById('settingsCreditList');
+  const creditAcc = document.getElementById('settingsCreditAccount');
+  if (creditAcc) creditAcc.innerHTML = settingsAccountOptionsHtml(creditAcc.value);
+  if (creditList) {
+    creditList.innerHTML = state.creditLimits.length
+      ? state.creditLimits.map((limit) => {
+          const acc = limit.accountId ? accountLabel(limit.accountId) : '';
+          return `<li>
+            <span class="cr-title">${escapeHtml(limit.title)}</span>
+            <span class="cr-amt">${fmtRub(limit.amount)} ₽</span>
+            <span class="cr-actions">
+              <button type="button" class="dict-ico" data-edit-credit="${escapeAttr(limit.id)}" title="Изменить">✎</button>
+              <button type="button" class="dict-ico danger" data-del-credit="${escapeAttr(limit.id)}" title="Удалить">✕</button>
+            </span>
+            ${acc ? `<span class="cr-meta">счёт: ${escapeHtml(acc)}</span>` : '<span class="cr-meta">без привязки к счёту</span>'}
+          </li>`;
+        }).join('')
+      : '<li class="hint">Пока нет кредитных лимитов</li>';
+    creditList.querySelectorAll('[data-edit-credit]').forEach((btn) => {
+      btn.addEventListener('click', () => editSettingsCredit(btn.dataset.editCredit));
+    });
+    creditList.querySelectorAll('[data-del-credit]').forEach((btn) => {
+      btn.addEventListener('click', () => deleteSettingsCredit(btn.dataset.delCredit));
+    });
+  }
+}
+function editSettingsFund(id) {
+  ensureFunds();
+  const fund = state.funds.find((f) => String(f.id) === String(id));
+  if (!fund) return;
+  const title = prompt('Название фонда', fund.title);
+  if (title == null) return;
+  const amountRaw = prompt('Сумма фонда, ₽', String(fund.amount));
+  if (amountRaw == null) return;
+  const amount = Math.round(Number(amountRaw) || 0);
+  if (!String(title).trim()) { toast('Нужно название'); return; }
+  if (amount < 0) { toast('Сумма не может быть отрицательной'); return; }
+  fund.title = String(title).trim();
+  fund.amount = amount;
+  saveState();
+  renderSettings();
+  renderCashReserves();
+  toast('Фонд обновлён');
+}
+function deleteSettingsFund(id) {
+  ensureFunds();
+  const idx = state.funds.findIndex((f) => String(f.id) === String(id));
+  if (idx < 0) return;
+  const fund = state.funds[idx];
+  if (!confirm(`Удалить фонд «${fund.title}»?`)) return;
+  state.funds.splice(idx, 1);
+  saveState();
+  renderSettings();
+  renderCashReserves();
+  toast('Фонд удалён');
+}
+function editSettingsCredit(id) {
+  ensureCreditLimits();
+  const limit = state.creditLimits.find((c) => String(c.id) === String(id));
+  if (!limit) return;
+  const title = prompt('Название лимита', limit.title);
+  if (title == null) return;
+  const amountRaw = prompt('Сумма лимита, ₽', String(limit.amount));
+  if (amountRaw == null) return;
+  const amount = Math.round(Number(amountRaw) || 0);
+  if (!String(title).trim() || !(amount > 0)) { toast('Нужны название и сумма > 0'); return; }
+  limit.title = String(title).trim();
+  limit.amount = amount;
+  saveState();
+  renderSettings();
+  renderCashReserves();
+  toast('Лимит обновлён');
+}
+function deleteSettingsCredit(id) {
+  ensureCreditLimits();
+  const idx = state.creditLimits.findIndex((c) => String(c.id) === String(id));
+  if (idx < 0) return;
+  const limit = state.creditLimits[idx];
+  if (!confirm(`Удалить лимит «${limit.title}»?`)) return;
+  state.creditLimits.splice(idx, 1);
+  saveState();
+  renderSettings();
+  renderCashReserves();
+  toast('Лимит удалён');
+}
+document.getElementById('settingsFreeCashMode')?.addEventListener('change', (e) => {
+  const input = e.target.closest('input[name="settingsFreeCashMode"]');
+  if (!input) return;
+  ensureSettings();
+  state.settings.freeCashMode = input.value === 'own_plus_credit' ? 'own_plus_credit' : 'own';
+  saveState();
+  renderSettings();
+  renderCashReserves();
+  toast(state.settings.freeCashMode === 'own_plus_credit'
+    ? 'Доступно: свои + лимит'
+    : 'Доступно: только собственные');
+});
+document.getElementById('settingsValetReport')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-valet-report]');
+  if (!btn) return;
+  ensureSettings();
+  const id = btn.dataset.valetReport;
+  if (!VALET_REPORT_SECTIONS.some((s) => s.id === id)) return;
+  const report = state.settings.valetReport || defaultValetReport();
+  const next = !(report[id] !== false);
+  report[id] = next;
+  state.settings.valetReport = normalizeValetReport(report);
+  btn.setAttribute('aria-checked', next ? 'true' : 'false');
+  saveState();
+  renderValetBrief(); // refresh from cached summary, if any
+});
+document.getElementById('settingsValetLlmGreeting')?.addEventListener('click', () => {
+  const btn = document.getElementById('settingsValetLlmGreeting');
+  if (!btn) return;
+  ensureSettings();
+  const next = !(state.settings.valetLlmGreeting === true);
+  state.settings.valetLlmGreeting = next;
+  btn.setAttribute('aria-checked', next ? 'true' : 'false');
+  saveState();
+  toast(next
+    ? 'При входе Валет снова соберёт LLM-доклад'
+    : 'При входе только приветствие');
+});
+document.getElementById('settingsAiMode')?.addEventListener('change', (e) => {
+  // Assistant stays locked; any attempt snaps back to Training (AD-009a).
+  if (e.target && e.target.value === 'assistant') {
+    e.target.checked = false;
+    const training = document.querySelector('input[name="settingsAiMode"][value="training"]');
+    if (training) training.checked = true;
+    toast('Assistant пока недоступен');
+  }
+  ensureSettings();
+  state.settings.aiMode = 'training';
+  saveState();
+});
+document.getElementById('settingsFundAdd')?.addEventListener('click', () => {
+  ensureFunds();
+  const title = (document.getElementById('settingsFundTitle')?.value || '').trim();
+  const amount = Number(document.getElementById('settingsFundAmount')?.value || 0);
+  if (!title || !(amount > 0)) { toast('Укажите название и сумму'); return; }
+  state.funds.push({
+    id: 'fund' + Date.now().toString(16),
+    title,
+    amount: Math.round(amount),
+  });
+  document.getElementById('settingsFundTitle').value = '';
+  document.getElementById('settingsFundAmount').value = '';
+  saveState();
+  renderSettings();
+  renderCashReserves();
+  toast('Фонд добавлен');
+});
+document.getElementById('settingsCreditAdd')?.addEventListener('click', () => {
+  ensureCreditLimits();
+  const title = (document.getElementById('settingsCreditTitle')?.value || '').trim();
+  const amount = Math.round(Number(document.getElementById('settingsCreditAmount')?.value || 0));
+  const accountId = (document.getElementById('settingsCreditAccount')?.value || '').trim();
+  const limit = normalizeCreditLimit({ title, amount, accountId });
+  if (!limit) { toast('Укажите название и сумму > 0'); return; }
+  state.creditLimits.push(limit);
+  document.getElementById('settingsCreditTitle').value = '';
+  document.getElementById('settingsCreditAmount').value = '';
+  if (document.getElementById('settingsCreditAccount')) document.getElementById('settingsCreditAccount').value = '';
+  saveState();
+  renderSettings();
+  renderCashReserves();
+  toast('Лимит добавлен');
 });
 function ensureIncomes() {
   if (!Array.isArray(state.incomes)) state.incomes = [];
@@ -11603,7 +12151,8 @@ function todayDisplayDate() {
   return `${dd}.${mm}.${yy}`;
 }
 function fillManExpCategories(wallet, selected) {
-  return setCategoryField('manExpCategory', wallet, selected);
+  // Add-expense: no default category — focus must show the full list, not one value.
+  return setCategoryField('manExpCategory', wallet, selected, { emptyDefault: true });
 }
 function syncManExpWalletFields(wallet) {
   syncWalletSectionFields(wallet, {
@@ -11728,13 +12277,17 @@ document.getElementById('manExpWallet')?.addEventListener('change', (e) => {
   const wallet = e.target.value === 'business' ? 'business' : 'personal';
   const cat = fillManExpCategories(wallet);
   fillExpenseList(cat);
-  const presets = (DATA.expensePresets && DATA.expensePresets[cat]) || [];
-  if (presets.length) document.getElementById('manExpExpense').value = presets[0];
+  const expEl = document.getElementById('manExpExpense');
+  if (expEl) {
+    const presets = cat && DATA.expensePresets ? (DATA.expensePresets[cat] || []) : [];
+    expEl.value = presets[0] || '';
+  }
   syncManExpWalletFields(wallet);
 });
 document.getElementById('manExpCategory')?.addEventListener('change', (e) => {
-  fillExpenseList(e.target.value);
-  const presets = (DATA.expensePresets && DATA.expensePresets[e.target.value]) || [];
+  const cat = (e.target.value || '').trim();
+  fillExpenseList(cat);
+  const presets = cat && DATA.expensePresets ? (DATA.expensePresets[cat] || []) : [];
   if (presets.length) document.getElementById('manExpExpense').value = presets[0];
 });
 document.getElementById('manExpSave')?.addEventListener('click', async () => {

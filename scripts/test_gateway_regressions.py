@@ -226,6 +226,44 @@ def assert_phase2_wallet_entry(html: str) -> None:
     assert "object," in man_save and "customer," in man_save
 
 
+def assert_settings_tab(html: str) -> None:
+    """Settings tab: AI mode (Assistant locked), free cash, funds and credit limits."""
+    assert 'data-view="settings"' in html
+    assert 'id="view-settings"' in html
+    assert "function renderSettings()" in html
+    assert "if (view === 'settings') renderSettings();" in html
+    assert "function availableToSpend()" in html
+    # Assistant cannot be enabled from the UI alone (AD-009a).
+    assert 'value="assistant" disabled' in html
+    assert "state.settings.aiMode = 'training'" in html
+    # Free-cash preference is writable and used for the «доступно» figure.
+    assert 'name="settingsFreeCashMode"' in html
+    assert "own_plus_credit" in html
+    # Funds and credit limits are managed here.
+    assert 'id="settingsFundsList"' in html
+    assert 'id="settingsCreditList"' in html
+    assert 'id="settingsFundAdd"' in html
+    assert 'id="settingsCreditAdd"' in html
+    assert "function deleteSettingsFund(id)" in html
+    assert "function deleteSettingsCredit(id)" in html
+    # Valet report section toggles (animated switches, not checkboxes).
+    assert 'id="settingsValetReport"' in html
+    assert "const VALET_REPORT_SECTIONS" in html
+    assert "function normalizeValetReport(raw)" in html
+    assert "function valetReportOn(id)" in html
+    assert 'role="switch"' in html
+    assert "settings.valetReport = normalizeValetReport(settings.valetReport)" in html
+    assert "{ id: 'accountReconciliation', title: 'Журнал сверки'" in html
+    assert "function latestAccountReconciliation()" in html
+    assert "дней с последней сверки" in html
+    assert "дата последней сверки" in html
+    assert 'id="settingsValetLlmGreeting"' in html
+    assert "valetLlmGreeting" in html
+    assert "function valetWelcomeText()" in html
+    # normalizeSettings still forces unknown aiMode back to training.
+    assert "if (settings.aiMode !== 'training') settings.aiMode = 'training'" in html
+
+
 def main() -> None:
     html = HTML.read_text(encoding="utf-8")
     assert_source_architecture(html)
@@ -233,6 +271,7 @@ def main() -> None:
     assert_store_combobox(html)
     assert_smart_select(html)
     assert_phase2_wallet_entry(html)
+    assert_settings_tab(html)
 
     # Test 5: repair restores the lost fund and credit limit exactly once.
     payload = live_payload_shape()
@@ -302,6 +341,7 @@ def main() -> None:
     print("- store combobox + merchant learning structure present and wired")
     print("- phase 2 personal/business expense entry uses createExpense")
     print("- SmartSelect wired by config to store/category/expense/object/customer")
+    print("- Settings tab: AI Training only, free cash mode, funds and credit CRUD")
 
 
 if __name__ == "__main__":

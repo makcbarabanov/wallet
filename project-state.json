@@ -1,13 +1,13 @@
 {
   "contextVersion": 1,
   "project": "Wallet",
-  "updatedAt": "2026-07-25",
+  "updatedAt": "2026-07-26",
   "role": "official_machine_context",
   "description": "Canonical machine context for Arden and other AI tools. Not a visual roadmap copy: short contract of version, hard architecture rules, accepted work, and next actions.",
   "version": {
-    "uiBuild": 53,
+    "uiBuild": 58,
     "schemaVersion": 11,
-    "serviceWorkerCache": "wallet-shell-v53",
+    "serviceWorkerCache": "wallet-shell-v58",
     "activePhase": "Phase 2",
     "aiMode": "training"
   },
@@ -46,36 +46,39 @@
     }
   ],
   "currentFocus": {
-    "status": "acceptance_required",
-    "item": "SmartSelect on all reference fields",
-    "build": 53,
-    "acceptance": [
-      "Store behaves exactly as before, aliases and cross-alphabet search intact",
-      "Category searches and suggests while typing, list depends on the wallet",
-      "A new category, expense purpose, object or customer can be created from the form",
-      "Popularity follows real usage from the Ledger",
-      "Long directories stay responsive",
-      "Old expenses open for editing without losing values"
-    ]
+    "status": "next_up",
+    "item": "Stable release checkpoint (git)",
+    "build": 58,
+    "note": "/logs accepted 2026-07-26; stabilize before major features"
   },
   "accepted": [
     {
       "item": "Funds and credit limit",
       "status": "accepted",
       "date": "2026-07-25",
-      "refs": ["AD-001", "AD-002", "AD-007", "AD-008"]
+      "refs": [
+        "AD-001",
+        "AD-002",
+        "AD-007",
+        "AD-008"
+      ]
     },
     {
       "item": "Expense Gateway",
       "status": "accepted",
       "date": "2026-07-25",
-      "refs": ["AD-009", "AD-009a"]
+      "refs": [
+        "AD-009",
+        "AD-009a"
+      ]
     },
     {
       "item": "NSP duplicate real flow",
       "status": "accepted",
       "date": "2026-07-25",
-      "refs": ["AD-009"]
+      "refs": [
+        "AD-009"
+      ]
     },
     {
       "item": "Store searchable combobox and merchant learning prep",
@@ -92,31 +95,33 @@
       "status": "accepted",
       "date": "2026-07-25",
       "build": 52,
-      "refs": ["AD-005", "AD-009"]
-    }
-  ],
-  "inProgress": [
+      "refs": [
+        "AD-005",
+        "AD-009"
+      ]
+    },
     {
       "item": "Universal SmartSelect for directories",
-      "status": "implemented_waiting_acceptance",
-      "build": 53,
-      "note": "attachSmartSelect(input, {source, searchFields, displayField, aliases, popularity, allowCreate, onCreate, onSelect}); UX only, createExpense, Gateway, Training mode, duplicate protection and Ledger untouched. Picking a row dispatches `change`, so existing field logic keeps working.",
-      "fields": [
-        "store (reference implementation, behaviour unchanged)",
-        "category (was <select> in manExp/modal/editRow/valetTeach, now searchable; create goes through ensureCategory)",
-        "expense purpose (usage inside the category plus presets)",
-        "business object and customer (from business ledger rows)"
-      ],
-      "popularitySource": "confirmed Ledger rows via directoryUsage(), so old data ranks correctly and no migration is needed",
-      "notConverted": ".as-cat and .as-exp inside proposal cards (short lists in re-rendered rows)",
-      "docs": "README section UI Patterns -> SmartSelect",
-      "tests": ["scripts/test_smart_select.js", "scripts/test_gateway_regressions.py"]
+      "status": "accepted",
+      "date": "2026-07-25",
+      "build": 54,
+      "note": "User verified: empty category on add-expense, «з» does not match «Жура», oz→Ozon still works"
     },
     {
       "item": "Settings tab",
-      "status": "planned_next",
-      "note": "AI mode (Assistant disabled), free cash rules, funds, credit limits"
+      "status": "accepted",
+      "date": "2026-07-26",
+      "build": 58,
+      "note": "User verified: Valet report toggles, account reconciliation age/date, LLM greeting off, funds/credit CRUD"
     },
+    {
+      "item": "/logs route",
+      "status": "accepted",
+      "date": "2026-07-26",
+      "note": "User verified Valet learning admin page opens"
+    }
+  ],
+  "inProgress": [
     {
       "item": "Yandex AI Studio integration",
       "status": "env_prepared_not_integrated",
@@ -124,7 +129,6 @@
     }
   ],
   "doNotDoNow": [
-    "new major features before v53 acceptance",
     "fund movement history",
     "mandatory fund assignment",
     "Assistant mode",
@@ -133,20 +137,12 @@
     "separate bridge project beyond this JSON"
   ],
   "nextActions": [
-    "Stabilize current version: accept UI_BUILD 53 (SmartSelect on category, expense, object, customer)",
-    "Implement the Settings tab with Assistant disabled",
-    "Fix the /logs route",
-    "Create the next stable release checkpoint",
-    "Later: receipts as sourceOperation through LLM and Gateway"
+    "Create the next stable release checkpoint (git)",
+    "Later: receipts as sourceOperation through LLM and Gateway",
+    "Later: merchantId / Assistant / full Valet — after checkpoint"
   ],
   "focus": "Do not add major new features; stabilize the current version first",
-  "knownIssues": [
-    {
-      "item": "/logs route",
-      "severity": "minor",
-      "status": "open"
-    }
-  ],
+  "knownIssues": [],
   "links": {
     "roadmap": "https://wallet.islanddream.ru/roadmap",
     "projectStateJson": "https://wallet.islanddream.ru/project-state.json",
@@ -155,8 +151,13 @@
     "repository": "https://github.com/makcbarabanov/wallet"
   },
   "sync": {
-    "updateWith": ["PROJECT_STATE.md", "wallet_roadmap.html"],
-    "deployCopies": ["public/project-state.json"],
+    "updateWith": [
+      "PROJECT_STATE.md",
+      "wallet_roadmap.html"
+    ],
+    "deployCopies": [
+      "public/project-state.json"
+    ],
     "forArden": "At the start of a Wallet discussion, fetch this JSON (contextVersion) and treat architectureRules as hard constraints. Use the roadmap for human detail. Chat never overrides this file."
   },
   "precedence": [

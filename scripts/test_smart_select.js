@@ -111,6 +111,21 @@ assert.strictEqual(cats.find((c) => c.value === 'Транспорт').count, 0);
 assert.deepStrictEqual(ranked(categoryCfg, 'з'), ['Здоровье', 'Зоотовары']);
 assert.deepStrictEqual(ranked(categoryCfg, 'зд'), ['Здоровье']);
 assert.deepStrictEqual(ranked(categoryCfg, 'ЗДОР'), ['Здоровье'], 'search is case-insensitive');
+// «ж»→«zh» must not make «Жура» look like a match for «з»
+assert.deepStrictEqual(
+  ranked({
+    source: [
+      { name: 'Жура', count: 17 },
+      { name: 'Заруб', count: 8 },
+      { name: 'Бензин', count: 19 },
+      { name: 'Здоровье', count: 3 },
+    ],
+    displayField: 'name',
+    popularity: 'count',
+  }, 'з'),
+  ['Заруб', 'Здоровье', 'Бензин'],
+  'Cyrillic «з» must not match «Жура» via digraph zh'
+);
 
 // 3. Aliases and cross-alphabet search keep working (store field behaviour).
 const storeCfg = {
