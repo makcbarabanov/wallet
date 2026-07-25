@@ -22,15 +22,13 @@ body{
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   padding-bottom:48px;
 }
-.wrap{max-width:920px; margin:0 auto; padding:0 14px}
+.wrap{max-width:760px; margin:0 auto; padding:0 14px}
 a{color:var(--ok)}
-
-/* ---------- header ---------- */
 header.top{
   background:linear-gradient(180deg,#fffcf7,#f7f2ea);
   border-bottom:1px solid var(--line); padding:22px 0 18px;
 }
-h1{margin:0 0 6px; font-size:1.6rem; letter-spacing:-.01em}
+h1{margin:0 0 6px; font-size:1.55rem; letter-spacing:-.01em}
 .sub{margin:0; color:var(--muted); font-size:.95rem}
 .updated{
   display:inline-flex; align-items:center; gap:6px; margin-top:12px;
@@ -39,99 +37,80 @@ h1{margin:0 0 6px; font-size:1.6rem; letter-spacing:-.01em}
 }
 .updated b{color:var(--ink); font-weight:600}
 
-/* ---------- sticky nav ---------- */
-nav.chips{
-  position:sticky; top:0; z-index:5; background:rgba(243,239,232,.94);
-  backdrop-filter:saturate(180%) blur(8px);
-  border-bottom:1px solid var(--line); padding:8px 0;
-}
-.chips-inner{display:flex; gap:6px; overflow-x:auto; padding:0 14px; max-width:920px; margin:0 auto; scrollbar-width:none}
-.chips-inner::-webkit-scrollbar{display:none}
-.chips-inner a{
-  flex:0 0 auto; text-decoration:none; color:var(--muted); background:var(--card);
-  border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:.84rem; white-space:nowrap;
-}
-.chips-inner a:active{background:var(--plan-soft)}
-
-/* ---------- sections ---------- */
-section{margin:26px 0 0}
-h2{
-  font-size:1.12rem; margin:0 0 4px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
-  scroll-margin-top:60px;
-}
-h2 .n{color:var(--muted); font-weight:600; font-size:.9rem}
-h2 .count{color:var(--muted); font-weight:400; font-size:.82rem}
-.sec-note{margin:0 0 12px; color:var(--muted); font-size:.9rem}
-h3.wave{
-  font-size:.95rem; margin:18px 0 8px; color:var(--ink);
-  border-left:3px solid var(--line); padding-left:8px;
-}
-
-/* ---------- cards ---------- */
-.grid{display:grid; gap:10px}
-@media (min-width:720px){ .grid.two{grid-template-columns:1fr 1fr} }
-.card{
-  background:var(--card); border:1px solid var(--line); border-left-width:4px;
-  border-radius:14px; padding:13px 14px; box-shadow:var(--shadow);
-}
-.card h4{margin:0 0 6px; font-size:1rem; display:flex; align-items:center; gap:7px; flex-wrap:wrap}
-.card p{margin:6px 0 0; font-size:.92rem}
-.card ul{margin:6px 0 0; padding-left:20px; font-size:.92rem}
-.card li{margin:2px 0}
-.card li::marker{color:var(--muted)}
-.lbl{
-  display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em;
-  color:var(--muted); margin:10px 0 2px; font-weight:600;
-}
-.badge{
-  font-size:.72rem; font-weight:600; border-radius:999px; padding:3px 9px;
-  border:1px solid transparent; white-space:nowrap;
-}
-.check{
-  margin-top:10px; background:var(--plan-soft); border:1px dashed var(--line);
-  border-radius:10px; padding:8px 10px; font-size:.88rem;
-}
-.check b{display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:2px}
-.path{
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.85em;
-  background:var(--plan-soft); border:1px solid var(--line); border-radius:6px; padding:1px 5px;
-  word-break:break-word;
-}
-.no-test{margin-top:10px; background:var(--bad-soft); border:1px solid var(--bad-line); border-radius:10px; padding:8px 10px; font-size:.88rem}
-.no-test b{display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--bad); margin-bottom:2px}
-
-/* status colours */
-.ok{border-color:var(--ok-line); border-left-color:var(--ok)}
-.ok .badge{background:var(--ok-soft); color:var(--ok); border-color:var(--ok-line)}
-.wip{border-color:var(--wip-line); border-left-color:var(--wip)}
-.wip .badge{background:var(--wip-soft); color:var(--wip); border-color:var(--wip-line)}
-.plan{border-color:var(--plan-line); border-left-color:#b9b0a2}
-.plan .badge{background:var(--plan-soft); color:var(--plan); border-color:var(--plan-line)}
-.bad{border-color:var(--bad-line); border-left-color:var(--bad)}
-.bad .badge{background:var(--bad-soft); color:var(--bad); border-color:var(--bad-line)}
-
-/* ---------- version block ---------- */
-.stats{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.stats{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:18px 0 0}
 @media (min-width:620px){ .stats{grid-template-columns:repeat(4,1fr)} }
 .stat{
-  background:var(--card); border:1px solid var(--line); border-radius:14px;
-  padding:12px 13px; box-shadow:var(--shadow);
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:10px 12px; box-shadow:var(--shadow);
 }
-.stat .k{font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600}
-.stat .v{font-size:1.32rem; font-weight:700; margin-top:3px; line-height:1.15}
-.stat .v small{font-size:.8rem; font-weight:600; color:var(--muted); display:block; margin-top:3px}
+.stat .k{font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600}
+.stat .v{font-size:1.15rem; font-weight:700; margin-top:2px; line-height:1.2}
+.stat .v small{display:block; font-size:.75rem; font-weight:600; color:var(--muted); margin-top:2px}
 
-/* ---------- legend ---------- */
-.legend{display:flex; flex-wrap:wrap; gap:7px; margin:12px 0 0}
+.focus{
+  margin:18px 0 0; padding:12px 14px; border-radius:12px;
+  background:var(--bad-soft); border:1px solid var(--bad-line); color:var(--bad);
+  font-size:.95rem; font-weight:600;
+}
+.focus span{display:block; font-weight:400; color:var(--ink); margin-top:4px; font-size:.9rem}
+
+.legend{display:flex; flex-wrap:wrap; gap:6px; margin:14px 0 0}
 .legend span{
-  font-size:.79rem; border-radius:999px; padding:4px 10px; border:1px solid var(--line); background:var(--card);
+  font-size:.78rem; border-radius:999px; padding:3px 10px; border:1px solid var(--line); background:var(--card);
 }
 .legend .l-ok{background:var(--ok-soft); color:var(--ok); border-color:var(--ok-line)}
 .legend .l-wip{background:var(--wip-soft); color:var(--wip); border-color:var(--wip-line)}
 .legend .l-plan{background:var(--plan-soft); color:var(--plan)}
 .legend .l-bad{background:var(--bad-soft); color:var(--bad); border-color:var(--bad-line)}
 
-/* ---------- steps ---------- */
+h2{font-size:1.05rem; margin:26px 0 10px; scroll-margin-top:12px}
+.sec-note{margin:0 0 10px; color:var(--muted); font-size:.9rem}
+
+/* accordion */
+.acc{display:flex; flex-direction:column; gap:8px}
+details.item{
+  background:var(--card); border:1px solid var(--line); border-left-width:4px;
+  border-radius:12px; box-shadow:var(--shadow); overflow:hidden;
+}
+details.item.ok{border-left-color:var(--ok)}
+details.item.wip{border-left-color:var(--wip)}
+details.item.plan{border-left-color:#b9b0a2}
+details.item.bad{border-left-color:var(--bad)}
+details.item summary{
+  list-style:none; cursor:pointer; display:flex; align-items:flex-start; gap:10px;
+  padding:12px 14px; user-select:none; -webkit-user-select:none;
+}
+details.item summary::-webkit-details-marker{display:none}
+details.item summary .mark{
+  flex:0 0 auto; font-size:1.05rem; line-height:1.35; width:1.4em; text-align:center;
+}
+details.item summary .title{flex:1; min-width:0; font-weight:600; font-size:.98rem}
+details.item summary .title small{
+  display:block; font-weight:400; color:var(--muted); font-size:.84rem; margin-top:2px;
+}
+details.item summary .chev{
+  flex:0 0 auto; color:var(--muted); font-size:.85rem; margin-top:2px; transition:transform .15s;
+}
+details.item[open] summary .chev{transform:rotate(90deg)}
+.panel{padding:0 14px 14px 14px; border-top:1px solid var(--line); margin-top:-1px}
+.panel-inner{padding-top:12px; font-size:.92rem}
+.panel ul{margin:6px 0 0; padding-left:18px}
+.panel li{margin:3px 0}
+.lbl{
+  display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--muted); margin:10px 0 2px; font-weight:600;
+}
+.path{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.85em;
+  background:var(--plan-soft); border:1px solid var(--line); border-radius:6px; padding:1px 5px;
+  word-break:break-word;
+}
+.check{
+  margin-top:10px; background:var(--plan-soft); border:1px dashed var(--line);
+  border-radius:10px; padding:8px 10px; font-size:.88rem;
+}
+.check b{display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:2px}
+
 ol.steps{list-style:none; counter-reset:s; margin:0; padding:0}
 ol.steps li{
   counter-increment:s; position:relative; background:var(--card); border:1px solid var(--line);
@@ -142,11 +121,13 @@ ol.steps li::before{
   border-radius:50%; background:var(--ink); color:var(--card);
   font-size:.8rem; font-weight:700; display:flex; align-items:center; justify-content:center;
 }
+ol.steps li.done{opacity:.55}
+ol.steps li.done::before{background:var(--ok)}
 ol.steps li b{display:block}
 ol.steps li span{color:var(--muted); font-size:.88rem}
 
-footer{margin:30px 0 0; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem}
-footer ul{padding-left:20px; margin:6px 0 0}
+footer{margin:28px 0 0; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem}
+footer ul{padding-left:18px; margin:6px 0 0}
 </style>
 </head>
 <body>
@@ -154,481 +135,286 @@ footer ul{padding-left:20px; margin:6px 0 0}
 <header class="top">
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
-    <p class="sub">Живая карта развития: что сделано, что тестировать, что в планах. Только отражение текущего состояния — новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>25 июля 2026</b> · contextVersion 1 · project-state.json как контракт</div>
+    <p class="sub">Короткий статус сверху. Нажми строку — откроются подробности. Новая архитектура здесь не создаётся.</p>
+    <div class="updated">Обновлено: <b>25 июля 2026</b> · UI_BUILD 52 · contextVersion 1</div>
+    <div class="stats">
+      <div class="stat"><div class="k">UI_BUILD</div><div class="v">52<small>Личный / Бизнес</small></div></div>
+      <div class="stat"><div class="k">schema</div><div class="v">11<small>sw v52</small></div></div>
+      <div class="stat"><div class="k">Фаза</div><div class="v" style="font-size:1rem">Фаза 2<small>стабилизация</small></div></div>
+      <div class="stat"><div class="k">ИИ</div><div class="v" style="font-size:1rem">Training<small>Assistant позже</small></div></div>
+    </div>
+    <div class="focus">
+      🔴 Сейчас главное — не добавлять новые функции, а стабилизировать текущую версию
+      <span>Принять v52 → мелкие баги → Настройки. Чеки, merchantId и Assistant — только после этого.</span>
+    </div>
+    <div class="legend">
+      <span class="l-ok">✅ готово</span>
+      <span class="l-wip">🟡 сейчас / следующий</span>
+      <span class="l-plan">⚪ потом</span>
+      <span class="l-bad">🔴 фокус</span>
+    </div>
   </div>
 </header>
 
-<nav class="chips">
-  <div class="chips-inner">
-    <a href="#v">Версия</a>
-    <a href="#done">✅ Реализовано</a>
-    <a href="#wip">🔄 В процессе</a>
-    <a href="#plan">📋 Планы</a>
-    <a href="#bugs">🔴 Проблемы</a>
-    <a href="#next">Следующие шаги</a>
-  </div>
-</nav>
-
 <div class="wrap">
 
-<!-- ============ 1. ВЕРСИЯ ============ -->
 <section>
-  <h2 id="v"><span class="n">1</span> Текущая версия</h2>
-  <div class="stats">
-    <div class="stat"><div class="k">UI_BUILD</div><div class="v">52<small>расход из Личный/Бизнес</small></div></div>
-    <div class="stat"><div class="k">schemaVersion</div><div class="v">11<small>backup schema 9 сохранён</small></div></div>
-    <div class="stat"><div class="k">Активная фаза</div><div class="v" style="font-size:1.05rem">Фаза 1 + Gateway<small>код готов, идёт приёмка UI</small></div></div>
-    <div class="stat"><div class="k">Режим ИИ</div><div class="v" style="font-size:1.05rem">Training<small>Assistant не реализуется</small></div></div>
-  </div>
-  <div class="legend">
-    <span class="l-ok">зелёный — готово</span>
-    <span class="l-wip">жёлтый — в работе</span>
-    <span class="l-plan">серый — план</span>
-    <span class="l-bad">красный — проблема</span>
-  </div>
-  <p class="sec-note" style="margin-top:12px">
-    Service worker: <span class="path">wallet-shell-v52</span> · миграции хранятся в payload (<span class="path">_migrations</span>) ·
-    режим ИИ жёстко нормализуется к <span class="path">settings.aiMode = 'training'</span>: любое создание расхода требует подтверждения.
-  </p>
-</section>
+  <h2 id="map">Статус проекта</h2>
+  <p class="sec-note">Основа — этот список. Детали внутри аккордеона.</p>
 
-<!-- ============ 2. РЕАЛИЗОВАНО ============ -->
-<section>
-  <h2 id="done">✅ <span class="n">2</span> Реализовано <span class="count">— работает, можно проверять</span></h2>
-  <p class="sec-note">Источник: PROJECT_STATE.md, ARCHITECTURE_DECISIONS.md (AD-001…AD-009a) и текущий код UI_BUILD 52.</p>
+  <div class="acc">
 
-  <div class="grid two">
+    <details class="item ok">
+      <summary>
+        <span class="mark">✅</span>
+        <span class="title">Архитектура денег (Ledger, фонды, кредит)<small>готово · AD-001…008</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Ledger (счета) — источник истины по деньгам на счетах (AD-003).</li>
+          <li>Фонд ≠ счёт (AD-002); кредитный лимит ≠ свои деньги (AD-001).</li>
+          <li><span class="path">fund.amount</span> = текущая распределённая сумма (AD-007).</li>
+          <li>Свободные собственные без учёта кредитного лимита (AD-008).</li>
+          <li><span class="path">fundId</span> на расходе опционален (AD-004).</li>
+          <li>Личный и Бизнес — разные таблицы и поля (AD-005).</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Фонды <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Создан слой <span class="path">funds</span>: фонд — назначение своих денег, не счёт (AD-002, AD-004).</li>
-        <li><span class="path">fund.amount</span> = текущая распределённая сумма (AD-007); доход фонд не увеличивает.</li>
-        <li>Кредитный лимит отделён в <span class="path">creditLimits</span> и не уменьшает свободные собственные (AD-001, AD-008).</li>
-        <li>Старый «Запас» (<span class="path">cashReserves</span>) переносится копией с пометками, legacy не удаляется.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Разбор → блок «Фонды» → сверить суммы фондов, лимита и свободных собственных.</div>
-    </div>
+    <details class="item ok">
+      <summary>
+        <span class="mark">✅</span>
+        <span class="title">Фонды и кредитный лимит<small>готово · принято 25.07.2026</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Слои <span class="path">funds</span> и <span class="path">creditLimits</span>; legacy <span class="path">cashReserves</span> сохранён.</li>
+          <li>Repair-миграция <span class="path">wallet_alloc_phase1_v2</span> восстановила «Бизнес» и лимит.</li>
+          <li>Приёмка на смартфоне: фонды видны, суммы на месте.</li>
+        </ul>
+        <span class="lbl">Пока не трогаем</span>
+        <ul>
+          <li>историю изменения фондов;</li>
+          <li>обязательное назначение фонда каждому расходу.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Фонд у расхода <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li><span class="path">fundId</span> — необязательное поле операции; старые расходы без него работают как раньше.</li>
-        <li>Создание расхода с фондом уменьшает фонд, удаление — возвращает сумму назад.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Добавить расход с выбранным фондом → сумма фонда уменьшилась; удалить запись → вернулась.</div>
-    </div>
+    <details class="item ok">
+      <summary>
+        <span class="mark">✅</span>
+        <span class="title">Gateway расходов через createExpense()<small>готово · фундамент AD-009</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Единственная точка создания расхода: импорт, Разбор, ручной ввод, будущие чеки/API.</li>
+          <li><span class="path">sourceOperation</span>, <span class="path">sourceOperationId</span>, <span class="path">proposalLog</span>.</li>
+          <li>Единственный production-вызов <span class="path">pushRow</span> — внутри шлюза.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Gateway: единая точка создания расхода <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li><span class="path">createExpense()</span> — единственный путь создания расхода (AD-009).</li>
-        <li>Через него идут: импорт, «Верно» в Разборе, Неучёл, Валет-обучение, ручной ввод, редактирование групп.</li>
-        <li>Единственный production-вызов <span class="path">pushRow</span> находится внутри шлюза.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Добавить расход разными путями (импорт / «Верно» / ручной ввод) → в каждом случае появляется подтверждение, счёт списывается один раз.</div>
-    </div>
+    <details class="item ok">
+      <summary>
+        <span class="mark">✅</span>
+        <span class="title">Защита от дублей<small>готово · NSP принят на реальном потоке</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Классы Exact / Strong / Weak; диалог «возможно, уже существует».</li>
+          <li>ИИ только помогает; решение — пользователь.</li>
+          <li>25.07.2026: «Сервисный центр НСП» → <span class="path">linked_existing</span>, второго списания нет.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Защита от дублей: матчер + диалог <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Классы совпадения: <b>Exact</b> (совпал bankId) · <b>Strong</b> (дата + сумма + счёт + магазин) · <b>Weak</b> (часть признаков).</li>
-        <li>Матчинг магазинов v1: нормализация, токены, удаление служебных слов — кейс «NSP» vs «Сервисный центр NSP» даёт Strong.</li>
-        <li>Диалог «возможно, операция уже существует» с выбором: использовать существующую / создать новую / объединить.</li>
-        <li>Регрессия зафиксирована: <span class="path">data/fixtures/tbank/05_nsp_duplicate_candidate.csv</span>.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Импортировать NSP-фикстуру при существующем расходе NSP 21.07.26 · 10 511 ₽ → должен появиться вопрос, а не второй расход.</div>
-    </div>
+    <details class="item ok">
+      <summary>
+        <span class="mark">✅</span>
+        <span class="title">Training mode ИИ<small>готово · Assistant не включаем</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Любой новый расход требует подтверждения (AD-009a).</li>
+          <li><span class="path">settings.aiMode</span> жёстко нормализуется к <span class="path">training</span>.</li>
+          <li>Assistant — только после статистики качества, отдельным AD.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Training mode зафиксирован <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Автосоздание расхода запрещено даже при высокой уверенности (AD-009 п.7, AD-009a).</li>
-        <li>Импорт больше не пишет в Ledger напрямую: все строки идут в Разбор как предложения.</li>
-        <li>ИИ предлагает категорию / кошелёк / магазин и объясняет похожесть, но не подтверждает.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Импортировать выписку → в Ledger ничего не появилось до вашего подтверждения в Разборе.</div>
-    </div>
+    <details class="item ok">
+      <summary>
+        <span class="mark">✅</span>
+        <span class="title">Магазины: поиск, автодополнение, алиасы<small>готово · v51 принято</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Searchable dropdown: популярные сверху, поиск по части слова и между алфавитами.</li>
+          <li>«Создать новый магазин»; поля <span class="path">count</span> / <span class="path">lastUsed</span> / <span class="path">aliases[]</span>.</li>
+          <li>Глубокое обучение и <span class="path">merchantId</span> — позже.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Связь расхода с источником и audit <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li><span class="path">sourceOperationId</span> — расход помнит исходную операцию.</li>
-        <li><span class="path">duplicateResolution</span>: none / linked_existing / created_new / merged / allowed_duplicate.</li>
-        <li><span class="path">proposalLog</span> — решения пользователя пишутся для будущих метрик.</li>
-        <li>Старые импорты <span class="path">importedOps</span> нормализуются лениво, ссылки не рвутся.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Подтвердить расход из импорта → в записи есть ссылка на источник; при разрешённом дубле фиксируется явное решение.</div>
-    </div>
+    <details class="item ok">
+      <summary>
+        <span class="mark">✅</span>
+        <span class="title">Git и контрольная точка<small>готово · GitHub main</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li><a href="https://github.com/makcbarabanov/wallet">github.com/makcbarabanov/wallet</a> · секреты и дампы в <span class="path">.gitignore</span>.</li>
+          <li>Репозиторий остаётся Public — решение пользователя.</li>
+          <li>Машинный контекст: <a href="/project-state.json"><span class="path">/project-state.json</span></a> · <span class="path">contextVersion: 1</span>.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Ledger и сверка счетов <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Счета и журнал операций — источник истины по деньгам (AD-003).</li>
-        <li>Сверка «факт ↔ Wallet» ведётся только по счетам; фонды, лимиты и планы — отдельные контуры.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Счета → сверить остатки «Нал» и «Т кредитка» с фактом после серии подтверждений.</div>
-    </div>
+    <details class="item wip" open>
+      <summary>
+        <span class="mark">🟡</span>
+        <span class="title">Добавление расходов из Личного / Бизнеса<small>ждёт приёмки · UI_BUILD 52</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Кнопки «Добавить расход» в обоих разделах.</li>
+          <li>Та же модалка и <span class="path">createExpense()</span> — без отдельной логики.</li>
+          <li>Для Бизнеса: Объект / Заказчик; кошельки не объединены.</li>
+        </ul>
+        <div class="check"><b>Как проверить</b>Жёсткая перезагрузка → шапка v52 → Личный: добавить расход → запись в Личном; Бизнес: Объект/Заказчик видны → запись в Бизнесе; счёт списался один раз.</div>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Поле «Магазин»: поиск с автодополнением <span class="badge">✅ работает (v51)</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Поле «Магазин» — searchable dropdown: «Популярные» (по частоте) сверху, затем «Все» по алфавиту.</li>
-        <li>Поиск без учёта регистра, по началу слова и по части слова; работает между алфавитами (<span class="path">оз → Ozon</span>, <span class="path">янд → Яндекс</span>) и по алиасам.</li>
-        <li>Новый магазин: строка «Создать новый магазин: …» добавляет его в справочник.</li>
-        <li>Подключено к добавлению расхода, ручному вводу и редактированию записи; клавиши ↑/↓/Enter/Esc.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>«Добавить расход» → поле «Магазин»: ввести «пят» → «Пятёрочка»; ввести новое имя → «Создать новый магазин».</div>
-    </div>
+    <details class="item wip">
+      <summary>
+        <span class="mark">🟡</span>
+        <span class="title">Универсальный SmartSelect для всех справочников<small>следующий шаг · UX</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Сейчас combobox есть у «Магазин». Тот же паттерн — на категории, расходы, объект, заказчик и другие списки.</li>
+          <li>Один компонент поиска/выбора, без разрозненных dropdown.</li>
+          <li>Делаем после приёмки v52, в рамках стабилизации UX — не новая архитектура денег.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Merchant Learning: структура-заготовка <span class="badge">✅ работает (v51)</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>У магазина появились поля <span class="path">count</span>, <span class="path">lastUsed</span>, <span class="path">aliases[]</span> (совместимо со старыми данными).</li>
-        <li>Статистика использования обновляется при каждом подтверждённом расходе (единая точка <span class="path">recordOutcome</span>).</li>
-        <li>Алиасы копятся автоматически: при импорте «ООО Ромашка → Магазин Ромашка» банковское имя запоминается как вариант написания.</li>
-        <li>Задел под дедуп: «NSP» и «Сервисный центр NSP» связываются как алиасы, но это по-прежнему только подсказка, не авто-дубль.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Разбор → подтвердить импорт с новым написанием магазина → в справочнике у магазина появляется alias; популярные поднимаются в списке поля «Магазин».</div>
-    </div>
+    <details class="item wip">
+      <summary>
+        <span class="mark">🟡</span>
+        <span class="title">Настройки Wallet<small>следующий шаг · Фаза 2</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Отдельная вкладка: режим ИИ (Assistant выключен), свободные деньги, фонды, лимиты.</li>
+          <li>Галочка Assistant сама по себе режим не включает — нужен отдельный AD после метрик.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Миграции схемы и синхронизация <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Пошаговые миграции до schema 11 (9 → 10 — Фаза 1, 10 → 11 — proposalLog).</li>
-        <li>Одноразовые миграции помечаются в самом payload, а не только в localStorage.</li>
-        <li>Синхронизация с Postgres с проверкой ревизии (оптимистичная блокировка).</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Открыть приложение на телефоне и ноутбуке → данные совпадают, повторный вход не плодит фонды и лимиты.</div>
-    </div>
+    <details class="item plan">
+      <summary>
+        <span class="mark">⚪</span>
+        <span class="title">Чеки через LLM → sourceOperation → Gateway<small>потом</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Фото чека → LLM извлекает структуру → предложение → подтверждение → <span class="path">createExpense()</span>.</li>
+          <li>Чек = ещё один источник, без парсера под каждый магазин.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Базовый учёт (накопленное ранее) <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Кошельки Личный / Бизнес, категории, долги, доходы, планы и конверты.</li>
-        <li>Разбор импорта T-Bank CSV, справочник магазинов, обучение по магазинам (<span class="path">merchants</span>, <span class="path">learnLog</span>).</li>
-        <li>Валет: наблюдение категорий и расходов, обучение через Разбор.</li>
-        <li>PWA: установка на телефон, network-first для HTML.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Пройти по вкладкам Разбор / Личный / Бизнес / Долги / Счета / Валет — ничего не пропало после волны Фаза 1 + Gateway.</div>
-    </div>
+    <details class="item plan">
+      <summary>
+        <span class="mark">⚪</span>
+        <span class="title">MerchantId и глубокое обучение магазинов<small>потом</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Переход от текста <span class="path">store</span> к ссылке <span class="path">merchantId</span>.</li>
+          <li>Структура aliases уже есть; массовую миграцию истории не начинаем сейчас.</li>
+        </ul>
+      </div></div>
+    </details>
 
-    <div class="card ok">
-      <h4>Документация и контрольная точка <span class="badge">✅ работает</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Канон: WALLET_PROJECT_BIBLE.md, ARCHITECTURE_DECISIONS.md (AD-001…AD-009a), PROJECT_STATE.md, WALLET_AI_LEARNING.md.</li>
-        <li>Официальный машинный контекст: <a href="/project-state.json"><span class="path">/project-state.json</span></a> · контракт <span class="path">contextVersion: 1</span> · блок <span class="path">architectureRules</span> из AD · без секретов.</li>
-        <li>Проект и чеклист шлюза: WALLET_GATEWAY_DESIGN.md, GATEWAY_IMPLEMENTATION_CHECKLIST.md.</li>
-        <li>Бэкап schema 9 с контрольными суммами: <span class="path">backup/20260724_gateway_pre_phase1_schema9/</span>.</li>
-        <li>Проверки: <span class="path">scripts/test_gateway_regressions.py</span> — PASS, разбор JS без ошибок, 0 lint.</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Открыть <a href="/project-state.json">project-state.json</a>; при спорном вопросе канон — ARCHITECTURE_DECISIONS.md.</div>
-    </div>
+    <details class="item plan">
+      <summary>
+        <span class="mark">⚪</span>
+        <span class="title">Assistant mode ИИ<small>только после статистики обучения</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Нужны метрики первого предложения (категория / кошелёк / магазин / дедуп).</li>
+          <li>Переход — отдельным архитектурным решением, не тумблером в UI.</li>
+        </ul>
+      </div></div>
+    </details>
 
-  </div>
-</section>
+    <details class="item plan">
+      <summary>
+        <span class="mark">⚪</span>
+        <span class="title">Полноценный Валет (память, советы, алерты)<small>позже · Фаза 3+</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Память решений по алертам (AD-006), советы без повторов.</li>
+          <li>Yandex AI Studio: переменные в локальном <span class="path">.env</span> есть, в код ещё не подключены.</li>
+        </ul>
+      </div></div>
+    </details>
 
-<!-- ============ 3. В ПРОЦЕССЕ ============ -->
-<section>
-  <h2 id="wip">🔄 <span class="n">3</span> В процессе <span class="count">— код есть, доверять рано</span></h2>
-
-  <div class="grid two">
-
-    <div class="card wip">
-      <h4>Приёмка UI v49 на реальных данных <span class="badge">🔄 в работе</span></h4>
-      <span class="lbl">Что уже есть</span>
-      <ul><li>Код Фазы 1 и шлюза, автоматические регрессии пройдены, бэкап schema 9 снят.</li></ul>
-      <span class="lbl">Что осталось</span>
-      <ul><li>Ручной прогон: фонды и лимит → импорт NSP → решения по дублям → сверка счетов.</li></ul>
-      <div class="no-test"><b>Пока не тестировать</b>Массовый импорт больших выписок и правки задним числом до завершения приёмки: сначала свежий дамп данных.</div>
-    </div>
-
-    <div class="card wip">
-      <h4>Перенос legacy «Запас» → фонды <span class="badge">🔄 в работе</span></h4>
-      <span class="lbl">Что уже есть</span>
-      <ul><li>Миграция копирует <span class="path">cashReserves</span> в фонды и кредитный лимит, помечает перенесённое, legacy не удаляет.</li></ul>
-      <span class="lbl">Что осталось</span>
-      <ul>
-        <li>Починить payload, где флаг миграции уже стоит, а фонды пустые (см. проблему «Фонды» ниже).</li>
-        <li>Отдельным решением — очистка deprecated <span class="path">cashReserves</span> после сверки.</li>
-      </ul>
-      <div class="no-test"><b>Пока не тестировать</b>Не удалять вручную старые записи «Запас»: они нужны как страховка для восстановления сумм.</div>
-    </div>
-
-    <div class="card wip">
-      <h4>UX диалога дубля <span class="badge">🔄 в работе</span></h4>
-      <span class="lbl">Что уже есть</span>
-      <ul><li>Логика поиска кандидатов, объяснение совпадения и три варианта решения.</li></ul>
-      <span class="lbl">Что осталось</span>
-      <ul><li>Мобильная посадка: скролл внутри модалки, читаемость длинного списка кандидатов.</li></ul>
-      <div class="no-test"><b>Пока не тестировать</b>Разбор дублей с телефона в спешке: на маленьком экране кнопки решения могут уехать за границу окна.</div>
-    </div>
-
-    <div class="card wip">
-      <h4>Метрики качества распознавания <span class="badge">🔄 в работе</span></h4>
-      <span class="lbl">Что уже есть</span>
-      <ul><li><span class="path">proposalLog</span> и <span class="path">duplicateResolution</span> уже пишутся при каждом решении.</li></ul>
-      <span class="lbl">Что осталось</span>
-      <ul><li>Экран статистики: точность категории, кошелька, магазина; recall и precision дедупа по классам Exact / Strong / Weak.</li></ul>
-      <div class="no-test"><b>Пока не тестировать</b>Не ждать процентов в интерфейсе — данные копятся, экрана метрик ещё нет.</div>
-    </div>
-
-    <div class="card wip">
-      <h4>Настройки Wallet <span class="badge">🔄 в работе</span></h4>
-      <span class="lbl">Что уже есть</span>
-      <ul><li>Поля <span class="path">settings.aiMode</span> и <span class="path">settings.freeCashMode</span> в модели, режим ИИ принудительно Training.</li></ul>
-      <span class="lbl">Что осталось</span>
-      <ul><li>Вкладка «Настройки» с показом режима ИИ и правил свободных денег (Фаза 2).</li></ul>
-      <div class="no-test"><b>Пока не тестировать</b>Переключение режима ИИ: Assistant не реализован, включение возможно только отдельным архитектурным решением после метрик.</div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ============ 4. ПЛАНЫ ============ -->
-<section>
-  <h2 id="plan">📋 <span class="n">4</span> Запланировано <span class="count">— по волнам</span></h2>
-  <p class="sec-note">Порядок волн отражает договорённость: сначала довести модель денег до устойчивого состояния, затем Git и релизы.</p>
-
-  <h3 class="wave">Фаза 2 · UI и UX</h3>
-  <div class="grid two">
-    <div class="card plan">
-      <h4>Добавление расхода из Личный / Бизнес <span class="badge">🔄 в v52, проверить</span></h4>
-      <ul>
-        <li>Кнопки «Добавить расход» в разделах Личный и Бизнес.</li>
-        <li>Та же модалка и <span class="path">createExpense()</span> — дедуп, sourceOperation, обучение сохраняются.</li>
-        <li>Кошельки не объединены: при Бизнес показываются Объект/Заказчик; при Личный — комментарий.</li>
-        <li>Из Разбора кнопка по-прежнему открывает ту же форму (кошелёк по умолчанию Личный).</li>
-      </ul>
-      <div class="check"><b>Как проверить</b>Личный → Добавить расход → сохранить; Бизнес → Добавить расход → Объект/Заказчик видны → сохранить. Запись появляется в нужном разделе, счёт списывается один раз.</div>
-    </div>
-    <div class="card plan">
-      <h4>Улучшение UX ввода <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Скролл и предельная высота модалок на смартфоне.</li>
-        <li>Меньше шагов на частых сценариях, понятные подписи фонда и счёта.</li>
-      </ul>
-    </div>
-    <div class="card plan">
-      <h4>Вкладка «Настройки» <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Режим ИИ (Training / Assistant, второй заблокирован), правило свободных денег.</li>
-        <li>Управление фондами и кредитным лимитом в одном месте.</li>
-      </ul>
-    </div>
-  </div>
-
-  <h3 class="wave">Gateway · остаток волны (фундамент уже реализован)</h3>
-  <div class="grid two">
-    <div class="card plan">
-      <h4>Объединение операций <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Сценарий «объединить»: связать источник с существующим расходом без второго списания.</li>
-        <li>Статусы источника: queued / linked / rejected / merged.</li>
-      </ul>
-    </div>
-    <div class="card plan">
-      <h4>bankId и новые каналы <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Банковский идентификатор от парсеров там, где он есть → класс Exact.</li>
-        <li>Переименование <span class="path">importedOps</span> → <span class="path">sourceOperations</span> без лишней миграции сейчас.</li>
-      </ul>
-    </div>
-  </div>
-
-  <h3 class="wave">AI Learning</h3>
-  <div class="grid two">
-    <div class="card ok">
-      <h4>Yandex AI Studio: ключи в окружении <span class="badge">✅ готово (локально)</span></h4>
-      <ul>
-        <li>В локальном <span class="path">.env</span> (не в Git) добавлены:
-          <span class="path">YANDEX_AI_STUDIO_API_KEY</span>,
-          <span class="path">YANDEX_AI_STUDIO_FOLDER_ID</span>,
-          <span class="path">YANDEX_AI_STUDIO_BASE_URL</span>,
-          <span class="path">YANDEX_AI_STUDIO_MODEL</span>.</li>
-        <li>Сейчас учебный ключ; перед продом заменить на секретный.</li>
-        <li><span class="path">FOLDER_ID</span> пока пустой — заполнить при первом подключении к API.</li>
-        <li>В коде Valet/парсера эти переменные ещё <b>не читаются</b> (Timeweb / OpenRouter остаются текущими провайдерами).</li>
-      </ul>
-      <div class="check"><b>Не публиковать</b>Значение ключа ни в roadmap, ни в Git, ни в скриншотах. Только имена переменных.</div>
-    </div>
-    <div class="card plan">
-      <h4>Подключить Yandex AI Studio в API <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Провайдер в <span class="path">valet_llm.py</span> / распознавании выписок и чеков.</li>
-        <li>Проброс переменных в <span class="path">docker-compose.yml</span> для контейнера <span class="path">wallet-api</span>.</li>
-        <li>Переключение через <span class="path">VALET_LLM_PROVIDER</span> (или отдельный флаг), без ломки Timeweb/OpenRouter.</li>
-      </ul>
-    </div>
-    <div class="card plan">
-      <h4>Статистика угадывания <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Доля верного <b>первого</b> предложения по категории, кошельку, магазину.</li>
-        <li>Качество дедупа в разрезе Exact / Strong / Weak.</li>
-        <li>Порог перехода в Assistant — отдельным архитектурным решением.</li>
-      </ul>
-    </div>
-    <div class="card plan">
-      <h4>Магазин как сущность: <span class="path">merchantId</span> <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Постепенный переход от <span class="path">store: "Яндекс"</span> к ссылке <span class="path">merchantId</span> на запись справочника.</li>
-        <li>Структура уже готова (name / aliases / count / lastUsed) — остаётся связать расход с id и мигрировать историю без потери текста.</li>
-        <li>Даст точный дедуп по алиасам и чистую статистику по магазину.</li>
-      </ul>
-    </div>
-    <div class="card plan">
-      <h4>Обучение Валета (Фаза 3) <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Стабильные ключи алертов, память решений, отсутствие повторяющихся предупреждений (AD-006).</li>
-        <li>Фаза 4: статистика использования разделов.</li>
-      </ul>
-    </div>
-  </div>
-
-  <h3 class="wave">Чеки и универсальный ввод</h3>
-  <div class="grid two">
-    <div class="card plan">
-      <h4>Распознавание чеков через LLM <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Фото и скриншот чека → предложение расхода, подтверждение остаётся за пользователем.</li>
-      </ul>
-    </div>
-    <div class="card plan">
-      <h4>Универсальный parser <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Один формат источника для PDF, Excel, CSV, буфера, API.</li>
-        <li>Любой канал входит только через шлюз — свой дедуп никто не изобретает.</li>
-      </ul>
-    </div>
-  </div>
-
-  <h3 class="wave">Git / Release</h3>
-  <div class="grid two">
-    <div class="card plan">
-      <h4>Восстановление истории <span class="badge">✅ сделано</span></h4>
-      <ul>
-        <li>Git инициализирован 25.07.2026, первый commit на GitHub.</li>
-        <li>Потери файлов из дерева больше не «без страховки».</li>
-      </ul>
-    </div>
-    <div class="card plan">
-      <h4>Безопасные релизы <span class="badge">📋 план</span></h4>
-      <ul>
-        <li>Репозиторий сейчас Public → перевести в Private.</li>
-        <li>Первый стабильный релиз / тег после приёмки Gateway и Фазы 2.</li>
-        <li>README по запуску, фиксация <span class="path">schemaVersion</span>.</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 5. ПРОБЛЕМЫ ============ -->
-<section>
-  <h2 id="bugs">🔴 <span class="n">5</span> Мои текущие проблемы / баги</h2>
-  <p class="sec-note">Фиксация без правок кода. Разбираем в этом порядке, до расширения функциональности.</p>
-
-  <div class="grid two">
-
-    <div class="card ok">
-      <h4>Modal добавления расхода <span class="badge">✅ принято (v50)</span></h4>
-      <ul>
-        <li>Было: на смартфоне форма не помещалась, внутреннего скролла нет, кнопки «Сохранить» и «Отмена» уезжали за границу экрана.</li>
-        <li>Исправлено в UI_BUILD 50: предельная высота с учётом <span class="path">100dvh</span>, скролл внутри окна, sticky-кнопки, safe-area.</li>
-        <li><b>Приёмка 25.07.2026:</b> пользователь подтвердил на смартфоне — форма скроллится, кнопки видны.</li>
-      </ul>
-    </div>
-
-    <div class="card ok">
-      <h4>Фонды: восстановление «Бизнес» и лимита <span class="badge">✅ принято (v50)</span></h4>
-      <ul>
-        <li>Было: после Фазы 1 виден только «Тест»; флаг <span class="path">wallet_alloc_phase1_v1</span> стоял, а <span class="path">funds</span>/<span class="path">creditLimits</span> были пусты.</li>
-        <li>Исправлено в UI_BUILD 50 repair-миграцией <span class="path">wallet_alloc_phase1_v2</span>.</li>
-        <li><b>Приёмка 25.07.2026:</b> на смартфоне после жёсткой перезагрузки видны «Тест», «Бизнес» 675 000 ₽ и лимит 150 000 ₽.</li>
-      </ul>
-    </div>
-
-    <div class="card ok">
-      <h4>Git / контрольная точка кода <span class="badge">✅ готово</span></h4>
-      <span class="lbl">Что сделано</span>
-      <ul>
-        <li>Локальный Git + remote <a href="https://github.com/makcbarabanov/wallet">github.com/makcbarabanov/wallet</a>, ветка <span class="path">main</span>, commit <span class="path">aae4e1e</span> (UI_BUILD 51 / schema 11).</li>
-        <li>Усиленный <span class="path">.gitignore</span>: <span class="path">.env</span>, дампы, <span class="path">wallet_review_v3*.json</span>, выписки CSV, <span class="path">backup/</span>, zip-архивы.</li>
-        <li>В репозитории есть код API, UI, docs, fixtures (включая NSP) — без реальных финансов.</li>
-      </ul>
-      <div class="check"><b>Осталось</b>Сделать репозиторий <b>Private</b> (сейчас Public). Дальше — обычные commit/push после волн.</div>
-    </div>
-
-    <div class="card ok">
-      <h4>Дубли: NSP на реальном потоке <span class="badge">✅ принято</span></h4>
-      <ul>
-        <li>25.07.2026: импорт «Сервисный центр НСП» при существующем NSP 10 511 ₽ → пользователь выбрал связать с существующим.</li>
-        <li>В payload: один расход <span class="path">NSP</span> · 10 511; sourceOp <span class="path">duplicateResolution = linked_existing</span>; <span class="path">proposalLog</span> записан.</li>
-        <li>Второго списания со счёта нет (rev 282).</li>
-      </ul>
-    </div>
-
-    <div class="card ok">
-      <h4>Файлы пропадают из дерева проекта <span class="badge">✅ риск снят (Git)</span></h4>
-      <ul>
-        <li>Было: пропадал UI и backend <span class="path">api/</span>; сервис жил на образе от 21.07.</li>
-        <li>25.07.2026: Git + GitHub. Код восстановлен и зафиксирован в <span class="path">aae4e1e</span>.</li>
-        <li>Дампы и секреты остаются локально (не в Git) — снимать дамп перед рискованными прогонами по-прежнему полезно.</li>
-      </ul>
-    </div>
-
-    <div class="card bad">
-      <h4>Раздел /logs недоступен <span class="badge">🔴 мелкое</span></h4>
-      <ul>
-        <li>Веб-сервер ищет файл <span class="path">logs.html</span>, а страница лежит как <span class="path">public/logs/index.html</span>.</li>
-        <li>Итог: адрес <span class="path">/logs</span> отвечает ошибкой, хотя страница существует.</li>
-      </ul>
-      <div class="check"><b>Требуется</b>Поправить настройку сервера при следующей правке конфигурации; на модель данных не влияет.</div>
-    </div>
+    <details class="item bad">
+      <summary>
+        <span class="mark">🔴</span>
+        <span class="title">Мелкий баг: /logs<small>открыт · не блокирует</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>nginx ищет <span class="path">logs.html</span>, страница лежит как <span class="path">public/logs/index.html</span>.</li>
+          <li>На модель денег не влияет; закрыть при удобном случае.</li>
+        </ul>
+      </div></div>
+    </details>
 
   </div>
 </section>
 
-<!-- ============ 6. СЛЕДУЮЩИЕ ДЕЙСТВИЯ ============ -->
 <section>
-  <h2 id="next"><span class="n">6</span> Следующие действия</h2>
-  <p class="sec-note">Согласовано 25.07.2026: стадия «закрепляем фундамент», не «добавляем фичи». Сначала страховка (Git), затем приёмка Gateway на реальных данных, только потом Фаза 2.</p>
+  <h2 id="next">Следующие действия</h2>
+  <p class="sec-note">Порядок стабилизации. Новые большие фичи — после приёмки текущей версии.</p>
   <ol class="steps">
-    <li style="opacity:.55"><b>✅ Проверить v50 на смартфоне</b><span>Принято 25.07.2026: фонды и скролл модалки работают.</span></li>
-    <li style="opacity:.55"><b>✅ Git: init + первый стабильный commit</b><span>25.07.2026 · <span class="path">aae4e1e</span> → <a href="https://github.com/makcbarabanov/wallet">github.com/makcbarabanov/wallet</a>. В истории нет <span class="path">.env</span>, дампов, выписок. <b>Внимание: репозиторий сейчас Public</b> — лучше сделать Private.</span></li>
-    <li style="opacity:.55"><b>✅ Приёмка Gateway на реальном дубле NSP</b><span>25.07.2026: «Верно» → диалог → <span class="path">linked_existing</span>. В Ledger один NSP 10 511 ₽; второго списания нет (rev 282).</span></li>
-    <li style="opacity:.55"><b>✅ Проверить v51: поле «Магазин»</b><span>Пользователь подтвердил 25.07.2026.</span></li>
-    <li style="opacity:.55"><b>⏭ Репозиторий Private</b><span>Отклонено пользователем 25.07.2026 — оставляем Public.</span></li>
-    <li><b>Проверить v52: расход из Личный / Бизнес</b><span>Кнопки в разделах, бизнес-поля Объект/Заказчик, путь через <span class="path">createExpense()</span>.</span></li>
-    <li><b>Закрыть мелкие баги roadmap</b><span>Напр. <span class="path">/logs</span> 404 (nginx ищет <span class="path">logs.html</span>).</span></li>
-    <li><b>Фаза 2 · Вкладка «Настройки»</b><span>Режим ИИ (Assistant выключен), правила свободных денег, управление фондами и лимитами.</span></li>
-    <li><b>Контрольная точка / первый релиз</b><span>Тег версии, фиксация <span class="path">schemaVersion</span>, README по запуску.</span></li>
-    <li style="opacity:.7"><b>Потом: Чеки как источник</b><span>Фото → LLM извлекает структуру → предложение расхода → подтверждение → через Gateway. Чек = ещё один <span class="path">sourceOperation</span>, без парсера под каждый магазин.</span></li>
+    <li class="done"><b>✅ Фонды, Gateway, NSP, Магазин, Git</b><span>Принято 25.07.2026.</span></li>
+    <li><b>Принять v52: расход из Личный / Бизнес</b><span>Кнопки в разделах, Объект/Заказчик для бизнеса, один debit.</span></li>
+    <li><b>SmartSelect для справочников</b><span>Тот же searchable-паттерн, что у магазинов: категории, расходы, объект, заказчик.</span></li>
+    <li><b>Вкладка «Настройки»</b><span>Training/Assistant (второй выключен), свободные деньги, фонды, лимиты.</span></li>
+    <li><b>Починить /logs</b><span>Мелочь nginx.</span></li>
+    <li class="done" style="opacity:.7"><b>Потом: чеки / merchantId / Assistant / Валет</b><span>Только после стабильной контрольной точки.</span></li>
   </ol>
 </section>
 
 <footer>
-  <div>Источники истины для этой страницы:</div>
+  <div>Источники:</div>
   <ul>
-    <li>PROJECT_STATE.md — снимок состояния и контрольная точка</li>
-    <li>ARCHITECTURE_DECISIONS.md — канон решений AD-001…AD-009a</li>
-    <li>WALLET_PROJECT_BIBLE.md — модель денег и инварианты</li>
-    <li>WALLET_AI_LEARNING.md — кто решает, что запоминаем, какие метрики</li>
-    <li>текущий код UI_BUILD 52 / schema 11 и реализованные фазы</li>
+    <li><a href="/project-state.json">/project-state.json</a> — машинный контекст для Ардена (<span class="path">contextVersion: 1</span>)</li>
+    <li>PROJECT_STATE.md · ARCHITECTURE_DECISIONS.md · WALLET_AI_LEARNING.md</li>
+    <li><a href="https://github.com/makcbarabanov/wallet">github.com/makcbarabanov/wallet</a></li>
   </ul>
-  <p>Страница только отражает состояние проекта. Новые архитектурные решения фиксируются в ARCHITECTURE_DECISIONS.md, а не здесь.</p>
 </footer>
 
 </div>

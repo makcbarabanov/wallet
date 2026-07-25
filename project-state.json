@@ -92,12 +92,23 @@
       "build": 52
     },
     {
+      "item": "Universal SmartSelect for directories",
+      "status": "planned_next",
+      "note": "Reuse store combobox pattern for category, expense, object, customer"
+    },
+    {
+      "item": "Settings tab",
+      "status": "planned_next",
+      "note": "AI mode (Assistant disabled), free cash rules, funds, credit limits"
+    },
+    {
       "item": "Yandex AI Studio integration",
       "status": "env_prepared_not_integrated",
       "note": "Only env variable names exist locally; secrets are never published here"
     }
   ],
   "doNotDoNow": [
+    "new major features before v52 acceptance",
     "fund movement history",
     "mandatory fund assignment",
     "Assistant mode",
@@ -106,12 +117,14 @@
     "separate bridge project beyond this JSON"
   ],
   "nextActions": [
-    "Accept UI_BUILD 52 on Personal and Business real flows",
+    "Stabilize current version: accept UI_BUILD 52 on Personal and Business",
+    "Universal SmartSelect for directories (same pattern as store combobox)",
     "Implement the Settings tab with Assistant disabled",
     "Fix the /logs route",
     "Create the next stable release checkpoint",
     "Later: receipts as sourceOperation through LLM and Gateway"
   ],
+  "focus": "Do not add major new features; stabilize the current version first",
   "knownIssues": [
     {
       "item": "/logs route",
