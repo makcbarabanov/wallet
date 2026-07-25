@@ -1,0 +1,53 @@
+# --- secrets & credentials ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets/
+
+# --- Python / Node ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+node_modules/
+dist/
+.vite/
+
+# --- OS / editor noise ---
+.DS_Store
+*.log
+*.swp
+*~
+
+# --- local DB ---
+*.db
+*.db-journal
+data/wallet.db
+data/wallet.db-*
+
+# --- real financial / personal data (never commit) ---
+data/dumps/
+data/makc_app_state.json
+wallet_review_v3.json
+wallet_review_v3.min.json
+public/wallet_review_v3.json
+public/wallet_review_v3.min.json
+Operations*.csv
+*.csv
+!data/fixtures/**/*.csv
+!data/sample_statement.csv
+2207.txt
+backup/
+review-pack/
+*.zip
+
+# --- optional local scratch ---
+tmp/
+.cache/

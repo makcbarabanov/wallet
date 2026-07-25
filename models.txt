@@ -1,0 +1,192 @@
+
+Favicon for sao10k
+Sao10K: Llama 3 8B Lunaris
+
+6,09B tokens
+
+Lunaris 8B is a versatile generalist and roleplaying model based on Llama 3. It's a strategic merge of multiple models, designed to balance creativity with improved logic and general knowledge.  Created by Sao10k, this model aims to offer an improved experience over Stheno v3.2, with enhanced creativity and logical reasoning.  For best results, use with Llama 3 Instruct context template, temperature 1.4, and min_p 0.1.
+
+by sao10k
+Aug 13, 2024
+8K context
+$0,04/M input tokens
+$0,05/M output tokens
+Favicon for openai
+OpenAI: GPT-4o (2024-08-06)
+
+1,55B tokens
+
+The 2024-08-06 version of GPT-4o offers improved performance in structured outputs, with the ability to supply a JSON schema in the respone_format. Read more here.  GPT-4o ("o" for "omni") is OpenAI's latest AI model, supporting both text and image inputs with text outputs. It maintains the intelligence level of GPT-4 Turbo while being twice as fast and 50% more cost-effective. GPT-4o also offers improved performance in processing non-English languages and enhanced visual capabilities.  For benchmarking against other models, it was briefly called "im-also-a-good-gpt2-chatbot"
+
+by openai
+Aug 6, 2024
+128K context
+$2,50/M input tokens
+$10/M output tokens
+Favicon for meta-llama
+Meta: Llama 3.1 8B Instruct
+
+54,1B tokens
+
+
+Health (#43)
+
+Translation (#2)
+
+Trivia (#19)
+Meta's latest class of model (Llama 3.1) launched with a variety of sizes & flavors. This 8B instruct-tuned version is fast and efficient.  It has demonstrated strong performance compared to leading closed-source models in human evaluations.  To read more about the model release, click here. Usage of this model is subject to Meta's Acceptable Use Policy.
+
+by meta-llama
+Jul 23, 2024
+131K context
+$0,02/M input tokens
+$0,03/M output tokens
+Favicon for meta-llama
+Meta: Llama 3.1 70B Instruct
+
+6,56B tokens
+
+
+Trivia (#43)
+Meta's latest class of model (Llama 3.1) launched with a variety of sizes & flavors. This 70B instruct-tuned version is optimized for high quality dialogue usecases.  It has demonstrated strong performance compared to leading closed-source models in human evaluations.  To read more about the model release, click here. Usage of this model is subject to Meta's Acceptable Use Policy.
+
+by meta-llama
+Jul 23, 2024
+131K context
+$0,40/M input tokens
+$0,40/M output tokens
+Favicon for mistralai
+Mistral: Mistral Nemo
+
+288B tokens
+
+
+Legal (#39)
+
+SEO (#29)
+
+Roleplay (#13)
+
+Translation (#45)
+
+Trivia (#36)
+A 12B parameter model with a 128k token context length built by Mistral in collaboration with NVIDIA.  The model is multilingual, supporting English, French, German, Spanish, Italian, Portuguese, Chinese, Japanese, Korean, Arabic, and Hindi.  It supports function calling and is released under the Apache 2.0 license.
+
+by mistralai
+Jul 19, 2024
+131K context
+$0,02/M input tokens
+$0,03/M output tokens
+Favicon for openai
+OpenAI: GPT-4o-mini (2024-07-18)
+
+12,3B tokens
+
+GPT-4o mini is OpenAI's newest model after GPT-4 Omni, supporting both text and image inputs with text outputs.  As their most advanced small model, it is many multiples more affordable than other recent frontier models, and more than 60% cheaper than GPT-3.5 Turbo. It maintains SOTA intelligence, while being significantly more cost-effective.  GPT-4o mini achieves an 82% score on MMLU and presently ranks higher than GPT-4 on chat preferences common leaderboards.  Check out the launch announcement to learn more.  #multimodal
+
+by openai
+Jul 18, 2024
+128K context
+$0,15/M input tokens
+$0,60/M output tokens
+Favicon for openai
+OpenAI: GPT-4o-mini
+
+260B tokens
+
+
+Academia (#20)
+
+Finance (#23)
+
+Health (#9)
+
+Legal (#23)
+
+Marketing (#14)
+
++6 categories
+GPT-4o mini is OpenAI's newest model after GPT-4 Omni, supporting both text and image inputs with text outputs.  As their most advanced small model, it is many multiples more affordable than other recent frontier models, and more than 60% cheaper than GPT-3.5 Turbo. It maintains SOTA intelligence, while being significantly more cost-effective.  GPT-4o mini achieves an 82% score on MMLU and presently ranks higher than GPT-4 on chat preferences common leaderboards.  Check out the launch announcement to learn more.  #multimodal
+
+by openai
+Jul 18, 2024
+128K context
+$0,15/M input tokens
+$0,60/M output tokens
+Favicon for google
+Google: Gemma 2 27B
+
+74,8M tokens
+
+Gemma 2 27B by Google is an open model built from the same research and technology used to create the Gemini models.  Gemma models are well-suited for a variety of text generation tasks, including question answering, summarization, and reasoning.  See the launch announcement for more details. Usage of Gemma is subject to Google's Gemma Terms of Use.
+
+by google
+Jul 13, 2024
+8K context
+$0,65/M input tokens
+$0,65/M output tokens
+Favicon for openai
+OpenAI: GPT-4o
+
+16B tokens
+
+
+Health (#47)
+GPT-4o ("o" for "omni") is OpenAI's latest AI model, supporting both text and image inputs with text outputs. It maintains the intelligence level of GPT-4 Turbo while being twice as fast and 50% more cost-effective. GPT-4o also offers improved performance in processing non-English languages and enhanced visual capabilities.  For benchmarking against other models, it was briefly called "im-also-a-good-gpt2-chatbot"  #multimodal
+
+by openai
+May 13, 2024
+128K context
+$2,50/M input tokens
+$10/M output tokens
+Favicon for openai
+OpenAI: GPT-4o (2024-05-13)
+
+61,2M tokens
+
+GPT-4o ("o" for "omni") is OpenAI's latest AI model, supporting both text and image inputs with text outputs. It maintains the intelligence level of GPT-4 Turbo while being twice as fast and 50% more cost-effective. GPT-4o also offers improved performance in processing non-English languages and enhanced visual capabilities.  For benchmarking against other models, it was briefly called "im-also-a-good-gpt2-chatbot"  #multimodal
+
+by openai
+May 13, 2024
+128K context
+$5/M input tokens
+$15/M output tokens
+Favicon for mistralai
+Mistral: Mixtral 8x22B Instruct
+
+283M tokens
+
+Mistral's official instruct fine-tuned version of Mixtral 8x22B. It uses 39B active parameters out of 141B, offering unparalleled cost efficiency for its size. Its strengths include: - strong math, coding, and reasoning - large context length (64k) - fluency in English, French, Italian, German, and Spanish  See benchmarks on the launch announcement here. #moe
+
+by mistralai
+Apr 17, 2024
+66K context
+$2/M input tokens
+$6/M output tokens
+Favicon for microsoft
+WizardLM-2 8x22B
+
+1,13B tokens
+
+WizardLM-2 8x22B is Microsoft AI's most advanced Wizard model. It demonstrates highly competitive performance compared to leading proprietary models, and it consistently outperforms all existing state-of-the-art opensource models.  It is an instruct finetune of Mixtral 8x22B.  To read more about the model release, click here.  #moe
+
+by microsoft
+Apr 16, 2024
+66K context
+$0,62/M input tokens
+$0,62/M output tokens
+Favicon for openai
+OpenAI: GPT-4 Turbo
+
+72M tokens
+
+The latest GPT-4 Turbo model with vision capabilities. Vision requests can now use JSON mode and function calling.  Training data: up to December 2023.
+
+by openai
+Apr 9, 2024
+128K context
+$10/M input tokens
+$30/M output tokens
+Favicon for anthropic
+Anthropic: Claude 3 Haiku
+

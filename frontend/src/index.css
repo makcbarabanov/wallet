@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% -10%, rgba(47, 107, 84, 0.08), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 0%, rgba(168, 93, 66, 0.06), transparent);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-pine-500/40 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-pine-600 text-white hover:bg-pine-700 active:bg-pine-700;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-ink-700 border border-ink-200 hover:bg-ink-100;
+  }
+
+  .btn-ghost {
+    @apply btn text-ink-500 hover:bg-ink-100 hover:text-ink-700;
+  }
+
+  .btn-danger {
+    @apply btn bg-clay-500 text-white hover:bg-clay-600;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm text-ink-800
+      placeholder:text-ink-400 focus:border-pine-500 focus:outline-none focus:ring-2 focus:ring-pine-500/20;
+  }
+
+  .select {
+    @apply input appearance-none bg-white pr-8;
+  }
+
+  .panel {
+    @apply rounded-2xl border border-ink-200/80 bg-white/80 backdrop-blur-sm shadow-soft;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium;
+  }
+}

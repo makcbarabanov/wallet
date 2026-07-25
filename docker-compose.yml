@@ -1,0 +1,16 @@
+services:
+  wallet-api:
+    build: ./api
+    container_name: wallet-api
+    ports:
+      - "127.0.0.1:8012:8012"
+    env_file:
+      - .env
+    environment:
+      APP_PORT: "8012"
+      WALLET_DEFAULT_USER: makc
+      WALLET_DUMP_DIR: /data/dumps
+    volumes:
+      # Private dumps — not served by nginx public/
+      - ./data:/data
+    restart: unless-stopped

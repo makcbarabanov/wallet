@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Wallet · Valet logs</title>
+  <style>
+    :root{--bg:#f3efe8;--card:#fff;--ink:#1a1714;--muted:#6b645c;--line:#e4ddd3;--ok:#2f6b54;--warn:#a85d42;--bad:#b91c1c;--attn:#fff1f0}
+    *{box-sizing:border-box}
+    body{margin:0;font:15px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+    header{padding:16px 20px;background:#1a3d32;color:#fff;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+    header h1{margin:0;font-size:1.15rem;font-weight:650}
+    header .stats{display:flex;gap:10px;flex-wrap:wrap;font-size:.85rem}
+    header .pill{background:rgba(255,255,255,.12);padding:4px 10px;border-radius:999px}
+    header .pill.bad{background:#b91c1c}
+    nav.tabs{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid var(--line);background:#f7f3ec;flex-wrap:wrap}
+    nav.tabs button{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;font:inherit}
+    nav.tabs button.active{background:var(--ok);color:#fff;border-color:var(--ok)}
+    main{padding:16px;max-width:1200px;margin:0 auto}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;align-items:center}
+    .toolbar input,.toolbar select,textarea,input[type=text]{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+    .btn{border:0;border-radius:10px;padding:8px 12px;cursor:pointer;font:inherit;background:#efeae2;transition:transform .15s ease, background .2s ease, color .2s ease}
+    .btn:active{transform:scale(.97)}
+    .btn-ok{background:var(--ok);color:#fff}
+    .btn-bad{background:#fde8e8;color:var(--bad)}
+    .btn-ghost{background:#fff;border:1px solid var(--line)}
+    .btn-done{background:#e5f0e9;color:var(--ok);font-weight:650;pointer-events:none}
+    .btn-pulse{animation:pulseOk .55s ease}
+    @keyframes pulseOk{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
+    .user-block{margin:0 0 18px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    .user-block h2{margin:0;padding:10px 14px;background:#efeae2;font-size:1rem}
+    table{width:100%;border-collapse:collapse;font-size:.88rem}
+    th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+    th{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#f7f3ec}
+    tr.attn{background:var(--attn)}
+    tr.overdue{background:#ffe4e1}
+    .msg{white-space:pre-wrap;max-width:420px}
+    .flags{display:flex;flex-wrap:wrap;gap:4px}
+    .flag{font-size:.72rem;padding:2px 7px;border-radius:999px;background:#efeae2}
+    .flag.red{background:#fde8e8;color:var(--bad);font-weight:700}
+    .flag.orange{background:#f2e4de;color:var(--warn)}
+    .flag.green{background:#e5f0e9;color:var(--ok)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}
+    .card.actual{border-color:#c9a227;box-shadow:inset 3px 0 0 #c9a227}
+    .card h3{margin:0 0 8px;font-size:1rem}
+    .row-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .empty{color:var(--muted);padding:20px}
+    .hint{font-size:.82rem;color:var(--muted)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:800px){.grid2{grid-template-columns:1fr}.msg{max-width:100%}}
+    textarea{width:100%;min-height:90px}
+    label{display:block;font-size:.8rem;color:var(--muted);margin:8px 0 4px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Valet · логи и обучение</h1>
+  <div class="stats" id="hdrStats"></div>
+</header>
+<nav class="tabs" id="tabs">
+  <button type="button" class="active" data-tab="logs">Логи</button>
+  <button type="button" data-tab="questions">Открытые вопросы</button>
+  <button type="button" data-tab="knowledge">База знаний</button>
+</nav>
+<main>
+  <section id="tab-logs">
+    <div class="toolbar">
+      <button type="button" class="btn btn-ok" id="reloadLogs">Обновить</button>
+      <label style="margin:0">только внимание <input type="checkbox" id="onlyAttn"/></label>
+      <span class="empty" id="logsMeta"></span>
+    </div>
+    <div id="logsRoot"></div>
+  </section>
+  <section id="tab-questions" hidden>
+    <div class="toolbar">
+      <select id="qStatus">
+        <option value="waiting">waiting</option>
+        <option value="all">все</option>
+        <option value="ready">ready</option>
+        <option value="delivered">delivered</option>
+        <option value="closed_ok">closed_ok</option>
+        <option value="closed_loop">closed_loop</option>
+      </select>
+      <button type="button" class="btn btn-ok" id="reloadQ">Обновить</button>
+    </div>
+    <div id="qRoot"></div>
+  </section>
+  <section id="tab-knowledge" hidden>
+    <div class="toolbar">
+      <select id="kFilter">
+        <option value="actual">актуально</option>
+        <option value="all">все</option>
+        <option value="normal">обычные</option>
+      </select>
+      <button type="button" class="btn btn-ok" id="reloadK">Обновить</button>
+      <button type="button" class="btn" id="addK">+ статья</button>
+      <span class="hint">«Актуально» = очередь доработки шпаргалки. Один список, без отдельной вкладки.</span>
+    </div>
+    <div id="kRoot"></div>
+  </section>
+</main>
+<script>
+const API = '/api/v1/admin/valet';
+const $ = (id) => document.getElementById(id);
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));}
+function fmt(dt){ if(!dt) return '—'; try{ return new Date(dt).toLocaleString('ru-RU'); }catch{ return String(dt);} }
+
+document.querySelectorAll('#tabs button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    ['logs','questions','knowledge'].forEach(t=>{
+      $(`tab-${t}`).hidden = t !== btn.dataset.tab;
+    });
+    if(btn.dataset.tab==='logs') loadLogs();
+    if(btn.dataset.tab==='questions') loadQuestions();
+    if(btn.dataset.tab==='knowledge') loadKnowledge();
+  });
+});
+
+async function api(path, opts){
+  const res = await fetch(API+path, {
+    headers:{'Content-Type':'application/json', ...(opts?.headers||{})},
+    ...opts,
+  });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.detail || ('HTTP '+res.status));
+  return data;
+}
+
+function markAdded(btn){
+  btn.classList.add('btn-done','btn-pulse');
+  btn.textContent = 'добавлено';
+  btn.title = 'Уже в базе знаний · актуально';
+}
+
+async function loadLogs(){
+  const data = await api('/logs?limit=400');
+  const only = $('onlyAttn').checked;
+  $('hdrStats').innerHTML = `
+    <span class="pill">всего ${data.stats.total}</span>
+    <span class="pill ${data.stats.attention?'bad':''}">внимание ${data.stats.attention}</span>
+    <span class="pill ${data.stats.overdue_24h?'bad':''}">просрочено 24ч ${data.stats.overdue_24h}</span>`;
+  $('logsMeta').textContent = 'сортировка по дате · группы по пользователю · логи в Postgres';
+  const grouped = data.grouped || {};
+  const names = Object.keys(grouped).sort();
+  if(!names.length){ $('logsRoot').innerHTML = '<div class="empty">Пока нет сообщений</div>'; return; }
+  $('logsRoot').innerHTML = names.map(name=>{
+    let rows = grouped[name];
+    if(only) rows = rows.filter(r=>r.attention);
+    if(!rows.length) return '';
+    return `<div class="user-block"><h2>${esc(name)}</h2>
+      <table><thead><tr>
+        <th>дата</th><th>роль</th><th>сообщение</th><th>оценка</th><th>маркеры</th><th></th>
+      </tr></thead><tbody>
+      ${rows.map(r=>{
+        const flags=[];
+        if(r.needs_attention) flags.push('<span class="flag red">внимание</span>');
+        if(r.is_dont_know) flags.push('<span class="flag red">не знаю</span>');
+        if(r.overdue_24h) flags.push('<span class="flag red">просрочено 24ч</span>');
+        if(r.hallucination_flag) flags.push('<span class="flag orange">галюцинация</span>');
+        if(r.message_kind && r.message_kind!=='normal') flags.push(`<span class="flag">${esc(r.message_kind)}</span>`);
+        if(r.rating===1) flags.push('<span class="flag green">👍</span>');
+        if(r.rating===-1) flags.push('<span class="flag red">👎</span>');
+        const rating = r.rating==null ? '—' : (r.rating===1?'👍':'👎') + (r.rating_comment?`<div class="msg">${esc(r.rating_comment)}</div>`:'');
+        const cls = r.overdue_24h ? 'overdue' : (r.attention ? 'attn' : '');
+        return `<tr class="${cls}" data-id="${r.id}">
+          <td>${esc(fmt(r.created_at))}</td>
+          <td>${esc(r.role)}</td>
+          <td class="msg">${esc(r.content)}</td>
+          <td>${rating}</td>
+          <td><div class="flags">${flags.join('')}</div></td>
+          <td class="row-actions">
+            <button class="btn btn-ghost" data-act="hall" data-id="${r.id}" title="Пометить как галлюцинацию">галюц.</button>
+            <button class="btn btn-ghost" data-act="attn" data-id="${r.id}" title="Пометить внимание">внимание</button>
+            <button class="btn" data-act="actual" data-id="${r.id}" title="Добавит черновик в Базу знаний с меткой «актуально»">в актуальность</button>
+          </td>
+        </tr>`;
+      }).join('')}
+      </tbody></table></div>`;
+  }).join('');
+  $('logsRoot').querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = Number(btn.dataset.id);
+      if(btn.dataset.act==='hall'){
+        await api(`/messages/${id}`,{method:'PATCH',body:JSON.stringify({hallucination_flag:true,needs_attention:true})});
+        loadLogs();
+      } else if(btn.dataset.act==='attn'){
+        await api(`/messages/${id}`,{method:'PATCH',body:JSON.stringify({needs_attention:true})});
+        loadLogs();
+      } else if(btn.dataset.act==='actual'){
+        if(btn.classList.contains('btn-done')) return;
+        btn.disabled = true;
+        try{
+          await api('/knowledge/from-message',{method:'POST',body:JSON.stringify({message_id:id})});
+          markAdded(btn);
+        } catch(err){
+          btn.disabled = false;
+          alert(err.message||err);
+        }
+      }
+    });
+  });
+}
+
+async function loadQuestions(){
+  const st = $('qStatus').value;
+  const q = st==='all' ? '' : `?status=${encodeURIComponent(st)}`;
+  const data = await api('/questions'+q);
+  if(!data.items.length){ $('qRoot').innerHTML='<div class="empty">Пусто</div>'; return; }
+  $('qRoot').innerHTML = data.items.map(q=>`
+    <div class="card ${q.overdue_24h?'overdue':''}">
+      <h3>#${q.id} · ${esc(q.username)} · ${esc(q.status)}${q.overdue_24h?' · <span class="flag red">просрочено 24ч</span>':''}</h3>
+      <div class="msg">${esc(q.question_text)}</div>
+      <div class="empty">${esc(fmt(q.created_at))}</div>
+      <label>Черновик ответа</label>
+      <textarea id="draft-${q.id}">${esc(q.draft_answer||q.final_answer||'')}</textarea>
+      <div class="row-actions">
+        <button class="btn" data-q="draft" data-id="${q.id}">Сгенерировать черновик</button>
+        <button class="btn btn-ok" data-q="send" data-id="${q.id}">Отправить пользователю</button>
+        <button class="btn" data-q="actual" data-id="${q.id}" title="В базу знаний · актуально">в актуальность</button>
+      </div>
+    </div>`).join('');
+  $('qRoot').querySelectorAll('[data-q]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = Number(btn.dataset.id);
+      if(btn.dataset.q==='draft'){
+        btn.disabled=true;
+        try{
+          const r = await api(`/questions/${id}/draft`,{method:'POST',body:'{}'});
+          $(`draft-${id}`).value = r.draft_answer||'';
+          if(r.still_needs_kb) alert('Черновик: всё ещё нужна база знаний');
+        } finally { btn.disabled=false; }
+      } else if(btn.dataset.q==='send'){
+        const answer = $(`draft-${id}`).value.trim();
+        if(!answer){ alert('Пустой ответ'); return; }
+        await api(`/questions/${id}/send`,{method:'POST',body:JSON.stringify({answer})});
+        alert('Ответ поставлен в inbox пользователя');
+        loadQuestions();
+      } else if(btn.dataset.q==='actual'){
+        if(btn.classList.contains('btn-done')) return;
+        const item = data.items.find(x=>x.id===id);
+        btn.disabled = true;
+        try{
+          await api('/knowledge',{method:'POST',body:JSON.stringify({
+            title: (item?.question_text||'').slice(0,120),
+            body: item?.question_text||'',
+            is_actual: true,
+            source_question_id: id,
+          })});
+          markAdded(btn);
+        } catch(err){
+          btn.disabled = false;
+          alert(err.message||err);
+        }
+      }
+    });
+  });
+}
+
+async function loadKnowledge(){
+  const filter = $('kFilter').value;
+  const data = await api('/knowledge?filter='+encodeURIComponent(filter));
+  if(!data.items.length){ $('kRoot').innerHTML='<div class="empty">Пусто</div>'; return; }
+  $('kRoot').innerHTML = data.items.map(k=>`
+    <div class="card ${k.is_actual?'actual':''}">
+      <div class="flags" style="margin-bottom:8px">
+        ${k.is_actual?'<span class="flag orange">актуально</span>':''}
+        ${k.is_active?'<span class="flag green">активна</span>':'<span class="flag">выкл</span>'}
+      </div>
+      <div class="grid2">
+        <div><label>slug</label><input type="text" id="ks-${k.id}" value="${esc(k.slug||'')}"/></div>
+        <div><label>порядок</label><input type="text" id="ko-${k.id}" value="${esc(k.sort_order)}"/></div>
+      </div>
+      <label>Заголовок</label>
+      <input type="text" id="kt-${k.id}" value="${esc(k.title)}"/>
+      <label>Текст</label>
+      <textarea id="kb-${k.id}">${esc(k.body)}</textarea>
+      <div class="row-actions">
+        <label style="margin:0"><input type="checkbox" id="ka-${k.id}" ${k.is_active?'checked':''}/> активна</label>
+        <button class="btn ${k.is_actual?'btn-ok':''}" data-k="toggle-actual" data-id="${k.id}" data-val="${k.is_actual?1:0}">
+          ${k.is_actual?'Снять «актуально»':'Актуально!'}
+        </button>
+        <button class="btn btn-ok" data-k="save" data-id="${k.id}" title="Сохранит статью и отправит ответ в связанные открытые вопросы">Сохранить и ответить</button>
+        <button class="btn btn-bad" data-k="del" data-id="${k.id}">Удалить</button>
+      </div>
+      <div class="hint" id="ksave-${k.id}" style="margin-top:8px"></div>
+    </div>`).join('');
+  $('kRoot').querySelectorAll('[data-k]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id=Number(btn.dataset.id);
+      if(btn.dataset.k==='save'){
+        btn.disabled = true;
+        const status = $(`ksave-${id}`);
+        if(status) status.textContent = 'Сохраняю…';
+        try{
+          const r = await api(`/knowledge/${id}`,{method:'PATCH',body:JSON.stringify({
+            slug: $(`ks-${id}`).value || null,
+            title: $(`kt-${id}`).value,
+            body: $(`kb-${id}`).value,
+            is_active: $(`ka-${id}`).checked,
+            sort_order: Number($(`ko-${id}`).value)||100,
+            reply_open_questions: true,
+          })});
+          const n = (r.reply && r.reply.sent || []).length;
+          if(status){
+            status.textContent = n
+              ? `Готово: ответ ушёл в чат, закрыто открытых вопросов: ${n}`
+              : 'Сохранено. Связанных открытых вопросов не найдено (проверь вкладку «Открытые вопросы»).';
+          }
+          loadKnowledge();
+        } catch(err){
+          if(status) status.textContent = 'Ошибка: ' + (err.message||err);
+          btn.disabled = false;
+        }
+      } else if(btn.dataset.k==='toggle-actual'){
+        const next = btn.dataset.val !== '1';
+        await api(`/knowledge/${id}`,{method:'PATCH',body:JSON.stringify({is_actual: next, reply_open_questions: false})});
+        loadKnowledge();
+      } else if(btn.dataset.k==='del'){
+        if(!confirm('Удалить статью?')) return;
+        await api(`/knowledge/${id}`,{method:'DELETE'});
+        loadKnowledge();
+      }
+    });
+  });
+}
+
+$('reloadLogs').onclick = loadLogs;
+$('onlyAttn').onchange = loadLogs;
+$('reloadQ').onclick = loadQuestions;
+$('qStatus').onchange = loadQuestions;
+$('reloadK').onclick = loadKnowledge;
+$('kFilter').onchange = loadKnowledge;
+$('addK').onclick = async ()=>{
+  const title = prompt('Заголовок статьи');
+  if(!title) return;
+  const body = prompt('Текст')||'';
+  const actual = confirm('Пометить как «актуально» (в очереди доработки)?');
+  await api('/knowledge',{method:'POST',body:JSON.stringify({title,body,is_actual:!!actual})});
+  $('kFilter').value = actual ? 'actual' : 'all';
+  loadKnowledge();
+};
+
+loadLogs().catch(err=>{ $('logsRoot').innerHTML = `<div class="empty">Ошибка: ${esc(err.message)}</div>`; });
+</script>
+</body>
+</html>

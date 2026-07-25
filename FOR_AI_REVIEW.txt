@@ -1,0 +1,62 @@
+Тема: Code review Wallet · wallet-for-ai-review-20260715.zip
+
+Привет.
+
+Нужен code review домашней бухгалтерии Wallet. Цель — обратная связь: сильные/слабые стороны, риски для денег, что чинить первым. Не проси «переписать всё на React», пока нет явной выгоды.
+
+Что в архиве
+- Живой UI: review_categorization.html (= public/index.html на проде)
+- README.md — операционная инструкция (схема, план/баланс, импорт, миграции, бух.безопасность)
+- api/ — FastAPI state/dumps (Postgres SoT)
+- db/ — SQL schema + seed scripts
+- data/fixtures/tbank/ — тестовые CSV (hard/soft/XSS)
+- backend/ + frontend/ — старый scaffold (НЕ дневной driver)
+- nginx.conf, docker-compose.yml
+
+Чего НЕТ в архиве (намеренно)
+- .env и пароли БД
+- Личные дампы расходов (wallet_review_v3*.json, data/dumps/)
+- Секреты / node_modules
+
+Архитектура сейчас (важно, не смотри как на «только localStorage»)
+1. Источник истины: Postgres (БД wallet на Timeweb), payload в user_app_state + нормализованные таблицы.
+2. UI на https://wallet.islanddream.ru тянет/пушит state через /api/v1/users/makc/state.
+3. localStorage — кэш на том же origin.
+4. Дампы на диск: data/dumps/makc/ДДММГГ/ (перед импортом, сверкой, удалением, переводом).
+5. schemaVersion=4, hard/soft дедуп импорта, auditLog, mutate() на денежных путях.
+
+Продукт
+- Разметка выписки Т‑Банка: личный / бизнес / Разбор
+- Счета, долги, план месяца (база/запас → Баланс)
+- Merchants: авто только при auto && userAuto
+- Один пользователь в проде: makc (схема уже с user_id)
+
+На что посмотреть в первую очередь
+1. Бухгалтерские гарантии: потеря данных, дубли импорта, «можно ли объяснить цифру».
+2. Импорт CSV: planImport → applyImport, hard/soft fingerprint.
+3. План: analyzePlan / база vs запас — не сломать формулу.
+4. Гонки UI + sync Postgres (mutate / saveState / syncPostgresSoT).
+5. XSS через поля банка (ожидаем escapeHtml).
+6. Что ещё из «надёжности» стоит следующим спринтом (без большого рефактора).
+
+Вопросы к ревьюеру
+- Что MUST / SHOULD / NICE с учётом Postgres+дампов (не советовать снова «только backup в localStorage» без сверки с README §0.1).
+- Где остались дыры в дедупе / audit / schema migrations.
+- Имеет ли смысл ImportSession как сущность, или текущего preview достаточно.
+- Конфликт: CSV говорит одно, вручную уже поправили — кто побеждает?
+- Wallet для нас и книга фактов, и план будущего — не тяни архитектуру только в одну сторону.
+
+Ограничения
+- Не предлагай молча мигрировать UI на React/Vite как обязательный шаг.
+- Не проси секреты БД.
+- Scaffold backend/frontend комментируй отдельно от живого HTML.
+
+Формат ответа
+1) Краткое резюме (до 10 пунктов: MUST/SHOULD/NICE)
+2) Что уже хорошо
+3) Главные риски
+4) Приоритетный следующий спринт
+5) Вопросы владельцу (если без них нельзя)
+
+Спасибо.
+— Максим / Wallet

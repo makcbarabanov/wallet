@@ -1,0 +1,263 @@
+#!/usr/bin/env python3
+"""Fast offline regression checks for Wallet's expense gateway contract."""
+
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+HTML = ROOT / "review_categorization.html"
+
+SERVICE_WORDS = {
+    "сервисный",
+    "сервис",
+    "центр",
+    "магазин",
+    "торговый",
+    "точка",
+    "ооо",
+    "ип",
+    "зао",
+    "пао",
+    "ao",
+    "llc",
+    "shop",
+    "store",
+}
+
+
+def normalize_store(value: str) -> str:
+    value = value.lower()
+    value = re.sub(r"[«»\"'`()\[\]{}]", " ", value)
+    value = re.sub(r"[^a-zа-яё0-9]+", " ", value, flags=re.IGNORECASE)
+    return " ".join(value.split())
+
+
+def tokens(value: str) -> list[str]:
+    return [token for token in normalize_store(value).split() if token not in SERVICE_WORDS]
+
+
+def store_signal(left: str, right: str, *, date: bool, amount: bool, account: bool) -> str:
+    key_left, key_right = normalize_store(left), normalize_store(right)
+    if key_left == key_right:
+        return "exact"
+    left_tokens, right_tokens = tokens(left), tokens(right)
+    meaningful_left, meaningful_right = " ".join(left_tokens), " ".join(right_tokens)
+    if (
+        len(meaningful_left) >= 5
+        and len(meaningful_right) >= 5
+        and (meaningful_left in meaningful_right or meaningful_right in meaningful_left)
+    ):
+        return "related"
+    token_hit = any(
+        len(a) >= 3
+        and len(b) >= 3
+        and (a == b or a in b or b in a)
+        for a in left_tokens
+        for b in right_tokens
+    )
+    return "token" if token_hit and date and amount and account else "none"
+
+
+def classify(*, bank_id: bool, date: bool, amount: bool, account: bool, store: str) -> str | None:
+    if bank_id:
+        return "exact"
+    if date and amount and account and store != "none":
+        return "strong"
+    evidence = sum((date, amount, account, store != "none"))
+    return "weak" if amount and evidence >= 2 else None
+
+
+def assert_source_architecture(html: str) -> None:
+    assert "const SCHEMA_VERSION = 11;" in html
+    assert "function createExpense(params)" in html
+    assert "function findDuplicateCandidates(input" in html
+    assert "function runGatewayRegressionTests()" in html
+    # Exactly one production call site: createExpense -> pushRow. Function declaration excluded.
+    calls = [
+        line
+        for line in html.splitlines()
+        if "pushRow(" in line and not line.lstrip().startswith("function pushRow")
+    ]
+    assert len(calls) == 1, f"direct pushRow call sites remain: {calls}"
+    assert "const ok = pushRow(params.wallet, row, { allowSoftDup: true });" in calls[0]
+    assert "for (const item of plan.autoItems)" in html
+    import_block = html[html.index("function applyImportPlan"): html.index("function walletLabelShort")]
+    assert "pushRow(" not in import_block, "Training mode must not auto-write ledger"
+
+
+def assert_allocation_repair(html: str) -> None:
+    """Phase 1 repair pass: v1 flag must not strand legacy reserves (see PROJECT_STATE bug)."""
+    assert "'wallet_alloc_phase1_v1','wallet_alloc_phase1_v2'" in html
+    assert "function needsAllocationRepair(st)" in html
+    assert "function runAllocationRepair(st)" in html
+    assert "function copyLegacyReservesToAllocation(st)" in html
+    assert "if (migrationsMap(st).wallet_alloc_phase1_v1 != null) return runAllocationRepair(st);" in html
+    copy_block = html[
+        html.index("function copyLegacyReservesToAllocation(st)"): html.index("function statePayload(st)")
+    ]
+    assert "setMigrationDone" not in copy_block, "copy helper must not own migration flags"
+
+
+def reserve_is_active(reserve: dict) -> bool:
+    return not reserve.get("migratedToFundId") and not reserve.get("migratedToCreditLimitId")
+
+
+def is_credit_candidate(reserve: dict) -> bool:
+    title = str(reserve.get("title") or "").lower()
+    amount = round(float(reserve.get("amount") or 0))
+    return bool(re.search(r"кредит|лимит", title)) or amount == 150000
+
+
+def run_allocation_migration(payload: dict) -> dict:
+    """Mirror of runAllocationPhase1Migration + runAllocationRepair for offline checks."""
+    flags = payload.setdefault("_migrations", {})
+    funds = payload.setdefault("funds", [])
+    limits = payload.setdefault("creditLimits", [])
+    reserves = payload.setdefault("cashReserves", [])
+
+    if flags.get("wallet_alloc_phase1_v1") is not None:
+        if flags.get("wallet_alloc_phase1_v2") is not None:
+            return {"skipped": True}
+        has_money = any(reserve_is_active(r) and round(float(r.get("amount") or 0)) > 0 for r in reserves)
+        migrated_exists = any(f.get("sourceReserveId") for f in funds) or any(
+            limit.get("sourceReserveId") for limit in limits
+        )
+        if not has_money or migrated_exists:
+            return {"skipped": True}
+        flag = "wallet_alloc_phase1_v2"
+    else:
+        flag = "wallet_alloc_phase1_v1"
+
+    moved_funds = moved_credit = 0
+    for reserve in reserves:
+        if not reserve_is_active(reserve):
+            continue
+        amount = round(float(reserve.get("amount") or 0))
+        if amount <= 0:
+            continue
+        if is_credit_candidate(reserve):
+            limits.append(
+                {"id": f"cl-{reserve['id']}", "title": reserve["title"], "amount": amount,
+                 "sourceReserveId": reserve["id"]}
+            )
+            reserve["migratedToCreditLimitId"] = f"cl-{reserve['id']}"
+            moved_credit += 1
+            continue
+        funds.append(
+            {"id": f"fund-{reserve['id']}", "title": reserve["title"], "amount": amount,
+             "sourceReserveId": reserve["id"]}
+        )
+        reserve["migratedToFundId"] = f"fund-{reserve['id']}"
+        moved_funds += 1
+
+    flags[flag] = f'{{"movedCredit":{moved_credit},"movedFunds":{moved_funds}}}'
+    return {"flag": flag, "movedCredit": moved_credit, "movedFunds": moved_funds}
+
+
+def live_payload_shape() -> dict:
+    """State observed in production payload revision 269 (funds lost, v1 flag kept)."""
+    return {
+        "schemaVersion": 11,
+        "funds": [{"id": "fund19f95bf76e2", "title": "Тест", "amount": 10000}],
+        "creditLimits": [],
+        "cashReserves": [
+            {"id": "cr19f889ec82a", "title": "Бизнес", "amount": 675000},
+            {"id": "cr19f889ee6aa", "title": "Кредитка", "amount": 150000},
+        ],
+        "_migrations": {"wallet_alloc_phase1_v1": '{"movedCredit":1,"movedFunds":1}'},
+    }
+
+
+def assert_store_combobox(html: str) -> None:
+    """Merchant Learning v1: searchable store field + prepared merchant structure."""
+    assert "function attachStoreCombobox(input" in html
+    assert "function storeMatchRank(item, query)" in html
+    assert "function recordMerchantUsage(name)" in html
+    assert "function learnMerchantAlias(canonName, rawName)" in html
+    # New merchant fields are seeded on creation.
+    assert "count: 0," in html and "aliases: []," in html
+    # Combobox is wired to the add-expense store field.
+    assert "attachStoreCombobox(document.getElementById('manExpStore'))" in html
+    # Alias capture on import correction (raw bank name -> chosen canonical).
+    assert "learnMerchantAlias(store, item.storeRaw)" in html
+
+
+def main() -> None:
+    html = HTML.read_text(encoding="utf-8")
+    assert_source_architecture(html)
+    assert_allocation_repair(html)
+    assert_store_combobox(html)
+
+    # Test 5: repair restores the lost fund and credit limit exactly once.
+    payload = live_payload_shape()
+    result = run_allocation_migration(payload)
+    assert result["flag"] == "wallet_alloc_phase1_v2", result
+    assert (result["movedFunds"], result["movedCredit"]) == (1, 1), result
+    titles = {fund["title"]: fund["amount"] for fund in payload["funds"]}
+    assert titles == {"Тест": 10000, "Бизнес": 675000}, titles
+    assert [(limit["title"], limit["amount"]) for limit in payload["creditLimits"]] == [("Кредитка", 150000)]
+    assert all(not reserve_is_active(reserve) for reserve in payload["cashReserves"])
+
+    # Repair is one-shot: a second pass changes nothing.
+    before = str(payload)
+    assert run_allocation_migration(payload) == {"skipped": True}
+    assert str(payload) == before
+
+    # A fund deleted on purpose stays deleted: its reserve keeps the marker.
+    deliberate = live_payload_shape()
+    deliberate["cashReserves"][0]["migratedToFundId"] = "fund-gone"
+    deliberate["cashReserves"][1]["migratedToCreditLimitId"] = "cl-gone"
+    assert run_allocation_migration(deliberate) == {"skipped": True}
+    assert [fund["title"] for fund in deliberate["funds"]] == ["Тест"]
+
+    # Fresh payload without the v1 flag still runs the original migration.
+    fresh = live_payload_shape()
+    fresh["_migrations"] = {}
+    assert run_allocation_migration(fresh)["flag"] == "wallet_alloc_phase1_v1"
+
+    # Test 1: unrelated store has no candidate from store evidence.
+    signal = store_signal("Новый магазин", "NSP", date=True, amount=False, account=True)
+    assert signal == "none"
+
+    # Test 2: mandatory NSP regression.
+    signal = store_signal(
+        "Сервисный центр NSP",
+        "NSP",
+        date=True,
+        amount=True,
+        account=True,
+    )
+    assert signal == "token"
+    assert classify(bank_id=False, date=True, amount=True, account=True, store=signal) == "strong"
+
+    # A short token alone is not enough.
+    assert store_signal(
+        "Сервисный центр NSP",
+        "NSP",
+        date=False,
+        amount=True,
+        account=False,
+    ) == "none"
+
+    # Exact bank id remains available but is not required for Strong.
+    assert classify(bank_id=True, date=False, amount=False, account=False, store="none") == "exact"
+
+    # Test 3/4 architecture markers: explicit allowed duplicate and manual source.
+    assert "duplicateResolution: 'allowed_duplicate'" in html
+    assert "sourceType: 'manual'" in html
+    assert "training_confirmation_required" in html
+
+    print("Gateway regressions: OK")
+    print("- one createExpense -> pushRow call site")
+    print("- import has no silent ledger write")
+    print("- NSP is Strong only with date+amount+account context")
+    print("- allowed_duplicate and manual source paths present")
+    print("- phase 1 repair restores lost fund/limit once, keeps deliberate deletions")
+    print("- store combobox + merchant learning structure present and wired")
+
+
+if __name__ == "__main__":
+    main()
