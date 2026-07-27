@@ -71,7 +71,7 @@ def classify(*, bank_id: bool, date: bool, amount: bool, account: bool, store: s
 
 
 def assert_source_architecture(html: str) -> None:
-    assert "const SCHEMA_VERSION = 11;" in html
+    assert "const SCHEMA_VERSION = 12;" in html
     assert "function createExpense(params)" in html
     assert "function findDuplicateCandidates(input" in html
     assert "function runGatewayRegressionTests()" in html
@@ -332,6 +332,22 @@ def main() -> None:
     assert "sourceType: 'manual'" in html
     assert "training_confirmation_required" in html
 
+    # AD-010 / AD-010.1 Wave 1: Purchase + receipt → shared Valet tutor (no batch modal)
+    assert "function createPurchaseRecord(" in html
+    assert "function normalizePurchase(" in html
+    assert "WALLET_RECEIPT_PARSE" in html
+    assert "function receiptToImportRows(" in html
+    assert "importReceiptBtn" in html
+    assert "async function runReceiptFromFile(" in html
+    assert "sourceType: 'receipt'" in html
+    assert "SCHEMA_VERSION = 12" in html
+    assert "UI_BUILD = 63" in html
+    assert "purchases:" in html
+    assert "разбираю как чек магазина" in html
+    assert "receiptConfirmModal" not in html
+    assert "commitReceiptConfirm" not in html
+    assert "startValetImportTutor" in html
+
     print("Gateway regressions: OK")
     print("- one createExpense -> pushRow call site")
     print("- import has no silent ledger write")
@@ -342,6 +358,7 @@ def main() -> None:
     print("- phase 2 personal/business expense entry uses createExpense")
     print("- SmartSelect wired by config to store/category/expense/object/customer")
     print("- Settings tab: AI Training only, free cash mode, funds and credit CRUD")
+    print("- AD-010.1 Wave 1: receipt → tutor (batch modal abandoned)")
 
 
 if __name__ == "__main__":

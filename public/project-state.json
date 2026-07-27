@@ -1,13 +1,13 @@
 {
   "contextVersion": 1,
   "project": "Wallet",
-  "updatedAt": "2026-07-26",
+  "updatedAt": "2026-07-27",
   "role": "official_machine_context",
   "description": "Canonical machine context for Arden and other AI tools. Not a visual roadmap copy: short contract of version, hard architecture rules, accepted work, and next actions.",
   "version": {
-    "uiBuild": 58,
-    "schemaVersion": 11,
-    "serviceWorkerCache": "wallet-shell-v58",
+    "uiBuild": 82,
+    "schemaVersion": 13,
+    "serviceWorkerCache": "wallet-shell-v81",
     "activePhase": "Phase 2",
     "aiMode": "training"
   },
@@ -43,15 +43,91 @@
     {
       "id": "AD-009",
       "rule": "AI proposes and ranks; the user decides duplicates and confirmations"
+    },
+    {
+      "id": "AD-010",
+      "rule": "Purchase is mandatory: sources[] (bank/receipt/…) and expenses[]; never skip Purchase"
+    },
+    {
+      "id": "AD-010",
+      "rule": "Bank source is truth for money movement on accounts; receipt is truth for purchase composition"
+    },
+    {
+      "id": "AD-010",
+      "rule": "Receipt upload means line-item expenses via createExpense after Training confirmation in the shared tutor flow; no store-specific parsers"
+    },
+    {
+      "id": "AD-010",
+      "rule": "Duplicate matching for bank↔receipt runs at Purchase level, not line-item level"
+    },
+    {
+      "id": "AD-010.1",
+      "rule": "One confirmation UI only: Valet tutor cards. One card = one expense (no groupValetTutorItems, no Группа N из M, no Верно · все N). Resume unfinished review in the same tutor interface, never a second screen."
+    },
+    {
+      "id": "AD-010.2",
+      "rule": "Unified search; bank.comment≠productName; reconLinks after Да одна запись → silent skip; day+amount alone never skip; card↔account optional remember"
+    },
+    {
+      "id": "AD-011",
+      "rule": "All expense sources share one pipeline: source → recognize → find existing → new/doubtful proposals → Valet tutor → user confirm → createExpense(). Source difference is data-only (sourceType), never a separate UX or write path."
+    },
+    {
+      "id": "AD-010",
+      "rule": "Honest failure: unrecognized import shows a modal (what happened + tips) and logs to existing /logs via reportUserError; no secrets/receipt body/amounts; partial recognition offers Continue with N of M; logging failure must not hide the modal"
+    },
+    {
+      "id": "AD-010",
+      "rule": "Receipt line = expense fields unit/qty/price/amount; any price×qty≉amount → doubt and ask in Razbor; Valet never auto-fixes; fields preserved through createExpense()"
     }
   ],
   "currentFocus": {
-    "status": "ready_for_next_wave",
-    "item": "Choose the next major wave",
-    "build": 58,
-    "note": "Stable checkpoint v58 pushed to main on 2026-07-26"
+    "status": "acceptance_required",
+    "item": "Уточнение = reconciliation link (UI_BUILD 81)",
+    "build": 81,
+    "acceptance": [
+      "Уточнение: Да, это одна запись → связь сохраняется",
+      "Повторный импорт той же операции → skip без Уточнения",
+      "Другой магазин на ту же сумму → не подхватывает чужую связь",
+      "Чекбокс карты *0507 ↔ счёт при подтверждении",
+      "Header v81"
+    ],
+    "refs": [
+      "AD-010.2",
+      "AD-011"
+    ]
   },
   "accepted": [
+    {
+      "item": "Stage 1 unified reconciliation layer",
+      "status": "implemented_awaiting_acceptance",
+      "note": "bank≠product; rowsMatchSameOp bank vs receipt; tests R1–R7",
+      "build": 78
+    },
+    {
+      "item": "Drawer restore «Вернуть назад»",
+      "status": "implemented_awaiting_acceptance",
+      "note": "Undo accidental park to drawer; back to Разбор queue",
+      "build": 77
+    },
+    {
+      "item": "Tutor one card = one expense (ungroup queue)",
+      "status": "implemented_awaiting_acceptance",
+      "note": "Removed groupValetTutorItems; wrapAsTutorItem; no mass assign",
+      "build": 76
+    },
+    {
+      "item": "Receipt line math unit/qty/price/amount + doubt in Razbor",
+      "status": "implemented_awaiting_acceptance",
+      "note": "No silent autofix; fields preserved to createExpense",
+      "build": 75
+    },
+    {
+      "item": "User-error handler reportUserError → /logs",
+      "status": "implemented_awaiting_acceptance",
+      "note": "Modal + safe critical log; partial recognition continue; quiet persist",
+      "build": 74
+    },
     {
       "item": "Funds and credit limit",
       "status": "accepted",
@@ -68,94 +144,109 @@
       "status": "accepted",
       "date": "2026-07-25",
       "refs": [
-        "AD-009",
-        "AD-009a"
-      ]
-    },
-    {
-      "item": "NSP duplicate real flow",
-      "status": "accepted",
-      "date": "2026-07-25",
-      "refs": [
         "AD-009"
       ]
     },
     {
-      "item": "Store searchable combobox and merchant learning prep",
+      "item": "NSP and store field",
       "status": "accepted",
       "date": "2026-07-25"
     },
     {
-      "item": "Git checkpoint",
-      "status": "accepted",
-      "date": "2026-07-25"
-    },
-    {
-      "item": "Expense entry from Personal and Business",
+      "item": "SmartSelect directories",
       "status": "accepted",
       "date": "2026-07-25",
-      "build": 52,
-      "refs": [
-        "AD-005",
-        "AD-009"
-      ]
-    },
-    {
-      "item": "Universal SmartSelect for directories",
-      "status": "accepted",
-      "date": "2026-07-25",
-      "build": 54,
       "note": "User verified: empty category on add-expense, «з» does not match «Жура», oz→Ozon still works"
     },
     {
-      "item": "Settings tab",
+      "item": "Settings and Valet report",
       "status": "accepted",
-      "date": "2026-07-26",
-      "build": 58,
-      "note": "User verified: Valet report toggles, account reconciliation age/date, LLM greeting off, funds/credit CRUD"
+      "date": "2026-07-26"
     },
     {
-      "item": "/logs route",
+      "item": "/logs admin",
       "status": "accepted",
-      "date": "2026-07-26",
-      "note": "User verified Valet learning admin page opens"
+      "date": "2026-07-26"
     },
     {
-      "item": "Stable checkpoint v58",
+      "item": "Git checkpoint v58",
       "status": "accepted",
       "date": "2026-07-26",
-      "build": 58,
       "note": "Settings, Valet report toggles, /logs pushed to main"
+    },
+    {
+      "item": "AD-010 Purchase and receipts",
+      "status": "accepted",
+      "date": "2026-07-26",
+      "refs": [
+        "AD-010"
+      ],
+      "note": "Architecture only; Purchase mandatory; bank=money truth; receipt=composition; line items → expenses; dedupe at Purchase"
+    },
+    {
+      "item": "AD-010.1 unified expense-learning UX",
+      "status": "accepted",
+      "date": "2026-07-26",
+      "refs": [
+        "AD-010.1"
+      ],
+      "note": "Statement/screenshot/receipt → same tutor; abandon receipt batch modal; full product name required"
+    },
+    {
+      "item": "OCR providers Yandex + Timeweb + OpenRouter×3",
+      "status": "implemented",
+      "date": "2026-07-26",
+      "note": "Primary chain: Yandex → Timeweb → OpenRouter (qwen3-vl-32b, llama-4-scout, nova-lite)"
     }
   ],
   "inProgress": [
     {
-      "item": "Yandex AI Studio integration",
-      "status": "env_prepared_not_integrated",
-      "note": "Only env variable names exist locally; secrets are never published here"
+      "item": "Receipt Wave 1",
+      "status": "implemented_waiting_acceptance",
+      "build": 70,
+      "note": "AD-011; Continue opens Valet tutor only; legacy import group list disabled; leftover -303 cleaned"
+    },
+    {
+      "item": "AD-011 Unified Source Processing",
+      "status": "accepted",
+      "date": "2026-07-26",
+      "note": "Documented + implemented wave A: shared planImport dedup for receipt and statement; Training always asks (no per-merchant Auto toggle in Razbor)"
     }
   ],
   "doNotDoNow": [
-    "fund movement history",
-    "mandatory fund assignment",
+    "Purchase↔Bank / bank↔receipt link before Stage 1 acceptance and re-audit",
+    "revive or patch the abandoned receipt batch-confirm modal",
+    "reintroduce groupValetTutorItems or mass Верно · все N in Valet tutor",
+    "store-specific receipt parsers",
+    "auto-create expenses without Training confirmation",
+    "show per-merchant Auto/Ask controls in Razbor while Training mode is on",
     "Assistant mode",
     "merchantId migration",
-    "store-specific receipt parsers",
-    "separate bridge project beyond this JSON"
+    "fund movement history",
+    "open legacy proposal-group UI (Неучёл/group cards) as the resume path for an unfinished import",
+    "create a second confirmation screen for any new source type",
+    "separate PDF-only dedup or MTS merchant exception list"
   ],
   "nextActions": [
-    "Choose the next major wave: receipts via LLM, merchantId, or Assistant",
-    "Receipts as sourceOperation through LLM and Gateway",
-    "merchantId migration only after receipts flow is stable"
+    "Accept v81: Да одна запись → silent skip next import",
+    "Accept Stage 1 / MTS 850 if not yet",
+    "Wave 2 Purchase↔Bank only after reconciliation acceptance",
+    "Accept Stage 1 reconciliation (UI_BUILD 78): MTS 850 PDF/CSV → skip; receipt regress OK",
+    "Re-audit CSV/PDF/receipt vs Ledger after device check",
+    "Accept drawer restore (UI_BUILD 77)",
+    "Accept tutor one-card-one-expense (UI_BUILD 76)",
+    "Accept receipt line math (UI_BUILD 75)",
+    "Accept user-error modal + /logs (UI_BUILD 74)"
   ],
-  "focus": "Do not add major new features; stabilize the current version first",
+  "focus": "Accept Уточнение→reconciliation link v81",
   "knownIssues": [],
   "links": {
     "roadmap": "https://wallet.islanddream.ru/roadmap",
     "projectStateJson": "https://wallet.islanddream.ru/project-state.json",
     "projectStateMd": "PROJECT_STATE.md",
     "architectureDecisions": "ARCHITECTURE_DECISIONS.md",
-    "repository": "https://github.com/makcbarabanov/wallet"
+    "repository": "https://github.com/makcbarabanov/wallet",
+    "receiptPlan": "RECEIPT_IMPLEMENTATION_PLAN.md"
   },
   "sync": {
     "updateWith": [

@@ -150,16 +150,16 @@ footer ul{padding-left:18px; margin:6px 0 0}
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
     <p class="sub">Короткий статус сверху. Нажми строку — откроются подробности. Новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>26 июля 2026</b> · UI_BUILD 58 · contextVersion 1</div>
+    <div class="updated">Обновлено: <b>27 июля 2026</b> · UI_BUILD 78 · contextVersion 1</div>
     <div class="stats">
-      <div class="stat"><div class="k">UI_BUILD</div><div class="v">58<small>Отчёт Валета</small></div></div>
-      <div class="stat"><div class="k">schema</div><div class="v">11<small>sw v58</small></div></div>
+      <div class="stat"><div class="k">UI_BUILD</div><div class="v">78<small>reconciliation</small></div></div>
+      <div class="stat"><div class="k">schema</div><div class="v">12<small>sw v77</small></div></div>
       <div class="stat"><div class="k">Фаза</div><div class="v" style="font-size:1rem">Фаза 2<small>стабилизация</small></div></div>
       <div class="stat"><div class="k">ИИ</div><div class="v" style="font-size:1rem">Training<small>Assistant позже</small></div></div>
     </div>
     <div class="focus">
-      🔴 Сейчас главное — не добавлять новые функции, а стабилизировать текущую версию
-      <span>Контрольная точка зафиксирована (v58 в main). Дальше: чеки, merchantId, Assistant, Валет.</span>
+      🟡 Разбор: одна карточка = один расход (v76)
+      <span>Убраны группы в очереди Валета. v75: цена×кол-во. OCR: Яндекс → Timeweb → OpenRouter×3.</span>
     </div>
     <div class="legend">
       <span class="l-check">✔️ Проверил</span>
@@ -364,17 +364,77 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
-    <details class="item plan">
+    <details class="item ok">
       <summary>
         <span class="num" aria-hidden="true"></span>
-        <span class="mark">⚪</span>
-        <span class="title">Чеки через LLM → sourceOperation → Gateway<small>потом</small></span>
+        <span class="mark">✅</span>
+        <span class="title">AD-010: Покупка, чеки, несколько источников<small>решение принято · 26.07.2026 · + AD-010.1 единый tutor</small></span>
         <span class="chev">›</span>
       </summary>
       <div class="panel"><div class="panel-inner">
         <ul>
-          <li>Фото чека → LLM извлекает структуру → предложение → подтверждение → <span class="path">createExpense()</span>.</li>
-          <li>Чек = ещё один источник, без парсера под каждый магазин.</li>
+          <li><b>Покупка</b> — всегда: связывает доказательства (банк, чек…) и расходы внутри.</li>
+          <li><b>Банк</b> — сколько реально ушло со счёта. <b>Чек</b> — на что именно (позиции = отдельные расходы).</li>
+          <li><b>AD-010.1:</b> выписка / скрин / чек → один поток обучения. Без отдельного экрана чека. Полное имя товара обязательно.</li>
+          <li>Дубли ищем по покупке, не по «молоко 1000». Расхождение сумм — спросить, не склеивать молча.</li>
+          <li>План: <span class="path">RECEIPT_IMPLEMENTATION_PLAN.md</span>.</li>
+        </ul>
+      </div></div>
+    </details>
+
+    <details class="item wip" open>
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
+        <span class="title">Чеки: волна 1 — фундамент<small>ждёт «Проверил» · UI_BUILD 76 · AD-011</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li><b>AD-011:</b> любой источник → распознавание → поиск уже есть → только новые/сомнительные → Разбор → <span class="path">createExpense()</span>.</li>
+          <li>Сообщение однотипное: <b>«Найдено N новых записей»</b> (не «чек уже обработан»).</li>
+          <li>Exact: fiscalId если есть; иначе дата+сумма+товар. Похожие (37 vs 38) → вопрос в Training.</li>
+          <li>Еда → «Продукты». Категория — список без авто-«Транспорт».</li>
+          <li>Дедуп <b>до</b> обучения: уверенный дубль не в Разбор; похожий (37↔38) — Отмена/Добавить до карточек.</li>
+          <li>Незавершённый хвост: до «Да» карточек нет; «Да» / «Продолжить разбор» → <b>только карточки Валета</b> (как будто не уходили). Старый список с «Неучёл» для импорта отключён.</li>
+          <li>Кнопки «Авто / Спрашивать» на карточках убраны: в режиме Обучения Валет спрашивает всегда.</li>
+          <li>Чек: выбор «Сфотографировать» / «Из галереи», дальше тот же разбор.</li>
+          <li>OCR: Яндекс → Timeweb → OpenRouter×3. Пакетный экран чека отменён.</li>
+          <li><b>v74 ошибки:</b> вместо «тихого» тоста — окно «Что произошло / Что можно сделать»; запись в тот же <a href="/logs">/logs</a> (без фото, сумм и ключей). Частично распознано → «Продолжить» с удачными позициями.</li>
+          <li><b>v75 позиция чека:</b> ед./кол-во/цена/стоимость; проверка Цена×Кол-во≈Стоимость; при сомнении — вопрос в Разборе (без автопочинки). Пример Магнит: перец 0.084 кг × 1169.91 = 98.27.</li>
+          <li><b>v76:</b> одна карточка Валета = один расход. Нет «Группа N из M» и «Верно · все N». 122 новых → 122 карточки.</li>
+        </ul>
+        <div class="check"><b>Как проверить → «Проверил»</b>Шапка v76 → выписка с 3 строками Лента → 3 карточки «Расход N из 3», без «Группа». Чек на 4 товара → 4 карточки. Остановить после 3 из 10 → «Продолжить» с 4-го.</div>
+      </div></div>
+    </details>
+    <details class="item plan">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">⚪</span>
+        <span class="title">Чеки: волна 2 — дружба с выпиской<small>потом</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Связь банка и чека на уровне Покупки; дедуп по событию покупки.</li>
+          <li>Замена общего расхода детализацией; расхождение сумм — вопрос пользователю.</li>
+        </ul>
+      </div></div>
+    </details>
+
+    <details class="item plan">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">⚪</span>
+        <span class="title">Обучение по товарам (Receipt Learning)<small>волна 3 · после чеков</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Распознавание позиций чека и запоминание твоих категорий («кофе», «лекарства», саморезы…).</li>
+          <li>Накопление решений из режима обучения → лучше подсказки со временем.</li>
+          <li>Статистика потребления: «сколько за год на кофе / лекарства» — ради этого и нужна детализация.</li>
+          <li>Следующий уровень после обучения магазинам (Merchant Learning).</li>
         </ul>
       </div></div>
     </details>
@@ -424,6 +484,38 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
+    <details class="item plan">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">⚪</span>
+        <span class="title">Дневной лимит расходов на ИИ<small>следом за подключением Яндекса</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Установить финансовый лимит на использование ИИ за сутки, чтобы токены не дали неожиданный счёт.</li>
+          <li>Показывать расход и остаток лимита; при достижении лимита — остановить платные запросы и честно сообщить пользователю.</li>
+          <li>Лимит задаётся в настройках; секреты и суммы пользователя не публикуются в машинном контексте.</li>
+        </ul>
+      </div></div>
+    </details>
+
+    <details class="item plan">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">⚪</span>
+        <span class="title">Нижнее меню в мобильном приложении<small>идея · перераспределить навигацию</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Добавить основное мобильное меню снизу, чтобы часто используемые разделы были доступны большим пальцем.</li>
+          <li>Распределить пункты между верхней и нижней панелями: внизу — основные действия, вверху — второстепенные и служебные.</li>
+          <li>Перед реализацией согласовать точный состав обеих панелей и проверить, что экран не перегружен.</li>
+        </ul>
+      </div></div>
+    </details>
+
     <details class="item checked">
       <summary>
         <span class="num" aria-hidden="true"></span>
@@ -436,7 +528,95 @@ footer ul{padding-left:18px; margin:6px 0 0}
           <li>Админ-страница: логи чата Валета, открытые вопросы («не знаю»), база знаний.</li>
           <li>Фикс: symlink <span class="path">public/logs.html</span> → <span class="path">logs/index.html</span>; nginx.conf → <span class="path">/logs/index.html</span>.</li>
           <li>URL: <a href="https://wallet.islanddream.ru/logs">wallet.islanddream.ru/logs</a></li>
+          <li>v74: в том же журнале видны ошибки импорта/распознавания (источник · этап · тип · техпричина), без секретов и содержимого чека.</li>
         </ul>
+      </div></div>
+    </details>
+
+    <details class="item wip">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
+        <span class="title">Ошибки импорта: модалка + /logs<small>ждёт «Проверил» · UI_BUILD 74</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Единый вход <span class="path">reportUserError()</span>: окно обязательно закрыть; тост для реальных ошибок не используем.</li>
+          <li>Лог в существующий канал Valet critical → <a href="/logs">/logs</a>; отдельный журнал не создаём.</li>
+          <li>Частичное распознавание: «N из M» → Продолжить / Отмена; при продолжении — обычный Разбор.</li>
+          <li>Падение POST /logs не скрывает окно ошибки.</li>
+        </ul>
+        <div class="check"><b>Как проверить → «Проверил»</b>Размытый чек / битый CSV → окно с подсказками → запись в /logs с меткой «ошибка UX».</div>
+      </div></div>
+    </details>
+
+    <details class="item wip" open>
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
+        <span class="title">Позиция чека: цена × кол-во = стоимость<small>ждёт «Проверил» · UI_BUILD 75</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Обычная модель расхода: ед.изм / кол-во / цена за ед. / стоимость. Чек только заполняет эти поля.</li>
+          <li>Инвариант: нарушение математики → doubt → вопрос в Разборе. Автоисправление запрещено.</li>
+          <li>Поля сохраняются до <span class="path">createExpense()</span> / строки Ledger.</li>
+        </ul>
+        <div class="check"><b>Как проверить → «Проверил»</b>Магнит перец → 98.27 руб; штучный → цена=стоимость; конфликт 37/38 → вопрос, не молчаливая запись.</div>
+      </div></div>
+    </details>
+
+    <details class="item wip" open>
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
+        <span class="title">Этап 1: единый reconciliation<small>ждёт «Проверил» · UI_BUILD 78 · AD-010.2</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Банковский comment (карта / MCC) больше не считается товаром.</li>
+          <li>Банк ↔ Ledger: день + сумма + (магазин или телефон/карта/счёт).</li>
+          <li>Чек ↔ Ledger: по-прежнему день + сумма + товар (AD-011 не ломаем).</li>
+          <li>Purchase↔Bank — не в этом этапе (волна 2).</li>
+        </ul>
+        <div class="check"><b>Как проверить → «Проверил»</b>В базе МТС 850 ₽ 19.07 (телефон) → импорт PDF/CSV с mBank.MTS −850 → skip, не новая карточка Разбора. Шапка v78.</div>
+      </div></div>
+    </details>
+
+    <details class="item wip" open>
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
+        <span class="title">Ящик: вернуть назад<small>ждёт «Проверил» · UI_BUILD 77</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Случайно нажал «В ящик» → в ящике кнопка <b>Вернуть назад</b>.</li>
+          <li>Расход снова в очереди Разбора (и в текущие карточки Валета, если обучение идёт).</li>
+          <li>«Убрать» по-прежнему удаляет без списания со счёта.</li>
+        </ul>
+        <div class="check"><b>Как проверить → «Проверил»</b>Шапка v77 → во время Разбора «В ящик» → в ящике «Вернуть назад» → снова карточка расхода.</div>
+      </div></div>
+    </details>
+
+    <details class="item wip" open>
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
+        <span class="title">Разбор: одна карточка = один расход<small>ждёт «Проверил» · UI_BUILD 76</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Убрана агрегация очереди (<span class="path">groupValetTutorItems</span>): больше нет «Группа N из M» и «Верно · все N».</li>
+          <li>Дедуп, обучение, ящик, resume и <span class="path">createExpense()</span> сохранены.</li>
+          <li>122 новых операции → 122 карточки (не 112 групп).</li>
+        </ul>
+        <div class="check"><b>Как проверить → «Проверил»</b>3 строки Лента → 3 карточки; чек 4 товара → 4 карточки; стоп после 3 из 10 → продолжение с 4-го.</div>
       </div></div>
     </details>
 
@@ -445,15 +625,28 @@ footer ul{padding-left:18px; margin:6px 0 0}
 
 <section>
   <h2 id="next">Следующие действия</h2>
-  <p class="sec-note">Порядок стабилизации. Новые большие фичи — после приёмки текущей версии.</p>
+  <p class="sec-note">AD-010 принят. Код чеков — после плана реализации.</p>
   <ol class="steps">
     <li class="done"><b>✔️ Проверил: Фонды, Gateway, NSP, Магазин, Git, v52</b><span>Ты проверил и одобрил · 25.07.2026.</span></li>
     <li class="done"><b>✔️ Проверил: SmartSelect v54</b><span>Пустая категория, «з» ≠ «Жура», «оз» → Ozon · 25.07.2026.</span></li>
     <li class="done"><b>✔️ Проверил: Настройки v58</b><span>Отчёт Валета, журнал сверки, фонды/лимиты · 26.07.2026.</span></li>
     <li class="done"><b>✔️ Проверил: /logs</b><span>Админка обучения Валета · 26.07.2026.</span></li>
     <li class="done"><b>✅ Контрольная точка v58</b><span>Настройки, отчёт Валета, /logs — в main · 26.07.2026.</span></li>
-    <li><b>Выбрать следующую большую волну</b><span>Чеки через LLM / merchantId / Assistant.</span></li>
-    <li class="done" style="opacity:.7"><b>Потом: чеки / merchantId / Assistant / Валет</b><span>Только после стабильной контрольной точки.</span></li>
+    <li class="done"><b>✅ AD-010 принят</b><span>Покупка / банк=деньги / чек=состав · 26.07.2026.</span></li>
+    <li class="done"><b>✅ AD-010.1</b><span>Единый поток обучения: выписка = скрин = чек · 26.07.2026.</span></li>
+    <li class="done"><b>✅ RECEIPT_IMPLEMENTATION_PLAN.md</b><span>План волн 1–3 · уточнён AD-010.1.</span></li>
+    <li class="done"><b>✅ AD-011</b><span>Единый конвейер источников · 26.07.2026.</span></li>
+    <li class="done"><b>✅ Ошибки → модалка + /logs (v74)</b><span>Код готов · ждёт «Проверил» на устройстве.</span></li>
+    <li class="done"><b>✅ Позиция чека: цена×кол-во (v75)</b><span>doubt без автопочинки · ждёт «Проверил».</span></li>
+    <li class="done"><b>✅ Одна карточка = один расход (v76)</b><span>без групп и «Верно · все N» · ждёт «Проверил».</span></li>
+    <li class="done"><b>✅ Ящик: вернуть назад (v77)</b><span>отмена случайного «В ящик» · ждёт «Проверил».</span></li>
+    <li class="done"><b>✅ Этап 1 reconciliation (v78)</b><span>банк ≠ товар; МТС 850 → skip · ждёт «Проверил».</span></li>
+    <li><b>Проверить v78: МТС 850 PDF/CSV → skip</b><span>Не новая карточка; повторный чек по-прежнему skip.</span></li>
+    <li><b>Проверить v76 + волну 1 + AD-011 + v74/v75</b><span>«Расход N из M»; «N новых»; окно ошибки; Магнит перец = 98.27.</span></li>
+    <li class="done"><b>✅ OCR: Яндекс → Timeweb → OpenRouter×3</b><span>Основные провайдеры подключены · 26.07.2026.</span></li>
+    <li><b>Ограничить дневные расходы на ИИ</b><span>Лимит, счётчик и остановка платных запросов при достижении порога.</span></li>
+    <li><b>Потом: волна 2 Purchase↔Bank</b><span>Только после приёмки Этапа 1 и повторного аудита CSV/PDF/чек.</span></li>
+    <li class="done" style="opacity:.7"><b>Потом: обучение по товарам / merchantId / Assistant</b><span>После волн чеков.</span></li>
   </ol>
 </section>
 

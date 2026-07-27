@@ -1,0 +1,72 @@
+{
+  "after": {
+    "total": 122,
+    "skip": 67,
+    "possible": 28,
+    "newReview": 27,
+    "auto": 0
+  },
+  "cases": {
+    "mts850": {
+      "store": "Оплата услуг mBank.MTS",
+      "amount": -850,
+      "bucket": "confident"
+    },
+    "pyaterochka": [
+      {
+        "store": "Пятёрочка",
+        "amount": -349.97,
+        "bucket": "new"
+      },
+      {
+        "store": "Пятёрочка",
+        "amount": -269.93,
+        "bucket": "confident"
+      },
+      {
+        "store": "Пятёрочка",
+        "amount": -127.24,
+        "bucket": "confident"
+      },
+      {
+        "store": "Пятёрочка",
+        "amount": -279.98,
+        "bucket": "confident"
+      },
+      {
+        "store": "Пятёрочка",
+        "amount": -179.98,
+        "bucket": "confident"
+      },
+      {
+        "store": "Пятёрочка",
+        "amount": -99.99,
+        "bucket": "confident"
+      },
+      {
+        "store": "Пятёрочка",
+        "amount": -227.13,
+        "bucket": "confident"
+      }
+    ],
+    "oooTruncated": [
+      {
+        "store": "OOO",
+        "amount": -1082,
+        "date": "2026-07-24T12:01",
+        "bucket": "new"
+      },
+      {
+        "store": "OOO",
+        "amount": -10545,
+        "date": "2026-07-24T11:47",
+        "bucket": "new"
+      }
+    ]
+  },
+  "baselineFromUiScreenshot": {
+    "skip": 72,
+    "new": 50,
+    "note": "UI before Stage1 (screenshot)"
+  }
+}

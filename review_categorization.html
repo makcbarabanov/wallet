@@ -285,7 +285,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
 .filter-pop .fp-count{padding:0 12px 8px; font-size:.75rem; color:var(--muted)}
 /* ===== Searchable store combobox (Merchant Learning v1) ===== */
 .combo-pop{
-  position:fixed; z-index:130; display:none; flex-direction:column;
+  position:fixed; z-index:230; display:none; flex-direction:column;
   background:var(--card); border:1px solid var(--line); border-radius:12px;
   box-shadow:0 16px 40px rgba(0,0,0,.18); overflow:auto; overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch; min-width:180px;
@@ -311,10 +311,18 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
 .combo-create b{font-weight:700}
 .modal-back{
   position:fixed; inset:0; background:rgba(26,23,20,.45); display:none;
-  align-items:center; justify-content:center; z-index:100;
+  align-items:center; justify-content:center; z-index:220;
   padding:16px calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
 }
 .modal-back.show{display:flex}
+.dup-clarify-nav{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin:4px 0 2px;
+}
+.dup-clarify-nav[hidden]{display:none !important}
+.dup-nav-btn{min-width:40px; padding:6px 10px; font-size:1.15rem; line-height:1}
+.dup-nav-label{font-size:.9rem; color:var(--muted); min-width:4.5rem; text-align:center}
+.dup-decision-mark{font-size:.8rem; color:var(--ok); margin-left:4px}
 .modal{background:var(--card); border-radius:16px; max-width:480px; width:100%; padding:20px; box-shadow:0 20px 50px rgba(0,0,0,.2)}
 /* Phones: long forms must scroll inside the window, not run off screen. */
 .modal{max-height:calc(100vh - 32px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch}
@@ -1031,8 +1039,11 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
       <button type="button" class="btn-ico" id="importCsvBtn" title="Загрузить выписку: CSV, PDF или фото">
         <img src="/ico/import.png" alt="Загрузить выписку" width="28" height="28"/>
       </button>
+      <button type="button" class="btn btn-ghost" id="importReceiptBtn" title="Загрузить фото чека магазина">Чек</button>
       <button type="button" class="btn btn-ghost" id="importPasteBtn" title="Вставить операции из буфера Т‑Банка">Буфер</button>
       <input type="file" id="importCsvInput" accept=".csv,text/csv,text/plain,.pdf,application/pdf,image/*" hidden/>
+      <input type="file" id="importReceiptInput" accept="image/*" hidden/>
+      <input type="file" id="importReceiptCameraInput" accept="image/*" capture="environment" hidden/>
       <div class="razbor-actions">
         <button type="button" class="btn-razbor expense" id="addExpenseBtn">Добавить расход</button>
         <button type="button" class="btn-razbor" id="cashReserveBtn" title="Фонды и распределение">Фонды</button>
@@ -1056,7 +1067,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     </div>
     <div id="drawerPanel" aria-live="polite">
       <h2>Ящик <span id="drawerCountBadge">0</span></h2>
-      <p class="hint" style="margin:0">Отложенные непонятные операции — разберёшь позже.</p>
+      <p class="hint" style="margin:0">Отложенные операции. «Вернуть назад» — снова в Разбор, если нажал случайно.</p>
       <ul id="drawerList"></ul>
       <div class="empty" id="drawerEmpty">Ящик пуст</div>
     </div>
@@ -1522,7 +1533,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Счёт списания</label>
     <select id="modalAccount"></select>
     <label>Категория</label>
-    <input id="modalCategory" placeholder="Начни вводить категорию" autocomplete="off"/>
+    <input id="modalCategory" placeholder="Начни вводить или выбери" autocomplete="off"/>
     <label>Расход</label>
     <input id="modalExpense" placeholder="Например: Заруб, Хозтовары…" autocomplete="off"/>
     <datalist id="expenseList"></datalist>
@@ -1598,7 +1609,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Счёт списания</label>
     <select id="valetTeachAccount"></select>
     <label>Категория</label>
-    <input id="valetTeachCategory" placeholder="Начни вводить категорию" autocomplete="off"/>
+    <input id="valetTeachCategory" placeholder="Начни вводить или выбери" autocomplete="off"/>
     <label>Расход</label>
     <input id="valetTeachExpense" placeholder="Например: Продукты" autocomplete="off"/>
     <label>Магазин</label>
@@ -1627,14 +1638,76 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
 
 <div class="modal-back" id="duplicateExpenseModal">
   <div class="modal">
-    <h3>Возможно, эта операция уже существует</h3>
+    <h3 id="duplicateExpenseTitle">Возможно, эта операция уже существует</h3>
+    <div id="duplicateExpenseNav" class="dup-clarify-nav" hidden>
+      <button type="button" class="btn btn-ghost dup-nav-btn" id="duplicatePrev" aria-label="Предыдущее">←</button>
+      <span id="duplicateNavLabel" class="dup-nav-label"></span>
+      <button type="button" class="btn btn-ghost dup-nav-btn" id="duplicateNext" aria-label="Следующее">→</button>
+    </div>
+    <p class="hint" id="duplicateExpenseIncoming" style="margin-top:8px" hidden></p>
     <p class="hint" id="duplicateExpenseSignals" style="margin-top:0">—</p>
     <div id="duplicateExpenseExisting"></div>
     <div class="modal-actions" style="flex-wrap:wrap">
       <button type="button" class="btn btn-ok" id="duplicateUseExisting">Использовать существующий</button>
+      <button type="button" class="btn btn-ok" id="duplicateLinkExisting" hidden>Да, это одна запись</button>
       <button type="button" class="btn btn-ghost" id="duplicateCreateNew">Создать новый</button>
+      <button type="button" class="btn btn-ghost" id="duplicateSkip" hidden>Не добавлять</button>
       <button type="button" class="btn btn-ghost" id="duplicateMerge">Объединить</button>
       <button type="button" class="btn btn-ghost" id="duplicateCancel">Отмена</button>
+    </div>
+    <label id="duplicateCardLinkWrap" class="hint" hidden style="display:block;margin-top:12px">
+      <input type="checkbox" id="duplicateCardLinkCheck" checked style="margin-right:6px;vertical-align:middle"/>
+      <span id="duplicateCardLinkLabel">Запомнить карту для этого счёта</span>
+    </label>
+  </div>
+</div>
+
+<div class="modal-back" id="valetDoubtModal">
+  <div class="modal">
+    <h3 id="valetDoubtTitle">Уточни сумму позиции</h3>
+    <p class="hint" id="valetDoubtBody" style="margin-top:0;white-space:pre-wrap">—</p>
+    <div id="valetDoubtManual" hidden style="margin:10px 0">
+      <label>Сумма расхода (стоимость)</label>
+      <input id="valetDoubtManualAmount" type="number" min="0" step="0.01" placeholder="0"/>
+    </div>
+    <div class="modal-actions" style="flex-wrap:wrap" id="valetDoubtActions"></div>
+  </div>
+</div>
+
+<div class="modal-back" id="razborResumeModal">
+  <div class="modal">
+    <h3>Незавершённый разбор</h3>
+    <p class="hint" id="razborResumeDetail" style="margin-top:0">—</p>
+    <p id="razborResumeQuestion">Продолжить?</p>
+    <div class="modal-actions" style="flex-wrap:wrap">
+      <button type="button" class="btn btn-ghost" id="razborResumeNo">Нет</button>
+      <button type="button" class="btn btn-ok" id="razborResumeYes">Да</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="receiptSourceModal">
+  <div class="modal">
+    <h3>Фото чека</h3>
+    <p class="hint" style="margin-top:0">Сфотографировать сейчас или выбрать из галереи — дальше тот же разбор.</p>
+    <div class="modal-actions" style="flex-wrap:wrap">
+      <button type="button" class="btn btn-ok" id="receiptSourceCamera">Сфотографировать</button>
+      <button type="button" class="btn btn-ghost" id="receiptSourceGallery">Из галереи</button>
+      <button type="button" class="btn btn-ghost" id="receiptSourceCancel">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="userErrorModal">
+  <div class="modal">
+    <h3 id="userErrorTitle">Не получилось обработать данные</h3>
+    <p class="hint" id="userErrorWhatLabel" style="margin:0 0 4px;font-weight:600;color:var(--ink)">Что произошло</p>
+    <p id="userErrorWhat" style="margin-top:0">—</p>
+    <p class="hint" id="userErrorTipsLabel" style="margin:12px 0 4px;font-weight:600;color:var(--ink)">Что можно сделать</p>
+    <ul id="userErrorTips" style="margin:0;padding-left:1.2em"></ul>
+    <div class="modal-actions" style="flex-wrap:wrap;margin-top:14px">
+      <button type="button" class="btn btn-ghost" id="userErrorCancel" hidden>Отмена</button>
+      <button type="button" class="btn btn-ok" id="userErrorOk">Понятно</button>
     </div>
   </div>
 </div>
@@ -1654,7 +1727,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Фонд <span class="hint">(необязательно)</span></label>
     <select id="manExpFund"></select>
     <label>Категория</label>
-    <input id="manExpCategory" placeholder="Выбери или начни вводить" autocomplete="off"/>
+    <input id="manExpCategory" placeholder="Начни вводить или выбери" autocomplete="off"/>
     <label>Расход</label>
     <input id="manExpExpense" placeholder="Например: Продукты" autocomplete="off"/>
     <label>Магазин</label>
@@ -1700,7 +1773,7 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
     <label>Счёт</label>
     <select id="editRowAccount"></select>
     <label>Категория</label>
-    <input id="editRowCategory" placeholder="Начни вводить категорию" autocomplete="off"/>
+    <input id="editRowCategory" placeholder="Начни вводить или выбери" autocomplete="off"/>
     <label>Расход</label>
     <input id="editRowExpense" autocomplete="off"/>
     <label>Магазин</label>
@@ -1748,14 +1821,15 @@ th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(-
 const DATA = JSON.parse(document.getElementById('bootstrap').textContent);
 const LS_KEY = 'wallet_review_v3';
 /** Payload schema for migrations (accountant-safety layer = 4). */
-const SCHEMA_VERSION = 11;
+const SCHEMA_VERSION = 13;
 /** Visible UI build — bump +1 on every shipped UI change (badge next to «Разбор»). */
-const UI_BUILD = 58;
+const UI_BUILD = 82;
 /** Postgres is the source of truth; localStorage is a write-through cache. */
 const WALLET_USER = 'makc';
 const WALLET_API_STATE = `/api/v1/users/${WALLET_USER}/state`;
 const WALLET_API_DUMPS = `/api/v1/users/${WALLET_USER}/dumps`;
 const WALLET_STATEMENT_PARSE = `/api/v1/users/${WALLET_USER}/statement/parse`;
+const WALLET_RECEIPT_PARSE = `/api/v1/users/${WALLET_USER}/receipt/parse`;
 const WALLET_MIGRATION_FLAGS = [
   'wallet_undo_razobrat_v2','wallet_food_vending_v1','wallet_batch_jul13b','wallet_batch_jul13c',
   'wallet_batch_jul13d','wallet_batch_jul13e2','wallet_batch_jul13f','wallet_batch_jul13g',
@@ -2016,6 +2090,7 @@ function statePayload(st) {
     accounts: Array.isArray(st.accounts) ? st.accounts : JSON.parse(JSON.stringify(DEFAULT_ACCOUNTS)),
     accountLog: Array.isArray(st.accountLog) ? st.accountLog : [],
     importedOps: Array.isArray(st.importedOps) ? st.importedOps : [],
+    purchases: Array.isArray(st.purchases) ? st.purchases : [],
     proposalLog: Array.isArray(st.proposalLog) ? st.proposalLog.slice(-1000) : [],
     merchants: st.merchants && typeof st.merchants === 'object' ? st.merchants : {},
     learnLog: Array.isArray(st.learnLog) ? st.learnLog : [],
@@ -2033,10 +2108,18 @@ function statePayload(st) {
     storeDirectory: st.storeDirectory && typeof st.storeDirectory === 'object' ? st.storeDirectory : {},
     drawerOps: Array.isArray(st.drawerOps) ? st.drawerOps : [],
     rejectedOps: Array.isArray(st.rejectedOps) ? st.rejectedOps : [],
+    reconciliationLinks: Array.isArray(st.reconciliationLinks) ? st.reconciliationLinks : [],
+    cardAccountLinks: Array.isArray(st.cardAccountLinks) ? st.cardAccountLinks : [],
     valetWatchCategories: Array.isArray(st.valetWatchCategories) ? st.valetWatchCategories : [],
     valetWatchExpenses: Array.isArray(st.valetWatchExpenses) ? st.valetWatchExpenses : [],
     defaultAccountId: st.defaultAccountId || '',
     importSkipPreview: !!st.importSkipPreview,
+    razborResume: st.razborResume && typeof st.razborResume === 'object' ? {
+      label: String(st.razborResume.label || '').trim(),
+      source: String(st.razborResume.source || '').trim(),
+      at: String(st.razborResume.at || ''),
+      totalHint: Number(st.razborResume.totalHint) || 0,
+    } : null,
     _migrations: st._migrations && typeof st._migrations === 'object' ? { ...st._migrations } : {},
     _expensePresets: st._expensePresets && typeof st._expensePresets === 'object'
       ? { ...st._expensePresets }
@@ -2083,6 +2166,13 @@ const SCHEMA_MIGRATIONS = {
   },
   10(data) {
     if (!Array.isArray(data.proposalLog)) data.proposalLog = [];
+  },
+  11(data) {
+    if (!Array.isArray(data.purchases)) data.purchases = [];
+  },
+  12(data) {
+    if (!Array.isArray(data.reconciliationLinks)) data.reconciliationLinks = [];
+    if (!Array.isArray(data.cardAccountLinks)) data.cardAccountLinks = [];
   },
 };
 function migratePayload(raw) {
@@ -2196,6 +2286,7 @@ function applyPayloadToState(s) {
   state.accounts = ensureAccounts(s.accounts);
   state.accountLog = Array.isArray(s.accountLog) ? s.accountLog : [];
   state.importedOps = Array.isArray(s.importedOps) ? s.importedOps : [];
+  state.purchases = Array.isArray(s.purchases) ? s.purchases.map(normalizePurchase).filter(Boolean) : [];
   state.proposalLog = Array.isArray(s.proposalLog) ? s.proposalLog.slice(-1000) : [];
   state.merchants = s.merchants && typeof s.merchants === 'object' ? s.merchants : {};
   state.learnLog = Array.isArray(s.learnLog) ? s.learnLog : [];
@@ -2217,6 +2308,12 @@ function applyPayloadToState(s) {
   state.storeDirectory = s.storeDirectory && typeof s.storeDirectory === 'object' ? { ...s.storeDirectory } : {};
   state.drawerOps = Array.isArray(s.drawerOps) ? s.drawerOps.map(normalizeDrawerOp).filter(Boolean) : [];
   state.rejectedOps = Array.isArray(s.rejectedOps) ? s.rejectedOps.map(normalizeRejectedOp).filter(Boolean) : [];
+  state.reconciliationLinks = Array.isArray(s.reconciliationLinks)
+    ? s.reconciliationLinks.map(normalizeReconciliationLink).filter(Boolean)
+    : [];
+  state.cardAccountLinks = Array.isArray(s.cardAccountLinks)
+    ? s.cardAccountLinks.map(normalizeCardAccountLink).filter(Boolean)
+    : [];
   state.valetWatchCategories = Array.isArray(s.valetWatchCategories)
     ? s.valetWatchCategories.map(String)
     : [];
@@ -2225,6 +2322,14 @@ function applyPayloadToState(s) {
     : [];
   state.defaultAccountId = s.defaultAccountId || '';
   state.importSkipPreview = !!s.importSkipPreview;
+  state.razborResume = s.razborResume && typeof s.razborResume === 'object'
+    ? {
+        label: String(s.razborResume.label || '').trim(),
+        source: String(s.razborResume.source || '').trim(),
+        at: String(s.razborResume.at || ''),
+        totalHint: Number(s.razborResume.totalHint) || 0,
+      }
+    : null;
   state.schemaVersion = SCHEMA_VERSION;
   state._migrations = s._migrations && typeof s._migrations === 'object' ? { ...s._migrations } : {};
   state._expensePresets = s._expensePresets && typeof s._expensePresets === 'object'
@@ -3602,6 +3707,7 @@ function loadState() {
         accounts: ensureAccounts(s.accounts),
         accountLog: Array.isArray(s.accountLog) ? s.accountLog : [],
         importedOps: Array.isArray(s.importedOps) ? s.importedOps : [],
+        purchases: Array.isArray(s.purchases) ? s.purchases.map(normalizePurchase).filter(Boolean) : [],
         proposalLog: Array.isArray(s.proposalLog) ? s.proposalLog.slice(-1000) : [],
         merchants: s.merchants && typeof s.merchants === 'object' ? s.merchants : {},
         learnLog: Array.isArray(s.learnLog) ? s.learnLog : [],
@@ -3625,6 +3731,12 @@ function loadState() {
           : {},
         drawerOps: Array.isArray(s.drawerOps) ? s.drawerOps.map(normalizeDrawerOp).filter(Boolean) : [],
         rejectedOps: Array.isArray(s.rejectedOps) ? s.rejectedOps.map(normalizeRejectedOp).filter(Boolean) : [],
+        reconciliationLinks: Array.isArray(s.reconciliationLinks)
+          ? s.reconciliationLinks.map(normalizeReconciliationLink).filter(Boolean)
+          : [],
+        cardAccountLinks: Array.isArray(s.cardAccountLinks)
+          ? s.cardAccountLinks.map(normalizeCardAccountLink).filter(Boolean)
+          : [],
         valetWatchCategories: Array.isArray(s.valetWatchCategories) ? s.valetWatchCategories.map(String) : [],
         valetWatchExpenses: Array.isArray(s.valetWatchExpenses) ? s.valetWatchExpenses.map(String) : [],
         defaultAccountId: s.defaultAccountId || '',
@@ -3846,6 +3958,7 @@ function loadState() {
     accounts: JSON.parse(JSON.stringify(DEFAULT_ACCOUNTS)),
     accountLog: [],
     importedOps: [],
+    purchases: [],
     proposalLog: [],
     merchants: {},
     learnLog: [],
@@ -3863,10 +3976,13 @@ function loadState() {
     storeDirectory: {},
     drawerOps: [],
     rejectedOps: [],
+    reconciliationLinks: [],
+    cardAccountLinks: [],
     valetWatchCategories: [],
     valetWatchExpenses: [],
     defaultAccountId: '',
     importSkipPreview: false,
+    razborResume: null,
     schemaVersion: SCHEMA_VERSION,
     _migrations: {},
   };
@@ -4062,6 +4178,176 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2200);
 }
 
+/** Единый вход пользовательских ошибок: модалка + запись в /logs. Toast для ошибок не используем. */
+let _userErrorResolver = null;
+const USER_ERROR_META_ALLOW = new Set([
+  'filename', 'mimeType', 'sizeBytes', 'httpStatus', 'provider', 'engine', 'model',
+  'recognizedCount', 'rawCount', 'validCount', 'failedCount', 'confidence', 'sourceLabel',
+  'stage', 'errorType', 'ok',
+]);
+
+function sanitizeUserErrorMeta(meta) {
+  const out = {};
+  if (!meta || typeof meta !== 'object') return out;
+  for (const [k, v] of Object.entries(meta)) {
+    if (!USER_ERROR_META_ALLOW.has(k)) continue;
+    if (v == null) continue;
+    if (typeof v === 'string') out[k] = String(v).slice(0, 200);
+    else if (typeof v === 'number' || typeof v === 'boolean') out[k] = v;
+  }
+  return out;
+}
+
+function classifyImportErrorKind(err, { emptyItems = false, partial = false } = {}) {
+  if (partial) return 'partial_recognition';
+  const msg = String(err?.message || err || '');
+  if (/HTTP\s*[45]\d\d|timeout|network|Failed to fetch|ECONN|Access denied|502|503|504|upstream/i.test(msg)) {
+    return 'technical_failure';
+  }
+  if (emptyItems || /не удалось распознать|unreadable|not_a_receipt|прочитать|OCR|vision/i.test(msg)) {
+    return 'recognition_failed';
+  }
+  return 'import_failed';
+}
+
+function defaultTipsForErrorKind(kind) {
+  if (kind === 'recognition_failed') {
+    return [
+      'сделать фото ближе и ровнее',
+      'расправить чек и снять при хорошем освещении',
+      'или добавить расход вручную',
+    ];
+  }
+  if (kind === 'technical_failure') {
+    return [
+      'попробовать ещё раз позже',
+      'проверить интернет',
+      'или добавить расход вручную',
+    ];
+  }
+  if (kind === 'partial_recognition') {
+    return [
+      'продолжить с распознанными позициями',
+      'или отменить и загрузить другое фото',
+    ];
+  }
+  return [
+    'попробовать ещё раз',
+    'или добавить расход вручную',
+  ];
+}
+
+function openUserErrorModal({
+  title,
+  what,
+  tips = [],
+  actions = 'ok',
+} = {}) {
+  return new Promise((resolve) => {
+    _userErrorResolver = resolve;
+    const titleEl = document.getElementById('userErrorTitle');
+    const whatEl = document.getElementById('userErrorWhat');
+    const tipsEl = document.getElementById('userErrorTips');
+    const okBtn = document.getElementById('userErrorOk');
+    const cancelBtn = document.getElementById('userErrorCancel');
+    if (titleEl) titleEl.textContent = title || 'Не получилось обработать данные';
+    if (whatEl) whatEl.textContent = what || '—';
+    if (tipsEl) {
+      tipsEl.innerHTML = (tips || []).map((t) => `<li>${escapeHtml(t)}</li>`).join('');
+    }
+    const continueMode = actions === 'continue_cancel';
+    if (okBtn) okBtn.textContent = continueMode ? 'Продолжить' : 'Понятно';
+    if (cancelBtn) {
+      cancelBtn.hidden = !continueMode;
+      cancelBtn.textContent = 'Отмена';
+    }
+    document.getElementById('userErrorModal')?.classList.add('show');
+  });
+}
+
+function closeUserErrorModal(decision = 'ok') {
+  document.getElementById('userErrorModal')?.classList.remove('show');
+  const resolve = _userErrorResolver;
+  _userErrorResolver = null;
+  if (typeof resolve === 'function') resolve(decision);
+}
+
+async function persistUserErrorLog(payload) {
+  const alert = {
+    severity: 'critical',
+    code: `user_error:${payload.error_type || 'unknown'}:${payload.stage || 'unknown'}:${Date.now()}`,
+    title: payload.title || 'Ошибка обработки',
+    detail: payload.user_message || '',
+    provider: payload.metadata?.provider || payload.metadata?.engine || 'client',
+    fallback: '',
+    http_status: payload.metadata?.httpStatus ?? null,
+    // Structured block for /logs (no secrets / receipt body / amounts).
+    user_error: {
+      timestamp: payload.timestamp,
+      source: payload.source,
+      stage: payload.stage,
+      error_type: payload.error_type,
+      user_message: payload.user_message,
+      technical_message: payload.technical_message,
+      stack: payload.stack,
+      metadata: payload.metadata || {},
+      session_id: payload.session_id || '',
+      user: WALLET_USER,
+    },
+  };
+  // Reuse existing /logs channel; never throw / never spam Valet chat.
+  try {
+    await notifyValetCritical([alert], { goToValet: false, quiet: true });
+  } catch (err) {
+    console.warn('user error log failed', err);
+  }
+}
+
+/**
+ * reportUserError — единый вход ошибок импорта/распознавания.
+ * Всегда показывает модалку; логирование не блокирует UX.
+ * @returns {'ok'|'continue'|'cancel'}
+ */
+async function reportUserError({
+  source = 'unknown',
+  stage = 'unknown',
+  errorType = 'import_failed',
+  title = 'Не получилось обработать данные',
+  userMessage = '',
+  technicalMessage = '',
+  recommendations = null,
+  error = null,
+  metadata = {},
+  actions = 'ok',
+} = {}) {
+  const tips = Array.isArray(recommendations) && recommendations.length
+    ? recommendations
+    : defaultTipsForErrorKind(errorType);
+  const tech = String(technicalMessage || error?.message || error || '').slice(0, 500);
+  const stack = String(error?.stack || '').slice(0, 2000);
+  const payload = {
+    timestamp: new Date().toISOString(),
+    source: String(source || 'unknown').slice(0, 40),
+    stage: String(stage || 'unknown').slice(0, 40),
+    error_type: String(errorType || 'import_failed').slice(0, 60),
+    user_message: String(userMessage || title).slice(0, 500),
+    technical_message: tech,
+    stack,
+    metadata: sanitizeUserErrorMeta(metadata),
+    session_id: _valetConversationId || '',
+    title,
+  };
+  // Log in background — failure must not hide the modal.
+  void persistUserErrorLog(payload);
+  const decision = await openUserErrorModal({
+    title,
+    what: userMessage || title,
+    tips,
+    actions,
+  });
+  return decision;
+}
+
 /**
  * Close modal only when both press and release happen on the backdrop.
  * Prevents closing while selecting text and dragging outside the dialog.
@@ -4079,6 +4365,18 @@ function bindModalBackdropClose(modalId, onClose) {
   });
 }
 
+document.getElementById('userErrorOk')?.addEventListener('click', () => {
+  const cancelBtn = document.getElementById('userErrorCancel');
+  const continueMode = cancelBtn && !cancelBtn.hidden;
+  closeUserErrorModal(continueMode ? 'continue' : 'ok');
+});
+document.getElementById('userErrorCancel')?.addEventListener('click', () => closeUserErrorModal('cancel'));
+bindModalBackdropClose('userErrorModal', () => {
+  const cancelBtn = document.getElementById('userErrorCancel');
+  const continueMode = cancelBtn && !cancelBtn.hidden;
+  closeUserErrorModal(continueMode ? 'cancel' : 'ok');
+});
+
 const DUPLICATE_RESOLUTIONS = new Set([
   'none', 'linked_existing', 'created_new', 'merged', 'allowed_duplicate',
 ]);
@@ -4086,15 +4384,19 @@ const SOURCE_STATUSES = new Set(['queued', 'linked', 'rejected', 'merged']);
 const STORE_SERVICE_WORDS = new Set([
   'сервисный', 'сервис', 'центр', 'магазин', 'торговый', 'точка',
   'ооо', 'ип', 'зао', 'пао', 'ao', 'llc', 'shop', 'store',
+  // bank description noise (not merchant names)
+  'оплата', 'услуг', 'услуга', 'услуги', 'payment', 'oplata',
 ]);
 function sourceTypeFromLabel(value) {
   const label = String(value || '').trim().toLowerCase();
+  if (/receipt|чек/.test(label) && !/screenshot|скрин/.test(label)) return 'receipt';
   if (/pdf/.test(label)) return 'pdf';
   if (/screen|image|photo|скрин|фото/.test(label)) return 'screenshot';
   if (/clipboard|paste|буфер/.test(label)) return 'clipboard';
   if (/manual|ручн/.test(label)) return 'manual';
   if (/api/.test(label)) return 'api';
   if (/excel|xlsx|xls|csv/.test(label)) return 'excel';
+  if (/bank|statement|выписк/.test(label)) return 'bank_statement';
   return label || 'unknown';
 }
 function normalizeStoreForGateway(value) {
@@ -4154,7 +4456,60 @@ function normalizeSourceOperation(raw, { sourceType } = {}) {
       : 'none',
   };
   normalized.fingerprint = String(raw.fingerprint || buildSourceFingerprint(normalized));
+  if (raw.receiptInfo && typeof raw.receiptInfo === 'object') {
+    normalized.receiptInfo = raw.receiptInfo;
+  }
+  if (raw.purchaseId) normalized.purchaseId = String(raw.purchaseId);
+  if (raw.productName) normalized.productName = String(raw.productName);
+  if (raw.receiptMerchant) normalized.receiptMerchant = String(raw.receiptMerchant);
   return normalized;
+}
+/** Purchase = событие покупки (AD-010). Старые расходы без purchaseId валидны. */
+function normalizePurchase(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const id = String(raw.id || '').trim();
+  if (!id) return null;
+  return {
+    id,
+    date: String(raw.date || ''),
+    store: String(raw.store || '').trim(),
+    totalAmount: Math.abs(Number(raw.totalAmount) || 0),
+    wallet: raw.wallet === 'business' ? 'business' : 'personal',
+    accountId: String(raw.accountId || ''),
+    fiscalId: String(raw.fiscalId || raw.receiptNumber || '').trim(),
+    sourceOperationIds: Array.isArray(raw.sourceOperationIds)
+      ? raw.sourceOperationIds.map(String)
+      : (raw.sourceOperationId != null ? [String(raw.sourceOperationId)] : []),
+    expenseOpIds: Array.isArray(raw.expenseOpIds) ? raw.expenseOpIds.map(String) : [],
+    status: String(raw.status || 'confirmed'),
+    createdAt: String(raw.createdAt || new Date().toISOString()),
+  };
+}
+function ensurePurchases() {
+  if (!Array.isArray(state.purchases)) state.purchases = [];
+}
+function purchaseById(id) {
+  ensurePurchases();
+  return state.purchases.find((p) => String(p.id) === String(id)) || null;
+}
+function createPurchaseRecord(fields) {
+  ensurePurchases();
+  const purchase = normalizePurchase({
+    id: fields.id || ('pur' + Date.now().toString(36) + Math.random().toString(16).slice(2, 6)),
+    date: fields.date,
+    store: fields.store,
+    totalAmount: fields.totalAmount,
+    wallet: fields.wallet,
+    accountId: fields.accountId,
+    fiscalId: fields.fiscalId || fields.receiptNumber || '',
+    sourceOperationIds: fields.sourceOperationIds || [],
+    expenseOpIds: fields.expenseOpIds || [],
+    status: fields.status || 'confirmed',
+    createdAt: fields.createdAt || new Date().toISOString(),
+  });
+  if (!purchase) return null;
+  state.purchases.push(purchase);
+  return purchase;
 }
 /** importedOps is the source-operation layer and still feeds Разбор. */
 function ensureImportedOps() {
@@ -4180,7 +4535,7 @@ function normalizeDrawerOp(raw) {
   const store = String(raw.store || '').trim();
   if (!store) return null;
   const kind = String(raw.kind || (amount > 0 ? 'unclear' : 'expense'));
-  return {
+  const out = {
     id: String(raw.id || nextDrawerId()),
     date: String(raw.date || ''),
     store,
@@ -4195,6 +4550,19 @@ function normalizeDrawerOp(raw) {
     status: String(raw.status || 'open'),
     at: String(raw.at || new Date().toISOString()),
   };
+  // Поля для «Вернуть назад» в Разбор (и для чековых позиций).
+  if (raw.sourceOpId != null && String(raw.sourceOpId)) out.sourceOpId = String(raw.sourceOpId);
+  if (raw.storeRaw) out.storeRaw = String(raw.storeRaw);
+  if (raw.productName) out.productName = String(raw.productName);
+  if (raw.receiptMerchant) out.receiptMerchant = String(raw.receiptMerchant);
+  if (raw.sourceType) out.sourceType = String(raw.sourceType);
+  if (raw.purchaseId) out.purchaseId = String(raw.purchaseId);
+  if (raw.unit != null && String(raw.unit)) out.unit = String(raw.unit);
+  if (Number.isFinite(Number(raw.qty))) out.qty = Number(raw.qty);
+  if (Number.isFinite(Number(raw.price))) out.price = Number(raw.price);
+  if (raw.placementHint && typeof raw.placementHint === 'object') out.placementHint = raw.placementHint;
+  if (raw.softDup) out.softDup = true;
+  return out;
 }
 function normalizeIncome(raw) {
   if (!raw || typeof raw !== 'object') return null;
@@ -4224,6 +4592,183 @@ function drawerCount() {
 function ensureRejectedOps() {
   if (!Array.isArray(state.rejectedOps)) state.rejectedOps = [];
 }
+function ensureReconciliationLinks() {
+  if (!Array.isArray(state.reconciliationLinks)) state.reconciliationLinks = [];
+}
+function ensureCardAccountLinks() {
+  if (!Array.isArray(state.cardAccountLinks)) state.cardAccountLinks = [];
+}
+function normalizeCardMask(value) {
+  const m = String(value || '').match(/\*?(\d{3,4})\b/);
+  return m ? `*${m[1]}` : '';
+}
+function normalizeReconciliationLink(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const bankFingerprint = String(raw.bankFingerprint || '').trim();
+  const linkedExpenseOpId = String(raw.linkedExpenseOpId || raw.expenseOpId || '').trim();
+  if (!bankFingerprint || !linkedExpenseOpId) return null;
+  const lookupKeys = Array.isArray(raw.lookupKeys)
+    ? raw.lookupKeys.map(String).filter(Boolean)
+    : [bankFingerprint];
+  return {
+    id: String(raw.id || ('rcl' + Date.now().toString(36) + Math.random().toString(16).slice(2, 6))),
+    bankFingerprint,
+    lookupKeys: [...new Set(lookupKeys)],
+    linkedExpenseOpId,
+    confirmedByUser: raw.confirmedByUser !== false,
+    at: String(raw.at || new Date().toISOString()),
+    importStore: String(raw.importStore || ''),
+    ledgerStore: String(raw.ledgerStore || ''),
+    amount: Math.abs(Number(raw.amount) || 0),
+    date: String(raw.date || ''),
+    cardHint: normalizeCardMask(raw.cardHint || ''),
+    phoneHint: String(raw.phoneHint || ''),
+    accountId: String(raw.accountId || ''),
+  };
+}
+function normalizeCardAccountLink(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const card = normalizeCardMask(raw.card || raw.cardHint);
+  const accountId = String(raw.accountId || '').trim();
+  if (!card || !accountId) return null;
+  return {
+    id: String(raw.id || ('cal' + Date.now().toString(36) + Math.random().toString(16).slice(2, 6))),
+    card,
+    accountId,
+    confirmedByUser: raw.confirmedByUser !== false,
+    at: String(raw.at || new Date().toISOString()),
+  };
+}
+/** Stable bank-op identity for reconciliation (not merchant learning). */
+function buildBankReconFingerprint(row) {
+  const day = datePartIso(row?.date || '');
+  const amount = absCost(row?.amount ?? row?.cost ?? row?.price).toFixed(2);
+  const store = normalizeStoreForGateway(row?.storeNormalized || row?.storeRaw || row?.store || '');
+  const ids = typeof bankMatchIdentifiers === 'function' ? bankMatchIdentifiers(row) : { cards: [], phones: [] };
+  const card = normalizeCardMask(ids.cards?.[0] || accountHintFromBank(row?.bank));
+  const phone = String(ids.phones?.[0] || '').trim();
+  return [day, amount, store, card, phone].join('|');
+}
+function bankReconLookupKeys(row) {
+  const day = datePartIso(row?.date || '');
+  const amount = absCost(row?.amount ?? row?.cost ?? row?.price).toFixed(2);
+  const store = normalizeStoreForGateway(row?.storeNormalized || row?.storeRaw || row?.store || '');
+  const ids = typeof bankMatchIdentifiers === 'function' ? bankMatchIdentifiers(row) : { cards: [], phones: [] };
+  const card = normalizeCardMask(ids.cards?.[0] || accountHintFromBank(row?.bank));
+  const phone = String(ids.phones?.[0] || '').trim();
+  const keys = new Set();
+  keys.add([day, amount, store, card, phone].join('|'));
+  // Safe aliases only with an extra identifier (never date+amount alone).
+  if (card) keys.add([day, amount, '', card, ''].join('|'));
+  if (phone) keys.add([day, amount, '', '', phone].join('|'));
+  if (store && card) keys.add([day, amount, store, card, ''].join('|'));
+  if (store && phone) keys.add([day, amount, store, '', phone].join('|'));
+  return [...keys].filter(Boolean);
+}
+function findExpenseByOpId(opId) {
+  const id = String(opId || '');
+  if (!id) return null;
+  for (const row of [...(state.personal || []), ...(state.business || [])]) {
+    if (String(row.opId) === id) return row;
+  }
+  return null;
+}
+function findReconciliationLinkForRow(row) {
+  ensureReconciliationLinks();
+  if (!row) return null;
+  const keys = new Set(bankReconLookupKeys(row));
+  const fp = buildBankReconFingerprint(row);
+  keys.add(fp);
+  for (const link of state.reconciliationLinks) {
+    if (!link?.confirmedByUser) continue;
+    const expense = findExpenseByOpId(link.linkedExpenseOpId);
+    if (!expense) continue;
+    const linkKeys = new Set([link.bankFingerprint, ...(link.lookupKeys || [])].filter(Boolean));
+    let hit = false;
+    for (const k of keys) {
+      if (linkKeys.has(k)) { hit = true; break; }
+    }
+    if (!hit) continue;
+    // Safety: still require same calendar day + amount as linked expense.
+    if (datePartIso(row.date) !== datePartIso(expense.date)) continue;
+    if (Math.abs(absCost(row.amount) - absCost(expense.cost ?? expense.price)) >= 0.02) continue;
+    return { link, expense };
+  }
+  return null;
+}
+function accountIdForCardHint(cardHint) {
+  ensureCardAccountLinks();
+  const card = normalizeCardMask(cardHint);
+  if (!card) return '';
+  const hit = state.cardAccountLinks.find((x) => normalizeCardMask(x.card) === card);
+  return hit ? String(hit.accountId) : '';
+}
+function rememberCardAccountLink(cardHint, accountId) {
+  ensureCardAccountLinks();
+  const card = normalizeCardMask(cardHint);
+  const acc = String(accountId || '').trim();
+  if (!card || !acc) return null;
+  const existing = state.cardAccountLinks.find((x) => normalizeCardMask(x.card) === card);
+  if (existing) {
+    existing.accountId = acc;
+    existing.confirmedByUser = true;
+    existing.at = new Date().toISOString();
+    return existing;
+  }
+  const link = normalizeCardAccountLink({
+    card,
+    accountId: acc,
+    confirmedByUser: true,
+    at: new Date().toISOString(),
+  });
+  if (link) state.cardAccountLinks.push(link);
+  return link;
+}
+function rememberReconciliationLink(importRow, expense, { rememberCard = true } = {}) {
+  ensureReconciliationLinks();
+  if (!importRow || !expense?.opId) return null;
+  const bankFingerprint = buildBankReconFingerprint(importRow);
+  const lookupKeys = bankReconLookupKeys(importRow);
+  const ids = bankMatchIdentifiers(importRow);
+  const cardHint = normalizeCardMask(ids.cards?.[0] || accountHintFromBank(importRow.bank));
+  const phoneHint = String(ids.phones?.[0] || '').trim();
+  const linkedExpenseOpId = String(expense.opId);
+  const existing = state.reconciliationLinks.find((l) => {
+    if (l.bankFingerprint === bankFingerprint) return true;
+    return l.linkedExpenseOpId === linkedExpenseOpId
+      && datePartIso(l.date) === datePartIso(importRow.date)
+      && Math.abs(Number(l.amount) - absCost(importRow.amount)) < 0.02;
+  });
+  const payload = normalizeReconciliationLink({
+    id: existing?.id,
+    bankFingerprint,
+    lookupKeys,
+    linkedExpenseOpId,
+    confirmedByUser: true,
+    at: new Date().toISOString(),
+    importStore: String(importRow.store || ''),
+    ledgerStore: String(expense.store || ''),
+    amount: absCost(importRow.amount),
+    date: datePartIso(importRow.date),
+    cardHint,
+    phoneHint,
+    accountId: String(expense.accountId || ''),
+  });
+  if (!payload) return null;
+  if (existing) {
+    Object.assign(existing, payload);
+  } else {
+    state.reconciliationLinks.push(payload);
+    if (state.reconciliationLinks.length > 2000) {
+      state.reconciliationLinks = state.reconciliationLinks.slice(-1500);
+    }
+  }
+  if (rememberCard && cardHint && expense.accountId) {
+    rememberCardAccountLink(cardHint, expense.accountId);
+  }
+  return payload;
+}
+
 function normalizeRejectedOp(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const amount = Number(raw.amount);
@@ -4338,8 +4883,10 @@ function pushDrawerOps(ops, { reason = '', source = 'tutor' } = {}) {
     state.drawerOps.push(
       normalizeDrawerOp({
         id: nextDrawerId(),
+        sourceOpId: op.id != null ? op.id : null,
         date: op.date,
         store,
+        storeRaw: op.storeRaw || op.store || store,
         amount,
         kind: rowKind(op),
         comment: op.comment || op.note || '',
@@ -4348,6 +4895,15 @@ function pushDrawerOps(ops, { reason = '', source = 'tutor' } = {}) {
         reason,
         source,
         filename: op.filename || (valetTutor?.plan?.filename || ''),
+        productName: op.productName || '',
+        receiptMerchant: op.receiptMerchant || '',
+        sourceType: op.sourceType || '',
+        purchaseId: op.purchaseId || '',
+        unit: op.unit,
+        qty: op.qty,
+        price: op.price,
+        placementHint: op.placementHint || null,
+        softDup: !!op.softDup,
         status: 'open',
         at: new Date().toISOString(),
       })
@@ -4362,6 +4918,114 @@ function removeDrawerOp(id) {
   state.drawerOps = state.drawerOps.filter((o) => String(o.id) !== String(id));
   return before !== state.drawerOps.length;
 }
+
+/** Собрать строку импорта из записи ящика (для возврата в Разбор). */
+function importedOpFromDrawer(drawerOp) {
+  if (!drawerOp) return null;
+  const product = String(drawerOp.productName || '').trim();
+  const storeRaw = String(drawerOp.storeRaw || drawerOp.store || '').trim();
+  const store = product
+    ? String(drawerOp.receiptMerchant || drawerOp.store || storeRaw).trim()
+    : storeRaw;
+  const id =
+    drawerOp.sourceOpId != null && String(drawerOp.sourceOpId)
+      ? drawerOp.sourceOpId
+      : nextImportOpId();
+  return normalizeSourceOperation(
+    {
+      id,
+      date: drawerOp.date,
+      store,
+      storeRaw: storeRaw || store,
+      amount: drawerOp.amount,
+      comment: drawerOp.comment || '',
+      bank: drawerOp.bank || null,
+      fingerprint: drawerOp.fingerprint || '',
+      productName: product,
+      receiptMerchant: drawerOp.receiptMerchant || (product ? store : ''),
+      sourceType: drawerOp.sourceType || '',
+      purchaseId: drawerOp.purchaseId || '',
+      unit: drawerOp.unit,
+      qty: drawerOp.qty,
+      price: drawerOp.price,
+      placementHint: drawerOp.placementHint || null,
+      softDup: !!drawerOp.softDup,
+      filename: drawerOp.filename || '',
+      status: 'queued',
+    },
+    { sourceType: drawerOp.sourceType || drawerOp.source || drawerOp.filename }
+  );
+}
+
+/** «Вернуть назад»: из ящика снова в очередь Разбора (отмена случайного «В ящик»). */
+async function restoreDrawerOpToReview(drawerId) {
+  ensureDrawerOps();
+  const drawerOp = openDrawerOps().find((x) => String(x.id) === String(drawerId));
+  if (!drawerOp) {
+    toast('Запись в ящике не найдена');
+    return false;
+  }
+  const restored = importedOpFromDrawer(drawerOp);
+  if (!restored) {
+    toast('Не удалось вернуть в Разбор');
+    return false;
+  }
+  try {
+    await mutate(
+      (st) => {
+        ensureImportedOps();
+        ensureDrawerOps();
+        const already = (st.importedOps || []).some((o) => {
+          if (o.id != null && restored.id != null && String(o.id) === String(restored.id)) return true;
+          if (o.fingerprint && restored.fingerprint && o.fingerprint === restored.fingerprint) return true;
+          return false;
+        });
+        if (!already) st.importedOps.push(restored);
+        st.drawerOps = (st.drawerOps || []).filter((o) => String(o.id) !== String(drawerId));
+        pushLearnLog({
+          type: 'drawer_restore',
+          drawerId,
+          store: restored.store,
+          amount: restored.amount,
+        });
+      },
+      { persist: true, source: 'drawer' }
+    );
+  } catch (err) {
+    console.error(err);
+    toast('Не удалось вернуть: ' + (err.message || err));
+    return false;
+  }
+
+  rememberRazborResume({
+    source: state.razborResume?.source || restored.sourceType || '',
+    label: state.razborResume?.label || 'разбор после возврата из ящика',
+    totalHint: liveRazborOps().length,
+  });
+  renderDrawerPanel();
+
+  // Если обучение уже идёт — сразу показать эту карточку снова.
+  if (valetTutor && Array.isArray(valetTutor.items)) {
+    const planish = planFromLiveImportedOps([restored]);
+    const built = buildValetTutorItems(planish);
+    const card = built[0];
+    if (card) {
+      const idx = Math.min(Number(valetTutor.index) || 0, valetTutor.items.length);
+      valetTutor.items.splice(idx, 0, card);
+      valetTutor.stats.cards = valetTutor.items.length;
+      valetTutor.stats.total = (Number(valetTutor.stats.total) || 0) + 1;
+      if (valetTutor.stats.drawer > 0) valetTutor.stats.drawer -= 1;
+      valetTutor.index = idx;
+      showValetTutorCard();
+      toast('Вернул в Разбор');
+      return true;
+    }
+  }
+
+  toast('Вернул в Разбор — открой Разбор, чтобы продолжить');
+  return true;
+}
+
 function renderDrawerPanel() {
   const panel = document.getElementById('drawerPanel');
   const list = document.getElementById('drawerList');
@@ -4379,32 +5043,48 @@ function renderDrawerPanel() {
   if (empty) empty.hidden = true;
   list.innerHTML = items
     .map((o) => {
-      const line = `${formatDate(o.date) || '—'} ${escapeHtml(o.store)} ${formatSignedAmount(o.amount)}`;
+      const label = String(o.productName || o.store || '').trim() || '—';
+      const line = `${formatDate(o.date) || '—'} ${escapeHtml(label)} ${formatSignedAmount(o.amount)}`;
       const reason = o.reason ? `<div class="hint" style="margin:2px 0 0">${escapeHtml(o.reason)}</div>` : '';
       return `<li data-drawer-id="${escapeAttr(o.id)}">
         <div class="drawer-main"><div>${line}</div>${reason}</div>
         <div class="drawer-actions">
+          <button type="button" class="btn" data-drawer-restore title="Отменить «В ящик» — снова в Разбор">Вернуть назад</button>
           <button type="button" class="btn btn-ok" data-drawer-assign>Назначить</button>
           <button type="button" class="btn btn-del" data-drawer-drop>Убрать</button>
         </div>
       </li>`;
     })
     .join('');
+  list.querySelectorAll('[data-drawer-restore]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.closest('li')?.dataset.drawerId;
+      if (!id) return;
+      restoreDrawerOpToReview(id);
+    });
+  });
   list.querySelectorAll('[data-drawer-assign]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const id = btn.closest('li')?.dataset.drawerId;
       const op = openDrawerOps().find((x) => String(x.id) === String(id));
       if (!op) return;
+      const productName = String(op.productName || '').trim();
       openValetTeachModal(
         {
-          store: op.store,
-          storeRaw: op.store,
+          store: productName || op.store,
+          storeRaw: op.storeRaw || op.store,
+          productName,
+          receiptMerchant: op.receiptMerchant || (productName ? op.store : ''),
           date: op.date,
           amount: op.amount,
           kind: op.kind,
           comment: op.comment,
           bank: op.bank,
           fingerprint: op.fingerprint,
+          sourceType: op.sourceType || '',
+          unit: op.unit,
+          qty: op.qty,
+          price: op.price,
           guess: null,
           identified: false,
           ops: [op],
@@ -4616,11 +5296,19 @@ function* iterRecordedOps({ drawerOnly = false } = {}) {
     for (const r of [...(state.personal || []), ...(state.business || [])]) {
       const cost = Number(r.cost ?? r.price) || 0;
       if (!cost) continue;
+      const isReceiptRow = sourceTypeFromLabel(r.sourceType) === 'receipt' || !!r.purchaseId;
       yield {
         date: r.date,
         store: r.store,
         amount: -Math.abs(cost),
         comment: r.note || r.comment || '',
+        // Ledger: expense = имя товара ИЛИ телефон/договор. Не помечаем все строки как ReceiptLine.
+        expense: r.expense || '',
+        productName: isReceiptRow ? (r.expense || '') : '',
+        sourceType: r.sourceType || (isReceiptRow ? 'receipt' : ''),
+        accountId: r.accountId || '',
+        opId: r.opId,
+        purchaseId: r.purchaseId || '',
       };
     }
     ensureImportedOps();
@@ -4642,6 +5330,15 @@ function* iterRecordedOps({ drawerOnly = false } = {}) {
   }
 }
 
+/** Receipt / product line input — never inferred from bank.comment or bare Ledger.expense. */
+function isReceiptSide(x) {
+  if (!x) return false;
+  if (isReceiptDuplicateInput(x)) return true;
+  if (sourceTypeFromLabel(x.sourceType) === 'receipt') return true;
+  if (x.bank && x.bank.receiptItem) return true;
+  return false;
+}
+
 function rowsMatchSameOp(a, b) {
   if (!a || !b) return false;
   const dayA = datePartIso(a.date);
@@ -4652,15 +5349,79 @@ function rowsMatchSameOp(a, b) {
   if (!amtA.length || !amtB.length) return false;
   const absA = new Set(amtA.map((x) => Math.abs(x)));
   if (!amtB.some((x) => absA.has(Math.abs(x)))) return false;
-  const storeA = String(a.store || '').trim();
-  const storeB = String(b.store || '').trim();
-  if (!storeA || !storeB) return false;
+
+  // Товарная ветка только если хотя бы одна сторона — позиция чека (не bank.comment).
+  if (isReceiptSide(a) || isReceiptSide(b)) {
+    const productA = String(
+      isReceiptSide(a) ? (a.productName || a.expense || '') : (a.expense || a.productName || '')
+    ).trim();
+    const productB = String(
+      isReceiptSide(b) ? (b.productName || b.expense || '') : (b.expense || b.productName || '')
+    ).trim();
+    if (!productA || !productB) return false;
+    if (normForSearch(productA) === normForSearch(productB)) return true;
+    if (productNameSimilar(productA, productB)) return true;
+    return false;
+  }
+
+  // Банк ↔ Ledger: день + сумма + (магазин ИЛИ идентификатор ИЛИ счёт/карта).
+  const storeA = String(a.store || a.storeRaw || '').trim();
+  const storeB = String(b.store || b.storeRaw || '').trim();
+  const accSame = !!(a.accountId && b.accountId && String(a.accountId) === String(b.accountId));
+  const storeSig = storeMatchSignal(storeA, storeB, { date: true, amount: true, account: accSame });
+  if (storeSig !== 'none') return true;
   for (const sa of storeNameVariants(storeA)) {
     for (const sb of storeNameVariants(storeB)) {
       if (storeKey(sa) === storeKey(sb) || storesRelated(sa, sb)) return true;
     }
   }
+  if (identifiersOverlap(bankMatchIdentifiers(a), ledgerMatchIdentifiers(b))) return true;
+  if (identifiersOverlap(bankMatchIdentifiers(b), ledgerMatchIdentifiers(a))) return true;
+  if (accSame) return true;
+  const cardA = accountHintFromBank(a.bank);
+  const cardB = accountHintFromBank(b.bank);
+  if (cardA && cardB && normForSearch(cardA) === normForSearch(cardB)) return true;
   return false;
+}
+
+/** Similar ≠ exact: same day, close amount, similar product name → ask before Training. */
+function productNameCanonical(value) {
+  return translitFold(String(value || ''))
+    .replace(/[^a-z0-9а-яё\s]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function productNameSimilar(a, b) {
+  const na = productNameCanonical(a);
+  const nb = productNameCanonical(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  if (na.length >= 4 && nb.length >= 4 && (na.includes(nb) || nb.includes(na))) return true;
+  // shared token length ≥ 4 (изолента…)
+  const ta = new Set(na.split(/\s+/).filter((w) => w.length >= 4));
+  for (const w of nb.split(/\s+/)) {
+    if (w.length >= 4 && ta.has(w)) return true;
+  }
+  return false;
+}
+function findSimilarRecordedExpense(row) {
+  if (!row) return null;
+  const day = datePartIso(row.date);
+  const product = String(row.productName || row.expense || row.comment || '').trim();
+  const amt = absCost(row.amount ?? row.cost ?? row.price);
+  if (!day || !product || !(amt > 0)) return null;
+  const pools = [...(state.personal || []), ...(state.business || [])];
+  for (const r of pools) {
+    if (datePartIso(r.date) !== day) continue;
+    const other = absCost(r.cost ?? r.price ?? r.amount);
+    if (!(other > 0)) continue;
+    if (Math.abs(other - amt) < 0.02) continue; // exact handled elsewhere
+    if (Math.abs(other - amt) > 2.01) continue; // 37 vs 38 OK; larger gap = other purchase
+    const name = String(r.expense || r.note || '').trim();
+    if (!productNameSimilar(product, name)) continue;
+    return r;
+  }
+  return null;
 }
 
 function rowMatchesRecordedOp(row, { drawerOnly = false } = {}) {
@@ -4689,7 +5450,14 @@ function collectKnownHardFingerprints() {
     const iso = rowDateToIso(r.date);
     const amt = -Math.abs(Number(r.cost || r.price) || 0);
     if (!iso || !r.store) continue;
-    add(iso, r.store, amt, r.note || r.comment || '', r.accountId || '');
+    const note = r.note || r.comment || '';
+    const expense = String(r.expense || '').trim();
+    add(iso, r.store, amt, note, r.accountId || '');
+    // Product lines (receipt): also fingerprint by store|product + expense as comment.
+    if (expense && normForSearch(expense) !== normForSearch(r.store)) {
+      add(iso, `${r.store}|${expense}`, amt, expense, r.accountId || '');
+      add(iso, r.store, amt, expense, r.accountId || '');
+    }
   }
   ensureDrawerOps();
   for (const op of openDrawerOps()) {
@@ -4721,7 +5489,12 @@ function collectKnownSoftKeys() {
   for (const r of [...(state.personal || []), ...(state.business || [])]) {
     const iso = rowDateToIso(r.date);
     const amt = -Math.abs(Number(r.cost || r.price) || 0);
-    if (iso && r.store && amt) addSoft(iso, r.store, amt);
+    if (!(iso && r.store && amt)) continue;
+    addSoft(iso, r.store, amt);
+    const expense = String(r.expense || '').trim();
+    if (expense && normForSearch(expense) !== normForSearch(r.store)) {
+      addSoft(iso, `${r.store}|${expense}`, amt);
+    }
   }
   ensureDrawerOps();
   for (const op of openDrawerOps()) addSoft(op.date, op.store, op.amount);
@@ -5161,18 +5934,28 @@ function isLikelyTransfer(op) {
   if (looksLikePersonName(store)) return true;
   return false;
 }
-/** «20.07.26 Перевод Наталья Ф. на сумму 4000» / «20.07.26 Ринат +5555» */
+/** «20.07.26 Перевод Наталья Ф. на сумму 4000» / «24.07.26 Изолента на сумму 37» */
 function formatTutorOpLine(op) {
   const d = formatDate(op?.date) || '—';
+  const product = String(op?.productName || '').trim();
   const storeRaw = String(op?.store || '—').trim();
+  const label = product || storeRaw;
   const signed = formatSignedAmount(op?.amount);
-  if (isUnclearRow(op)) return `${d} ${storeRaw} ${signed}`;
-  const sum = Math.round(Math.abs(Number(op?.amount) || 0));
-  if (isLikelyTransfer(op)) {
-    const bare = stripTransferPrefix(storeRaw) || storeRaw;
-    return `${d} Перевод ${bare} на сумму ${sum}`;
+  if (isUnclearRow(op)) return `${d} ${label} ${signed}`;
+  const sum = Math.abs(Number(op?.amount) || 0);
+  const qty = Number(op?.qty);
+  const unit = String(op?.unit || '').trim();
+  const unitPrice = Number(op?.unitPrice ?? op?.price);
+  if (product && Number.isFinite(qty) && qty > 0 && unit && Number.isFinite(unitPrice) && unitPrice > 0
+      && (Math.abs(qty - 1) > 0.001 || Math.abs(unitPrice - sum) > 0.05)) {
+    const q = Number.isInteger(qty) ? String(qty) : String(Math.round(qty * 1000) / 1000);
+    return `${d} ${label} · ${q} ${unit} × ${Math.round(unitPrice * 100) / 100} = ${Math.round(sum * 100) / 100}`;
   }
-  return `${d} ${storeRaw} на сумму ${sum}`;
+  if (!product && isLikelyTransfer(op)) {
+    const bare = stripTransferPrefix(storeRaw) || storeRaw;
+    return `${d} Перевод ${bare} на сумму ${Math.round(sum)}`;
+  }
+  return `${d} ${label} на сумму ${Math.round(sum)}`;
 }
 /** Ключ ФИО «Имя И.» — Сергей М. и Сергей Ш. разные люди */
 function personNameKey(name) {
@@ -5264,9 +6047,12 @@ function storeMatchSignal(a, b, { date = false, amount = false, account = false 
   const keyB = normalizeStoreForGateway(b);
   if (!keyA || !keyB) return 'none';
   if (keyA === keyB) return 'exact';
+  const foldA = translitFold(keyA);
+  const foldB = translitFold(keyB);
+  if (foldA && foldB && foldA === foldB) return 'exact';
 
-  const tokensA = meaningfulStoreTokens(keyA);
-  const tokensB = meaningfulStoreTokens(keyB);
+  const tokensA = meaningfulStoreTokens(keyA).map((t) => translitFold(t)).filter(Boolean);
+  const tokensB = meaningfulStoreTokens(keyB).map((t) => translitFold(t)).filter(Boolean);
   const meaningfulA = tokensA.join(' ');
   const meaningfulB = tokensB.join(' ');
   if (
@@ -5276,13 +6062,21 @@ function storeMatchSignal(a, b, { date = false, amount = false, account = false 
   ) {
     return 'related';
   }
+  if (
+    foldA.length >= 5 &&
+    foldB.length >= 5 &&
+    (foldA.includes(foldB) || foldB.includes(foldA))
+  ) {
+    return 'related';
+  }
 
   const shortTokenHit = tokensA.some((left) =>
     left.length >= 3 && tokensB.some((right) =>
       right.length >= 3 && (left === right || left.includes(right) || right.includes(left))
     )
   );
-  // A short token such as NSP is only evidence together with the financial triple.
+  // Short merchant token (МТС↔mts) counts with date+amount — account not required.
+  if (shortTokenHit && date && amount) return 'token';
   if (shortTokenHit && date && amount && account) return 'token';
   return 'none';
 }
@@ -5292,24 +6086,43 @@ function candidateBankId(row) {
 }
 function duplicateExplanation(signals) {
   const result = [];
+  if (signals.reconLink) result.push('подтверждённая связь ✓');
   if (signals.bankId) result.push('банковский ID ✓');
   if (signals.date) result.push('дата ✓');
   if (signals.amount) result.push('сумма ✓');
+  if (signals.expense) result.push('товар ✓');
+  if (signals.identifier) result.push('идентификатор ✓');
   if (signals.account) result.push('счёт ✓');
   if (signals.store === 'exact') result.push('магазин ✓');
   if (signals.store === 'related' || signals.store === 'token') result.push('магазин похож ✓');
   return result;
 }
+function isReceiptDuplicateInput(input) {
+  const t = sourceTypeFromLabel(input?.sourceType || '');
+  if (t === 'receipt') return true;
+  if (input?.receiptInfo) return true;
+  if (input?.bank && input.bank.receiptItem) return true;
+  return false;
+}
 /**
  * Pure duplicate matcher. Fingerprint is a search aid, never a uniqueness constraint.
  * Returns runtime candidates; nothing is written to the ledger.
+ * AD-010.2: receipt lines match on date + amount + product name (expense).
+ * Bank lines never treat comment/card as productName.
  */
 function findDuplicateCandidates(input, { excludeOpId } = {}) {
   const day = datePartIso(input?.date || '');
   const value = absCost(input?.amount ?? input?.cost ?? input?.price);
-  const accountId = String(input?.accountId || '');
+  const accountId = String(input?.accountId || accountHintFromBank(input?.bank) || '');
   const store = input?.storeNormalized || input?.storeRaw || input?.store || '';
   const bankId = bankIdFromSource(input || {});
+  const receiptLine = isReceiptDuplicateInput(input);
+  // Товар только для чека. Банковский comment / карта / MCC сюда не попадают.
+  const expenseRaw = receiptLine
+    ? String(input?.expense || input?.productName || '').trim()
+    : '';
+  const expenseQ = normForSearch(expenseRaw);
+  const inputIds = bankMatchIdentifiers(input);
   const rows = [
     ...(state.personal || []).map((row) => ({ wallet: 'personal', row })),
     ...(state.business || []).map((row) => ({ wallet: 'business', row })),
@@ -5319,32 +6132,56 @@ function findDuplicateCandidates(input, { excludeOpId } = {}) {
   for (const item of rows) {
     const row = item.row;
     if (excludeOpId != null && String(row.opId) === String(excludeOpId)) continue;
+    const rowExpense = String(row.expense || '').trim();
+    const otherAmt = absCost(row.cost ?? row.price ?? row.amount);
+    const amountExact = value > 0 && otherAmt > 0 && Math.abs(otherAmt - value) < 0.02;
+    const amountClose = value > 0 && otherAmt > 0 && Math.abs(otherAmt - value) <= 2.01;
+    const idHit = identifiersOverlap(inputIds, ledgerMatchIdentifiers(row));
+    const rowCards = extractCardHints([row.note, row.comment, row.expense, row.store].filter(Boolean).join(' '));
+    const inputCards = extractCardHints([accountId, input?.comment, store, input?.bank?.desc, input?.bank?.card].filter(Boolean).join(' '));
+    const cardHit = inputCards.some((c) => rowCards.includes(c));
     const signals = {
       date: !!day && datePartIso(row.date) === day,
-      amount: value > 0 &&
-        Math.abs(absCost(row.cost ?? row.price ?? row.amount) - value) < 0.02,
-      account: !!accountId && String(row.accountId || '') === accountId,
+      amount: amountExact,
+      account: !!accountId && (
+        String(row.accountId || '') === accountId
+        || cardHit
+      ),
       store: 'none',
       bankId: !!bankId && candidateBankId(row) === bankId,
+      identifier: idHit,
+      expenseExact: !!expenseQ && normForSearch(rowExpense) === expenseQ,
+      expense: !!expenseQ && (
+        normForSearch(rowExpense) === expenseQ || productNameSimilar(expenseRaw, rowExpense)
+      ),
     };
-    signals.store = storeMatchSignal(store, row.store, signals);
+    signals.store = storeMatchSignal(store, row.store, {
+      date: signals.date,
+      amount: amountExact || amountClose,
+      account: signals.account,
+    });
 
     let matchClass = null;
-    if (signals.bankId) {
+    if (receiptLine) {
+      // Уверенный дубль: тот же день + та же сумма + тот же/очень похожий товар
+      if (signals.date && amountExact && signals.expense) matchClass = 'strong';
+      else if (signals.date && signals.expense && amountClose && !amountExact) matchClass = 'weak';
+    } else if (signals.bankId) {
       matchClass = 'exact';
     } else if (
-      signals.date && signals.amount && signals.account &&
-      signals.store !== 'none'
+      signals.date && amountExact && (
+        signals.store !== 'none' || signals.identifier || signals.account
+      )
     ) {
+      // Банк: день + сумма + (магазин ИЛИ id ИЛИ счёт/карта) → уверенный skip.
       matchClass = 'strong';
-    } else {
-      const evidence = [
-        signals.date,
-        signals.amount,
-        signals.account,
-        signals.store !== 'none',
-      ].filter(Boolean).length;
-      if (signals.amount && evidence >= 2) matchClass = 'weak';
+    } else if (signals.date && amountClose && !amountExact && (
+      signals.store !== 'none' || signals.identifier
+    )) {
+      matchClass = 'weak';
+    } else if (signals.date && amountExact) {
+      // Только день+сумма — не silent skip: спросить (possible), не confident.
+      matchClass = 'weak';
     }
     if (!matchClass) continue;
     candidates.push({
@@ -5353,6 +6190,7 @@ function findDuplicateCandidates(input, { excludeOpId } = {}) {
       expense: row,
       signals,
       explanation: duplicateExplanation(signals),
+      receiptLine,
     });
   }
   const rank = { exact: 3, strong: 2, weak: 1 };
@@ -5361,6 +6199,63 @@ function findDuplicateCandidates(input, { excludeOpId } = {}) {
     (b.explanation.length - a.explanation.length)
   );
   return { candidates: candidates.slice(0, 5), best: candidates[0] || null };
+}
+
+/**
+ * Единая классификация строки импорта до обучения (AD-011).
+ * A confident → skip; B possible → ask before tutor; C new → Разбор.
+ * BankOperation никогда не превращается в ReceiptLine через comment → productName.
+ */
+function classifyImportRowDuplicate(row) {
+  if (!row) return { bucket: 'new', best: null };
+  // Confirmed reconciliation link → silent skip (not merchant learning).
+  if (!isReceiptDuplicateInput(row)) {
+    const hit = findReconciliationLinkForRow(row);
+    if (hit?.expense) {
+      return {
+        bucket: 'confident',
+        best: {
+          class: 'exact',
+          wallet: (state.business || []).includes(hit.expense) ? 'business' : 'personal',
+          expense: hit.expense,
+          signals: { date: true, amount: true, reconLink: true },
+          explanation: ['подтверждённая связь ✓'],
+          receiptLine: false,
+          reconLink: hit.link,
+        },
+        result: { candidates: [], best: null },
+      };
+    }
+  }
+  const receipt = isReceiptDuplicateInput(row);
+  const product = receipt
+    ? String(row.productName || row.expense || '').trim()
+    : '';
+  const cardHint = accountHintFromBank(row.bank) || (bankMatchIdentifiers(row).cards || [])[0] || '';
+  const mappedAccount = accountIdForCardHint(cardHint);
+  const matchInput = {
+    date: row.date,
+    amount: row.amount,
+    store: row.store,
+    storeRaw: row.storeRaw || row.store,
+    accountId: row.accountId || mappedAccount || accountHintFromBank(row.bank) || '',
+    expense: product,
+    productName: product,
+    comment: row.comment || '',
+    sourceType: row.sourceType || '',
+    bank: row.bank || null,
+    receiptInfo: row.receiptInfo || null,
+  };
+  const result = findDuplicateCandidates(matchInput);
+  const best = result.best;
+  if (!best) return { bucket: 'new', best: null, result };
+  if (best.class === 'exact' || best.class === 'strong') {
+    return { bucket: 'confident', best, result };
+  }
+  if (best.class === 'weak') {
+    return { bucket: 'possible', best, result };
+  }
+  return { bucket: 'new', best: null, result };
 }
 function getOrCreateSourceOperation(params) {
   ensureImportedOps();
@@ -5380,6 +6275,8 @@ function getOrCreateSourceOperation(params) {
       comment: raw.comment || params.note || '',
       bank: raw.bank || null,
       bankId: raw.bankId || null,
+      receiptInfo: raw.receiptInfo || params.receiptInfo || null,
+      purchaseId: params.purchaseId || raw.purchaseId || '',
       status: 'queued',
       duplicateResolution: 'none',
     }, { sourceType: params.sourceType });
@@ -5390,6 +6287,12 @@ function getOrCreateSourceOperation(params) {
     source.storeRaw = String(source.storeRaw || source.store || params.store || '');
     source.storeNormalized = normalizeStoreForGateway(source.storeNormalized || source.storeRaw);
     source.bankId = bankIdFromSource(source) || null;
+    if (params.receiptInfo || raw.receiptInfo) {
+      source.receiptInfo = params.receiptInfo || raw.receiptInfo;
+    }
+    if (params.purchaseId || raw.purchaseId) {
+      source.purchaseId = String(params.purchaseId || raw.purchaseId);
+    }
     source.status = SOURCE_STATUSES.has(source.status) ? source.status : 'queued';
     source.duplicateResolution = DUPLICATE_RESOLUTIONS.has(source.duplicateResolution)
       ? source.duplicateResolution
@@ -5461,6 +6364,10 @@ function createExpense(params) {
     amount,
     accountId: params.accountId,
     store: params.store || source.storeNormalized || source.storeRaw,
+    expense: params.expense,
+    productName: params.expense || params.productName,
+    sourceType: params.sourceType || source.sourceType,
+    receiptInfo: params.receiptInfo || source.receiptInfo,
   };
   const duplicateResult = params.skipDuplicateCheck
     ? { candidates: [], best: null }
@@ -5508,6 +6415,11 @@ function createExpense(params) {
     fundId: params.fundId,
     sourceOperationId: source.id,
     fingerprint: source.fingerprint,
+    purchaseId: params.purchaseId || source.purchaseId || '',
+    qty: params.qty,
+    unit: params.unit,
+    unitPrice: params.unitPrice ?? params.price,
+    price: params.unitPrice ?? params.price,
   });
   const ok = pushRow(params.wallet, row, { allowSoftDup: true });
   if (!ok) return { ok: false, reason: 'ledger_write_failed' };
@@ -5558,33 +6470,313 @@ function createExpenseBatch(operations, paramsFactory) {
   });
 }
 let duplicateExpenseContext = null;
+/** Session for pre-tutor «Уточнение N из M» with ← → navigation. */
+let possibleDupSession = null;
+
+function resetDuplicateExpenseChrome() {
+  const btnUse = document.getElementById('duplicateUseExisting');
+  const btnMerge = document.getElementById('duplicateMerge');
+  const btnNew = document.getElementById('duplicateCreateNew');
+  const btnSkip = document.getElementById('duplicateSkip');
+  const btnLink = document.getElementById('duplicateLinkExisting');
+  const nav = document.getElementById('duplicateExpenseNav');
+  const incoming = document.getElementById('duplicateExpenseIncoming');
+  const cardWrap = document.getElementById('duplicateCardLinkWrap');
+  if (btnUse) btnUse.hidden = false;
+  if (btnMerge) btnMerge.hidden = false;
+  if (btnNew) btnNew.textContent = 'Создать новый';
+  if (btnSkip) btnSkip.hidden = true;
+  if (btnLink) btnLink.hidden = true;
+  if (nav) nav.hidden = true;
+  if (incoming) {
+    incoming.hidden = true;
+    incoming.textContent = '';
+  }
+  if (cardWrap) cardWrap.hidden = true;
+}
+
+function formatDupLedgerLine(row) {
+  if (!row) return '—';
+  return `${formatDate(row.date)} · ${row.store || '—'} · ${money(row.cost || row.price || 0)}\n`
+    + `${accountLabel(row.accountId)} · ${row.category || '—'} / ${row.expense || '—'}`;
+}
+
 function openDuplicateExpenseDialog(params, source, duplicateResult) {
   const best = duplicateResult.best;
-  duplicateExpenseContext = { params, source, best };
+  const receiptLine = !!(best?.receiptLine || isReceiptDuplicateInput(params) || isReceiptDuplicateInput(source));
+  duplicateExpenseContext = { params, source, best, receiptLine, mode: params?.mode || 'createExpense' };
+  const title = document.getElementById('duplicateExpenseTitle');
   const signals = document.getElementById('duplicateExpenseSignals');
   const existing = document.getElementById('duplicateExpenseExisting');
-  if (signals) {
-    const title = best.class === 'exact' ? 'Exact' : best.class === 'strong' ? 'Strong' : 'Weak';
-    signals.textContent = `${title}: ${best.explanation.join(' · ')}`;
-  }
-  if (existing) {
-    const row = best.expense;
-    existing.innerHTML = `<p><b>${escapeHtml(formatDate(row.date))}</b> · `
-      + `${escapeHtml(row.store || '—')} · <b>${money(row.cost || row.price || 0)}</b><br/>`
-      + `${escapeHtml(accountLabel(row.accountId))} · ${escapeHtml(row.category || '—')} / `
-      + `${escapeHtml(row.expense || '—')}</p>`;
+  const incoming = document.getElementById('duplicateExpenseIncoming');
+  const nav = document.getElementById('duplicateExpenseNav');
+  const btnUse = document.getElementById('duplicateUseExisting');
+  const btnMerge = document.getElementById('duplicateMerge');
+  const btnNew = document.getElementById('duplicateCreateNew');
+  const btnSkip = document.getElementById('duplicateSkip');
+  const btnLink = document.getElementById('duplicateLinkExisting');
+  const cardWrap = document.getElementById('duplicateCardLinkWrap');
+  const cardCheck = document.getElementById('duplicateCardLinkCheck');
+  const cardLabel = document.getElementById('duplicateCardLinkLabel');
+  const row = best.expense;
+  const preTutor = duplicateExpenseContext.mode === 'preTutor';
+
+  if (nav) nav.hidden = !preTutor;
+  if (btnSkip) btnSkip.hidden = true; // legacy; replaced by «Да, это одна запись»
+  if (btnLink) btnLink.hidden = !preTutor;
+  if (btnUse) btnUse.hidden = !!(receiptLine || preTutor);
+  if (btnMerge) btnMerge.hidden = !!(receiptLine || preTutor);
+  if (btnNew) btnNew.textContent = preTutor ? 'Нет, это новый расход' : (receiptLine ? 'Добавить' : 'Создать новый');
+
+  if (preTutor) {
+    const s = possibleDupSession;
+    const idx = s ? s.index : 0;
+    const total = s ? s.list.length : 1;
+    if (title) title.textContent = total > 1 ? `Уточнение ${idx + 1} из ${total}` : 'Уточнение';
+    const navLabel = document.getElementById('duplicateNavLabel');
+    if (navLabel) {
+      const mark = s && s.decisions[idx] === 'add' ? ' · новый'
+        : s && s.decisions[idx] === 'link' ? ' · одна запись'
+        : s && s.decisions[idx] === 'skip' ? ' · одна запись'
+        : '';
+      navLabel.textContent = `${idx + 1} / ${total}${mark}`;
+    }
+    const prevBtn = document.getElementById('duplicatePrev');
+    const nextBtn = document.getElementById('duplicateNext');
+    if (prevBtn) prevBtn.disabled = !s || idx <= 0;
+    if (nextBtn) nextBtn.disabled = !s || idx >= total - 1;
+
+    const importLabel = String(params.store || params.expense || 'операция').trim();
+    const importAmt = money(Math.abs(Number(params.amount) || 0));
+    const importDate = formatDate(params.date) || '—';
+    if (incoming) {
+      incoming.hidden = false;
+      incoming.textContent = `Из импорта: ${importLabel} · ${importDate} · ${importAmt}`;
+    }
+    if (signals) signals.textContent = 'В базе числится как:';
+    if (existing) {
+      existing.innerHTML = `<p style="white-space:pre-wrap;margin:0">${escapeHtml(formatDupLedgerLine(row))}</p>`;
+    }
+    const cardHint = normalizeCardMask(
+      accountHintFromBank(source?.bank) || (bankMatchIdentifiers(source || params).cards || [])[0] || ''
+    );
+    const accId = String(row?.accountId || '').trim();
+    if (cardWrap && cardHint && accId) {
+      cardWrap.hidden = false;
+      if (cardCheck) cardCheck.checked = true;
+      if (cardLabel) {
+        cardLabel.textContent =
+          `Карта ${cardHint} — это счёт «${accountLabel(accId)}»? Запомнить для следующих импортов.`;
+      }
+    } else if (cardWrap) {
+      cardWrap.hidden = true;
+    }
+  } else {
+    if (incoming) {
+      incoming.hidden = true;
+      incoming.textContent = '';
+    }
+    if (cardWrap) cardWrap.hidden = true;
+    if (title) {
+      title.textContent = receiptLine
+        ? 'Эта позиция уже была записана'
+        : 'Возможно, эта операция уже существует';
+    }
+    if (signals) {
+      if (receiptLine) {
+        const product = String(params.expense || params.productName || row.expense || 'позиция').trim();
+        signals.textContent =
+          `${product} — уже есть запись на ${formatDate(row.date)} на сумму ${money(row.cost || row.price || 0)}. `
+          + 'Это новая покупка или дубль?';
+      } else {
+        const label = best.class === 'exact' ? 'Exact' : best.class === 'strong' ? 'Strong' : 'Weak';
+        signals.textContent = `${label}: ${best.explanation.join(' · ')}`;
+      }
+    }
+    if (existing) {
+      existing.innerHTML = `<p><b>${escapeHtml(formatDate(row.date))}</b> · `
+        + `${escapeHtml(row.store || '—')} · <b>${money(row.cost || row.price || 0)}</b><br/>`
+        + `${escapeHtml(accountLabel(row.accountId))} · ${escapeHtml(row.category || '—')} / `
+        + `${escapeHtml(row.expense || '—')}</p>`;
+    }
   }
   document.getElementById('duplicateExpenseModal')?.classList.add('show');
 }
+
+function renderPossibleDupSession() {
+  const s = possibleDupSession;
+  if (!s || !s.list.length) return;
+  const item = s.list[s.index];
+  const best = item.matchBest || classifyImportRowDuplicate(item).best;
+  if (!best) {
+    s.decisions[s.index] = 'add';
+    possibleDupAdvanceOrFinish();
+    return;
+  }
+  const product = isReceiptDuplicateInput(item)
+    ? String(item.productName || item.expense || 'позиция').trim()
+    : String(item.store || item.productName || 'операция').trim();
+  openDuplicateExpenseDialog(
+    {
+      mode: 'preTutor',
+      expense: product,
+      productName: isReceiptDuplicateInput(item) ? product : '',
+      date: item.date,
+      amount: item.amount,
+      store: item.store,
+      sourceType: item.sourceType || (isReceiptDuplicateInput(item) ? 'receipt' : ''),
+    },
+    item,
+    { best, candidates: [best] }
+  );
+}
+
+function finishPossibleDupSession({ cancel = false } = {}) {
+  const s = possibleDupSession;
+  document.getElementById('duplicateExpenseModal')?.classList.remove('show');
+  resetDuplicateExpenseChrome();
+  duplicateExpenseContext = null;
+  possibleDupSession = null;
+  if (!s) return;
+  const added = [];
+  let skipped = 0;
+  let linked = 0;
+  s.list.forEach((item, i) => {
+    const d = s.decisions[i];
+    if (d === 'add') {
+      const clean = { ...item };
+      delete clean.matchBest;
+      clean.softDup = false;
+      clean.duplicateHint = '';
+      added.push(clean);
+    } else if (d === 'link' || d === 'skip') {
+      // «Да, это одна запись» already persisted in possibleDupDecide('link')
+      linked += 1;
+      skipped += 1;
+    } else {
+      // cancel / undecided → не в Разбор
+      skipped += 1;
+    }
+  });
+  if (linked > 0) {
+    try { saveState(); } catch (_) { /* ignore */ }
+  }
+  if (typeof s.resolve === 'function') s.resolve({ added, skipped, linked });
+}
+
+function possibleDupAdvanceOrFinish() {
+  const s = possibleDupSession;
+  if (!s) return;
+  const nextUndecided = s.decisions.findIndex((d, i) => d == null && i > s.index);
+  const anyUndecided = s.decisions.findIndex((d) => d == null);
+  if (nextUndecided >= 0) {
+    s.index = nextUndecided;
+    renderPossibleDupSession();
+    return;
+  }
+  if (anyUndecided >= 0) {
+    s.index = anyUndecided;
+    renderPossibleDupSession();
+    return;
+  }
+  finishPossibleDupSession({ cancel: false });
+}
+
+function possibleDupDecide(decision) {
+  const s = possibleDupSession;
+  if (!s) return;
+  if (decision === 'cancel') {
+    finishPossibleDupSession({ cancel: true });
+    return;
+  }
+  if (decision === 'link') {
+    const item = s.list[s.index];
+    const best = item?.matchBest || classifyImportRowDuplicate(item).best;
+    const expense = best?.expense;
+    if (item && expense) {
+      const rememberCard = !!document.getElementById('duplicateCardLinkCheck')?.checked;
+      rememberReconciliationLink(item, expense, { rememberCard });
+      // Attach source id on expense when possible (no new Ledger row).
+      try {
+        const src = normalizeSourceOperation({
+          ...item,
+          status: 'linked',
+          duplicateResolution: 'linked_existing',
+        }, { sourceType: item.sourceType || 'bank_statement' });
+        if (src) {
+          ensureImportedOps();
+          const exists = state.importedOps.some((o) => String(o.id) === String(src.id));
+          if (!exists) state.importedOps.push(src);
+          attachSourceToExpense(expense, src.id);
+        }
+      } catch (_) { /* non-fatal */ }
+    }
+    s.decisions[s.index] = 'link';
+    possibleDupAdvanceOrFinish();
+    return;
+  }
+  s.decisions[s.index] = decision === 'add' ? 'add' : 'skip';
+  possibleDupAdvanceOrFinish();
+}
+
+function possibleDupNavigate(delta) {
+  const s = possibleDupSession;
+  if (!s) return;
+  const next = s.index + delta;
+  if (next < 0 || next >= s.list.length) return;
+  s.index = next;
+  renderPossibleDupSession();
+}
+
+async function resolvePossibleDupItems(plan) {
+  const list = [...(plan.possibleDupItems || [])];
+  if (!list.length) return { added: [], skipped: 0 };
+  // Import progress overlay must not block clarify dialogs.
+  setImportBusy(false);
+  return new Promise((resolve) => {
+    possibleDupSession = {
+      list,
+      index: 0,
+      decisions: list.map(() => null),
+      resolve,
+    };
+    renderPossibleDupSession();
+  });
+}
+
 function closeDuplicateExpenseDialog({ cancel = false } = {}) {
+  if (possibleDupSession && duplicateExpenseContext?.mode === 'preTutor') {
+    finishPossibleDupSession({ cancel: true });
+    return;
+  }
   const context = duplicateExpenseContext;
   document.getElementById('duplicateExpenseModal')?.classList.remove('show');
+  resetDuplicateExpenseChrome();
   duplicateExpenseContext = null;
+  if (context?.mode === 'preTutor') {
+    const resolve = context.params?.onPreTutorResolve;
+    if (typeof resolve === 'function') resolve('skip');
+    return;
+  }
   if (cancel && typeof context?.params?.onCancel === 'function') context.params.onCancel();
 }
 function resolveDuplicateExpense(resolution) {
   const context = duplicateExpenseContext;
   if (!context) return;
+  if (context.mode === 'preTutor' && possibleDupSession) {
+    possibleDupDecide(resolution === 'created_new' ? 'add' : 'link');
+    return;
+  }
+  if (context.mode === 'preTutor') {
+    const resolve = context.params?.onPreTutorResolve;
+    document.getElementById('duplicateExpenseModal')?.classList.remove('show');
+    resetDuplicateExpenseChrome();
+    duplicateExpenseContext = null;
+    if (typeof resolve === 'function') {
+      resolve(resolution === 'created_new' ? 'add' : 'skip');
+    }
+    return;
+  }
   closeDuplicateExpenseDialog();
   const duplicateResolution = resolution === 'created_new' &&
     ['exact', 'strong'].includes(context.best.class)
@@ -5607,6 +6799,14 @@ document.getElementById('duplicateCreateNew')?.addEventListener(
   'click',
   () => resolveDuplicateExpense('created_new')
 );
+document.getElementById('duplicateLinkExisting')?.addEventListener(
+  'click',
+  () => possibleDupDecide('link')
+);
+document.getElementById('duplicateSkip')?.addEventListener(
+  'click',
+  () => possibleDupDecide('link')
+);
 document.getElementById('duplicateMerge')?.addEventListener(
   'click',
   () => resolveDuplicateExpense('merged')
@@ -5615,10 +6815,19 @@ document.getElementById('duplicateCancel')?.addEventListener(
   'click',
   () => closeDuplicateExpenseDialog({ cancel: true })
 );
+document.getElementById('duplicatePrev')?.addEventListener(
+  'click',
+  () => possibleDupNavigate(-1)
+);
+document.getElementById('duplicateNext')?.addEventListener(
+  'click',
+  () => possibleDupNavigate(1)
+);
 bindModalBackdropClose(
   'duplicateExpenseModal',
   () => closeDuplicateExpenseDialog({ cancel: true })
 );
+
 /** Manual browser-console regression suite for the real gateway implementation. */
 function runGatewayRegressionTests() {
   const originalState = state;
@@ -5911,7 +7120,98 @@ function extractPhoneDigits(text) {
   const compact = raw.replace(/[\s\-()]/g, '');
   pm = compact.match(/(?<!\d)8(\d{10})(?!\d)/) || compact.match(/(?<!\d)7(\d{10})(?!\d)/);
   if (pm) return '8' + pm[1];
+  // 11 digits starting with 8 already compact, or 10-digit local as expense field
+  if (/^8\d{10}$/.test(compact)) return compact;
+  if (/^9\d{9}$/.test(compact)) return '8' + compact;
   return '';
+}
+/** Card masks like *0507 from bank comment / desc — not a product name. */
+function extractCardHints(text) {
+  const raw = String(text || '');
+  const out = new Set();
+  const re = /\*\s*(\d{3,4})\b/g;
+  let m;
+  while ((m = re.exec(raw))) out.add('*' + m[1]);
+  return [...out];
+}
+function extractAccountHints(text) {
+  return extractCardHints(text);
+}
+function normalizePhoneId(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  if (digits.length === 11 && digits[0] === '7') return '8' + digits.slice(1);
+  if (digits.length === 11 && digits[0] === '8') return digits;
+  if (digits.length === 10 && digits[0] === '9') return '8' + digits;
+  return digits.length >= 10 ? digits : '';
+}
+/** Identifiers from a bank / import row (never treat as expenseName). */
+function bankMatchIdentifiers(input) {
+  const bank = input && input.bank && typeof input.bank === 'object' ? input.bank : {};
+  const blob = [
+    input?.store,
+    input?.storeRaw,
+    input?.comment,
+    bank.desc,
+    bank.card,
+    bank.category,
+    bank.account,
+  ].filter(Boolean).join(' ');
+  const phones = new Set();
+  const p1 = extractPhoneDigits(blob);
+  if (p1) phones.add(normalizePhoneId(p1));
+  const p2 = extractPhoneDigits(input?.store || '');
+  if (p2) phones.add(normalizePhoneId(p2));
+  const cards = new Set([
+    ...extractCardHints(blob),
+    ...extractCardHints(accountHintFromBank(bank)),
+  ]);
+  const accounts = new Set(
+    [String(input?.accountId || '').trim(), String(accountHintFromBank(bank) || '').trim()]
+      .filter(Boolean)
+  );
+  return {
+    phones: [...phones].filter(Boolean),
+    cards: [...cards],
+    accounts: [...accounts],
+    contracts: [],
+  };
+}
+/** Identifiers visible on a Ledger expense row. */
+function ledgerMatchIdentifiers(row) {
+  const blob = [row?.store, row?.expense, row?.note, row?.comment, row?.accountId]
+    .filter(Boolean)
+    .join(' ');
+  const phones = new Set();
+  const fromExpense = normalizePhoneId(row?.expense);
+  if (fromExpense) phones.add(fromExpense);
+  const p = extractPhoneDigits(blob);
+  if (p) phones.add(normalizePhoneId(p));
+  return {
+    phones: [...phones].filter(Boolean),
+    cards: extractCardHints(blob),
+    accounts: [String(row?.accountId || '').trim()].filter(Boolean),
+    contracts: [],
+  };
+}
+function identifiersOverlap(a, b) {
+  if (!a || !b) return false;
+  for (const p of a.phones || []) {
+    for (const q of b.phones || []) {
+      if (p && q && p === q) return true;
+    }
+  }
+  for (const c of a.cards || []) {
+    for (const d of b.cards || []) {
+      if (c && d && normForSearch(c) === normForSearch(d)) return true;
+    }
+  }
+  for (const x of a.accounts || []) {
+    for (const y of b.accounts || []) {
+      if (x && y && String(x) === String(y)) return true;
+      if (x && y && normForSearch(x) === normForSearch(y)) return true;
+    }
+  }
+  return false;
 }
 function findRelatedOutcome(store) {
   const canon = canonicalStoreName(store);
@@ -6010,17 +7310,15 @@ function merchantHintText(store, suggest) {
   const trust = (m && m.trust) || 0;
   const learn = (m && m.learn) || 0;
   const scores = (trust || learn) ? ` · <b class="trust">д ${trust}</b>/<b class="learn">о ${learn}</b>` : '';
+  // Training mode: подтверждает всегда пользователь, поэтому режимов «авто/спрашивать» здесь нет.
   if (sug && sug.category && sug.category !== 'Разобрать') {
-    const mode = m && (m.mode === 'auto' || m.auto) ? 'авто'
-      : (m && m.mode === 'ask' ? 'спрашивать' : 'предложение');
-    return `${mode} · ${sug.category}/${sug.expense} · ${sug.source}${scores}`;
+    return `предложение · ${sug.category}/${sug.expense} · ${sug.source}${scores}`;
   }
   if (!m) return `новый · подтвердите вручную${scores}`;
   const tops = topOutcomes(store, 3);
-  if (!tops.length) return `${m.auto ? 'авто · пока без истории' : 'новый · подтвердите вручную'}${scores}`;
+  if (!tops.length) return `новый · подтвердите вручную${scores}`;
   const bits = tops.map(o => `${o.category}/${o.expense} ${o.count}×`);
-  const mode = m.mode === 'auto' || m.auto ? 'авто' : (m.mode === 'ask' ? 'спрашивать' : 'разобрать');
-  return `${mode} · ${bits.join(' · ')}${scores}`;
+  return `предложение · ${bits.join(' · ')}${scores}`;
 }
 function floatScoreNear(el, text, kind) {
   const node = document.createElement('div');
@@ -6210,17 +7508,31 @@ function importStatementRows(parsed) {
 async function parseStatementFileRemote(file) {
   const fd = new FormData();
   fd.append('file', file, file.name || 'statement');
-  const res = await fetch(WALLET_STATEMENT_PARSE, { method: 'POST', body: fd });
+  let res;
+  try {
+    res = await fetch(WALLET_STATEMENT_PARSE, { method: 'POST', body: fd });
+  } catch (err) {
+    err.userErrorKind = 'technical_failure';
+    err.httpStatus = 0;
+    throw err;
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const d = data.detail;
     const msg = typeof d === 'string' ? d
       : Array.isArray(d) ? d.map((x) => x.msg || JSON.stringify(x)).join('; ')
       : (d && d.message) || ('HTTP ' + res.status);
-    throw new Error(msg);
+    const err = new Error(msg);
+    err.userErrorKind = 'technical_failure';
+    err.httpStatus = res.status;
+    throw err;
   }
   if (Array.isArray(data.warnings) && data.warnings.length) {
-    toast(data.warnings.join(' · '));
+    const human = data.warnings.filter((w) => {
+      const s = String(w || '');
+      return s && !/OpenRouter.*HTTP|Access denied by security policy|success:\s*false/i.test(s);
+    });
+    if (human.length) toast(human.join(' · '));
   }
   if (Array.isArray(data.critical_alerts) && data.critical_alerts.length) {
     await notifyValetCritical(data.critical_alerts, { goToValet: true });
@@ -6240,10 +7552,619 @@ function setImportBusy(on, title) {
     if (el) el.disabled = _importBusy;
   };
   lock('importCsvBtn');
+  lock('importReceiptBtn');
   lock('importPasteBtn');
   lock('valetAttachBtn');
   lock('importCsvInput');
+  lock('importReceiptInput');
+  lock('importReceiptCameraInput');
   lock('valetStatementInput');
+}
+
+/** AD-010.1: receipt → same tutor flow as statement (no batch modal). */
+
+async function parseReceiptFileRemote(file) {
+  const fd = new FormData();
+  fd.append('file', file, file.name || 'receipt.jpg');
+  let res;
+  try {
+    res = await fetch(WALLET_RECEIPT_PARSE, { method: 'POST', body: fd });
+  } catch (err) {
+    err.userErrorKind = 'technical_failure';
+    err.httpStatus = 0;
+    throw err;
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const d = data.detail;
+    const msg = typeof d === 'string' ? d
+      : Array.isArray(d) ? d.map((x) => x.msg || JSON.stringify(x)).join('; ')
+      : (d && d.message) || ('HTTP ' + res.status);
+    const err = new Error(msg);
+    err.userErrorKind = 'technical_failure';
+    err.httpStatus = res.status;
+    throw err;
+  }
+  // Critical alerts from backend → structured user error log (no toast).
+  if (Array.isArray(data.critical_alerts) && data.critical_alerts.length) {
+    for (const a of data.critical_alerts) {
+      if (!a || typeof a !== 'object') continue;
+      persistUserErrorLog({
+        timestamp: new Date().toISOString(),
+        source: 'receipt',
+        stage: 'recognition',
+        error_type: 'technical_failure',
+        user_message: a.detail || a.title || 'Сбой сервиса распознавания',
+        technical_message: [a.code, a.detail, a.provider].filter(Boolean).join(' · ').slice(0, 500),
+        stack: '',
+        metadata: sanitizeUserErrorMeta({
+          provider: a.provider,
+          httpStatus: a.http_status,
+          engine: data.meta?.engine,
+          model: data.meta?.model,
+          filename: file?.name || '',
+        }),
+        session_id: _valetConversationId || '',
+        title: a.title || 'Сбой распознавания',
+      });
+    }
+  }
+  return data;
+}
+
+/** Soft/hard identity: same day+store+amount must not collapse different receipt products. */
+function rowIdentityStore(row) {
+  const store = String(row?.store || '').trim();
+  const product = String(row?.productName || '').trim();
+  return product ? `${store}|${product}` : store;
+}
+
+function attachExpenseToPurchase(purchaseId, expenseOpId, sourceOpId) {
+  const purchase = purchaseById(purchaseId);
+  if (!purchase) return;
+  if (expenseOpId) {
+    const eid = String(expenseOpId);
+    if (!purchase.expenseOpIds.includes(eid)) purchase.expenseOpIds.push(eid);
+  }
+  if (sourceOpId != null && sourceOpId !== '') {
+    const sid = String(sourceOpId);
+    if (!purchase.sourceOperationIds.includes(sid)) purchase.sourceOperationIds.push(sid);
+  }
+}
+
+/** Чек: не плодить «Соусы»/«Молочка» — еда из магазина → «Продукты». */
+function normalizeReceiptCategory(cat, productName) {
+  const c = String(cat || '').trim();
+  const name = String(productName || '').trim();
+  const blob = `${c} ${name}`.toLowerCase();
+  const foodSignal = /майонез|соус|кетчуп|сыр|хлеб|молоч|йогурт|кефир|сметан|бакале|снек|чипс|шоколад|конфет|печень|консерв|овощ|фрукт|яблок|банан|мяс|колбас|сосиск|рыб|крупа|макарон|рис|масло|сахар|соль|мука|яйц|напиток|сок|вода|чай|кофе|пиво|вино|алко|ряба|магнит|пятероч|лента|перекр/i;
+  const alreadyOk = /^(продукты|напитки|здоровье|аптека|бытовая химия|хозяйственные|животные|дети)/i;
+  if (foodSignal.test(blob) && !alreadyOk.test(c)) return 'Продукты';
+  return c || 'Продукты';
+}
+
+function receiptMoneyTol(a, b) {
+  const scale = Math.max(Math.abs(a), Math.abs(b), 1);
+  return Math.max(0.05, 0.02 * scale);
+}
+function receiptApproxEq(a, b) {
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+  return Math.abs(a - b) <= receiptMoneyTol(a, b);
+}
+function inferReceiptUnit(name, qty, rawUnit) {
+  const u = String(rawUnit || '').trim().toLowerCase().replace(/\./g, '');
+  const blob = `${u} ${name || ''}`.toLowerCase().replace(/\s+/g, '');
+  if (['кг', 'kg', 'г', 'g', 'гр'].includes(u)) return 'кг';
+  if (['л', 'l'].includes(u)) return 'л';
+  if (['м', 'm'].includes(u)) return 'м';
+  if (['шт', 'pcs'].includes(u)) return 'шт';
+  if (/кг|kg|килограм/.test(blob)) return 'кг';
+  if (/\b(шт|штук|pcs)\b/i.test(`${u} ${name || ''}`)) return 'шт';
+  if (Number.isFinite(qty) && qty > 0 && qty < 0.999) return 'кг';
+  return 'шт';
+}
+
+/**
+ * Mirror of api normalize_receipt_line_item.
+ * Invariant: NEVER silently fix broken price×qty≈amount — status=doubt + candidates.
+ */
+function normalizeReceiptLineItem(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const name = String(raw.name || raw.title || '').trim();
+  if (!name) return null;
+  let qty = Number(raw.qty != null ? raw.qty : raw.quantity);
+  if (!Number.isFinite(qty) || qty <= 0) qty = 1;
+  let price = raw.price != null ? Number(raw.price) : (raw.unitPrice != null ? Number(raw.unitPrice) : NaN);
+  if (!Number.isFinite(price)) price = null;
+  let amount = raw.amount != null ? Number(raw.amount) : (raw.sum != null ? Number(raw.sum) : NaN);
+  if (!Number.isFinite(amount)) amount = null;
+  else amount = Math.abs(amount);
+
+  let unit = inferReceiptUnit(name, qty, raw.unit || raw.uom);
+  const category = normalizeReceiptCategory(raw.category, name);
+  const subcategory = String(raw.subcategory || raw.expense || '').trim();
+  const qtyIsOne = Math.abs(qty - 1) <= 0.001;
+  let status = 'ok';
+  let amountDoubt = null;
+  let product = price != null ? Math.round(price * qty * 10000) / 10000 : null;
+
+  if (amount != null && price == null) {
+    price = qty ? Math.round((amount / qty) * 10000) / 10000 : amount;
+    status = qtyIsOne ? 'ok' : 'inferred';
+    product = Math.round(price * qty * 10000) / 10000;
+  } else if (amount == null && price != null) {
+    amount = Math.round(price * qty * 100) / 100;
+    product = Math.round(price * qty * 10000) / 10000;
+    status = 'inferred';
+  } else if (amount != null && price != null) {
+    product = Math.round(price * qty * 10000) / 10000;
+    if (receiptApproxEq(product, amount)) {
+      status = 'ok';
+    } else if (qtyIsOne && receiptApproxEq(price, amount)) {
+      status = 'ok';
+      if (unit === 'кг') unit = 'шт';
+    } else if (!qtyIsOne && receiptApproxEq(amount, price) && product != null && !receiptApproxEq(product, amount)) {
+      status = 'doubt';
+      const lineTotal = Math.round(product * 100) / 100;
+      amountDoubt = {
+        kind: 'unit_price_as_amount',
+        explanation:
+          `Похоже, ${amount.toFixed(2)} — цена за ${unit}, а стоимость строки `
+          + `${price.toFixed(2)} × ${qty} = ${lineTotal.toFixed(2)}.`,
+        candidates: [
+          {
+            id: 'line_total',
+            label: `Да, цена за ${unit} → стоимость ${lineTotal.toFixed(2)}`,
+            amount: lineTotal, price, qty, unit,
+          },
+          {
+            id: 'keep_amount',
+            label: `Оставить стоимость ${amount.toFixed(2)}`,
+            amount,
+            price: receiptApproxEq(amount, price) ? amount : price,
+            qty: receiptApproxEq(amount, price) ? 1 : qty,
+            unit: receiptApproxEq(amount, price) ? 'шт' : unit,
+          },
+          { id: 'manual', label: 'Нет, укажу сам', amount: null, price, qty, unit },
+        ],
+      };
+    } else if (!receiptApproxEq(product, amount)) {
+      status = 'doubt';
+      amountDoubt = {
+        kind: 'conflict',
+        explanation:
+          `Цена ${price.toFixed(2)} × кол-во ${qty} = ${product.toFixed(2)}, `
+          + `но сумма строки ${amount.toFixed(2)}. Как записать?`,
+        candidates: [
+          {
+            id: 'use_amount',
+            label: `Использовать сумму строки ${amount.toFixed(2)}`,
+            amount, price, qty, unit,
+          },
+          {
+            id: 'use_product',
+            label: `Использовать ${price.toFixed(2)} × ${qty} = ${(Math.round(product * 100) / 100).toFixed(2)}`,
+            amount: Math.round(product * 100) / 100, price, qty, unit,
+          },
+          { id: 'manual', label: 'Я укажу сам', amount: null, price, qty, unit },
+        ],
+      };
+    }
+  } else {
+    return null;
+  }
+  if (amount == null || !(amount > 0)) return null;
+  const out = {
+    name,
+    qty,
+    price: price != null ? price : amount,
+    amount: Math.abs(amount),
+    unit,
+    category,
+    subcategory,
+    amountStatus: status,
+  };
+  if (amountDoubt) out.amountDoubt = amountDoubt;
+  return out;
+}
+
+let _valetDoubtResolver = null;
+function closeValetDoubtModal(decision) {
+  document.getElementById('valetDoubtModal')?.classList.remove('show');
+  const manualWrap = document.getElementById('valetDoubtManual');
+  if (manualWrap) manualWrap.hidden = true;
+  const resolve = _valetDoubtResolver;
+  _valetDoubtResolver = null;
+  if (typeof resolve === 'function') resolve(decision);
+}
+
+/**
+ * Ask user when price×qty≉amount. Never auto-pick.
+ * @returns {Promise<object|null>} chosen candidate fields or null if skipped
+ */
+function askReceiptAmountDoubt(row) {
+  return new Promise((resolve) => {
+    const doubt = row?.amountDoubt;
+    if (!doubt || !Array.isArray(doubt.candidates) || !doubt.candidates.length) {
+      resolve({
+        amount: Math.abs(Number(row.amount) || 0),
+        price: Number(row.unitPrice ?? row.price) || Math.abs(Number(row.amount) || 0),
+        qty: Number(row.qty) || 1,
+        unit: row.unit || 'шт',
+        choiceId: 'passthrough',
+      });
+      return;
+    }
+    _valetDoubtResolver = resolve;
+    const titleEl = document.getElementById('valetDoubtTitle');
+    const bodyEl = document.getElementById('valetDoubtBody');
+    const actions = document.getElementById('valetDoubtActions');
+    const manualWrap = document.getElementById('valetDoubtManual');
+    const manualInput = document.getElementById('valetDoubtManualAmount');
+    const product = String(row.productName || row.comment || 'позиция').trim();
+    if (titleEl) titleEl.textContent = 'Уточни сумму позиции';
+    if (bodyEl) {
+      bodyEl.textContent =
+        `${product}\n`
+        + `Цена: ${Number(row.unitPrice ?? row.price) || '—'} · `
+        + `Кол-во: ${row.qty || '—'} ${row.unit || ''}\n`
+        + `Стоимость (как распознано): ${Math.abs(Number(row.amount) || 0)}\n\n`
+        + (doubt.explanation || 'Цена × количество не сходится со стоимостью.');
+    }
+    if (manualWrap) manualWrap.hidden = true;
+    if (manualInput) manualInput.value = '';
+    if (actions) {
+      actions.innerHTML = '';
+      doubt.candidates.forEach((cand, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = idx === 0 ? 'btn btn-ok' : 'btn btn-ghost';
+        btn.textContent = cand.label || cand.id;
+        btn.addEventListener('click', () => {
+          if (cand.id === 'manual' || cand.amount == null) {
+            if (manualWrap) manualWrap.hidden = false;
+            if (manualInput) {
+              manualInput.focus();
+              const save = document.createElement('button');
+              save.type = 'button';
+              save.className = 'btn btn-ok';
+              save.textContent = 'Сохранить сумму';
+              save.addEventListener('click', () => {
+                const v = Math.abs(Number(manualInput.value) || 0);
+                if (!(v > 0)) {
+                  toast('Укажи сумму больше нуля');
+                  return;
+                }
+                closeValetDoubtModal({
+                  amount: v,
+                  price: Number(cand.price) || v,
+                  qty: Number(cand.qty) || 1,
+                  unit: cand.unit || row.unit || 'шт',
+                  choiceId: 'manual',
+                });
+              });
+              actions.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+              actions.appendChild(save);
+            }
+            return;
+          }
+          closeValetDoubtModal({
+            amount: Math.abs(Number(cand.amount) || 0),
+            price: Number(cand.price),
+            qty: Number(cand.qty),
+            unit: cand.unit || 'шт',
+            choiceId: cand.id,
+          });
+        });
+        actions.appendChild(btn);
+      });
+      const skip = document.createElement('button');
+      skip.type = 'button';
+      skip.className = 'btn btn-ghost';
+      skip.textContent = 'Пропустить позицию';
+      skip.addEventListener('click', () => closeValetDoubtModal(null));
+      actions.appendChild(skip);
+    }
+    document.getElementById('valetDoubtModal')?.classList.add('show');
+  });
+}
+bindModalBackdropClose('valetDoubtModal', () => closeValetDoubtModal(null));
+
+function recordReceiptAmountLesson(store, lesson) {
+  if (!store || !lesson) return;
+  ensureLearnState();
+  const m = getMerchant(store);
+  if (!m) return;
+  if (!Array.isArray(m.receiptAmountLessons)) m.receiptAmountLessons = [];
+  m.receiptAmountLessons.push({
+    at: new Date().toISOString(),
+    kind: lesson.kind || '',
+    choiceId: lesson.choiceId || '',
+    unit: lesson.unit || '',
+  });
+  if (m.receiptAmountLessons.length > 20) {
+    m.receiptAmountLessons = m.receiptAmountLessons.slice(-20);
+  }
+}
+
+/** Resolve math doubts on draft rows before plan/dedup. Never auto-fix. */
+async function resolveReceiptAmountDoubtsOnRows(rows) {
+  const list = Array.isArray(rows) ? rows : [];
+  const out = [];
+  for (const row of list) {
+    if (row.amountStatus !== 'doubt' || !row.amountDoubt) {
+      out.push(row);
+      continue;
+    }
+    setImportBusy(false);
+    const choice = await askReceiptAmountDoubt(row);
+    if (!choice || !(choice.amount > 0)) continue;
+    recordReceiptAmountLesson(row.store || row.receiptMerchant, {
+      kind: row.amountDoubt?.kind,
+      choiceId: choice.choiceId,
+      unit: choice.unit,
+    });
+    const signed = -Math.abs(choice.amount);
+    out.push({
+      ...row,
+      amount: signed,
+      qty: choice.qty,
+      unit: choice.unit,
+      unitPrice: choice.price,
+      price: choice.price,
+      amountStatus: 'resolved',
+      amountDoubt: null,
+      receiptLine: {
+        ...(row.receiptLine || {}),
+        qty: choice.qty,
+        unit: choice.unit,
+        price: choice.price,
+        amount: Math.abs(choice.amount),
+        amountStatus: 'resolved',
+      },
+    });
+  }
+  return out;
+}
+
+/**
+ * AD-010.1: receipt line items → same import rows as bank statement / clipboard.
+ * No separate confirm UI — Valet tutor asks one question per product.
+ */
+function receiptToImportRows(receipt, { purchaseId = '', meta = {}, fiscalId = '' } = {}) {
+  const merchant = String(receipt?.merchant || '').trim() || 'Чек';
+  const date = String(receipt?.date || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
+  const rawItems = Array.isArray(receipt?.items) ? receipt.items : [];
+  const items = rawItems.map((it) => normalizeReceiptLineItem(it)).filter(Boolean);
+  const fid = String(
+    fiscalId || receipt?.fiscalId || receipt?.receiptNumber || meta?.fiscalId || ''
+  ).trim();
+  const receiptInfo = {
+    merchantRaw: merchant,
+    date,
+    totalAmount: Math.abs(Number(receipt?.totalAmount ?? receipt?.total) || 0)
+      || items.reduce((s, it) => s + Math.abs(Number(it?.amount) || 0), 0),
+    fiscalId: fid,
+    items: items.map((it) => ({
+      name: it.name,
+      qty: it.qty,
+      unit: it.unit,
+      price: it.price,
+      amount: it.amount,
+      category: it.category,
+      subcategory: it.subcategory,
+      amountStatus: it.amountStatus,
+    })),
+    model: receipt?.model || meta?.model || '',
+    confidence: receipt?.confidence,
+  };
+  return items.map((it) => {
+    const name = it.name;
+    const amount = Math.abs(Number(it.amount) || 0);
+    const category = normalizeReceiptCategory(it.category, name);
+    const subcategory = String(it.subcategory || '').trim();
+    return {
+      date,
+      store: merchant,
+      amount: -amount,
+      kind: 'expense',
+      comment: name,
+      productName: name,
+      receiptMerchant: merchant,
+      purchaseId: purchaseId || '',
+      fiscalId: fid,
+      sourceType: 'receipt',
+      qty: it.qty,
+      unit: it.unit,
+      unitPrice: it.price,
+      price: it.price,
+      amountStatus: it.amountStatus,
+      amountDoubt: it.amountDoubt || null,
+      receiptLine: {
+        qty: it.qty,
+        unit: it.unit,
+        price: it.price,
+        amount,
+        amountStatus: it.amountStatus,
+      },
+      receiptInfo,
+      bank: {
+        desc: name,
+        category,
+        merchant,
+        receiptItem: true,
+      },
+      placementHint: {
+        wallet: 'personal',
+        category,
+        expense: name,
+        accountId: '',
+        subcategory: subcategory || '',
+      },
+    };
+  }).filter((row) => row.productName && Math.abs(row.amount) > 0);
+}
+
+async function runReceiptFromFile(file) {
+  if (!file) return;
+  if (_importBusy) {
+    toast('Уже идёт загрузка — подожди');
+    return;
+  }
+  setImportBusy(true, 'Читаю чек…');
+  const fileMeta = {
+    filename: String(file.name || '').slice(0, 120),
+    mimeType: String(file.type || '').slice(0, 80),
+    sizeBytes: Number(file.size) || 0,
+  };
+  try {
+    const data = await parseReceiptFileRemote(file);
+    const receipt = data.receipt || {};
+    const items = Array.isArray(receipt.items) ? receipt.items : [];
+    const draftRows = receiptToImportRows(receipt, {
+      purchaseId: '',
+      meta: data.meta || {},
+      fiscalId: String(receipt.fiscalId || receipt.receiptNumber || '').trim(),
+    });
+
+    if (!items.length || !draftRows.length) {
+      const why = (data.warnings && data.warnings[0])
+        || 'Я не смог уверенно прочитать чек.';
+      setImportBusy(false);
+      await reportUserError({
+        source: 'receipt',
+        stage: 'recognition',
+        errorType: 'recognition_failed',
+        title: 'Не получилось обработать данные',
+        userMessage: why,
+        technicalMessage: receipt.error || why,
+        recommendations: defaultTipsForErrorKind('recognition_failed'),
+        metadata: {
+          ...fileMeta,
+          provider: data.meta?.engine || receipt.engine || '',
+          model: data.meta?.model || receipt.model || '',
+          rawCount: items.length,
+          validCount: draftRows.length,
+        },
+      });
+      return;
+    }
+
+    // Partial: raw LLM lines vs usable rows (empty name/amount filtered out).
+    if (items.length > draftRows.length) {
+      setImportBusy(false);
+      const decision = await reportUserError({
+        source: 'receipt',
+        stage: 'recognition',
+        errorType: 'partial_recognition',
+        title: 'Не получилось обработать данные',
+        userMessage:
+          `Я смог распознать ${draftRows.length} из ${items.length} позиций. `
+          + `${items.length - draftRows.length} позиции требуют ручного ввода или другого фото.`,
+        technicalMessage: `partial_recognition raw=${items.length} valid=${draftRows.length}`,
+        recommendations: defaultTipsForErrorKind('partial_recognition'),
+        metadata: {
+          ...fileMeta,
+          provider: data.meta?.engine || '',
+          model: data.meta?.model || '',
+          rawCount: items.length,
+          validCount: draftRows.length,
+          failedCount: items.length - draftRows.length,
+        },
+        actions: 'continue_cancel',
+      });
+      if (decision !== 'continue') return;
+      setImportBusy(true, 'Готовлю позиции чека…');
+    }
+
+    const merchant = String(receipt.merchant || '').trim() || 'Чек';
+    const date = String(receipt.date || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
+    // Math doubts BEFORE plan/dedup — never auto-fix price×qty≠amount.
+    let resolvedRows = draftRows;
+    if (draftRows.some((r) => r.amountStatus === 'doubt')) {
+      resolvedRows = await resolveReceiptAmountDoubtsOnRows(draftRows);
+      if (!resolvedRows.length) {
+        setImportBusy(false);
+        toast('Нет позиций для разбора');
+        return;
+      }
+      setImportBusy(true, 'Готовлю позиции чека…');
+    }
+    const totalAmount = Math.abs(Number(receipt.totalAmount ?? receipt.total) || 0)
+      || resolvedRows.reduce((s, it) => s + Math.abs(Number(it?.amount) || 0), 0);
+    const fiscalId = String(receipt.fiscalId || receipt.receiptNumber || '').trim();
+    // AD-011: same pipeline as statement — plan first, only new/similar go to Разбор.
+    const plan = planImportStatementRows(resolvedRows);
+    plan.filename = file.name || '';
+    plan.source = 'RECEIPT';
+    plan.status = 'preview';
+    const newCount = (plan.autoItems?.length || 0) + (plan.reviewItems?.length || 0);
+    const possibleCount = (plan.possibleDupItems || []).length;
+    if (!newCount && !possibleCount) {
+      const skipped = plan.skippedHard ?? plan.skipped ?? 0;
+      toast(
+        skipped
+          ? `Найдено 0 новых записей · уже в базе: ${skipped}`
+          : 'Найдено 0 новых записей'
+      );
+      return;
+    }
+    const purchase = createPurchaseRecord({
+      date,
+      store: merchant,
+      totalAmount,
+      fiscalId,
+      wallet: 'personal',
+      accountId: '',
+      sourceOperationIds: [],
+      expenseOpIds: [],
+      status: 'open',
+    });
+    if (!purchase) {
+      setImportBusy(false);
+      await reportUserError({
+        source: 'receipt',
+        stage: 'normalization',
+        errorType: 'normalization_failed',
+        title: 'Не получилось обработать данные',
+        userMessage: 'Не удалось создать покупку для позиций чека.',
+        technicalMessage: 'createPurchaseRecord returned null',
+        metadata: fileMeta,
+      });
+      return;
+    }
+    for (const it of [...(plan.autoItems || []), ...(plan.reviewItems || []), ...(plan.possibleDupItems || [])]) {
+      it.purchaseId = purchase.id;
+      if (it.receiptInfo && typeof it.receiptInfo === 'object') {
+        it.receiptInfo = { ...it.receiptInfo, fiscalId: fiscalId || it.receiptInfo.fiscalId || '' };
+      }
+    }
+    saveState();
+    setImportBusy(false);
+    await startValetImportTutor(plan);
+  } catch (err) {
+    console.warn('receipt parse', err);
+    setImportBusy(false);
+    const kind = err?.userErrorKind || classifyImportErrorKind(err);
+    await reportUserError({
+      source: 'receipt',
+      stage: 'recognition',
+      errorType: kind,
+      title: 'Не получилось обработать данные',
+      userMessage: kind === 'technical_failure'
+        ? 'Не удалось связаться с сервисом распознавания.'
+        : 'Я не смог уверенно прочитать чек.',
+      technicalMessage: err?.message || String(err),
+      error: err,
+      recommendations: defaultTipsForErrorKind(kind),
+      metadata: {
+        ...fileMeta,
+        httpStatus: err?.httpStatus,
+      },
+    });
+  } finally {
+    setImportBusy(false);
+  }
 }
 
 async function runImportPlanFromRows(parsed, { source = 'CSV', filename = '' } = {}) {
@@ -6255,7 +8176,9 @@ async function runImportPlanFromRows(parsed, { source = 'CSV', filename = '' } =
     toast('Нет операций для импорта');
     return null;
   }
-  setImportBusy(true, source === 'CLIPBOARD' ? 'Разбираю буфер…' : 'Готовлю импорт…');
+  setImportBusy(true, source === 'CLIPBOARD' ? 'Разбираю буфер…'
+    : source === 'RECEIPT' ? 'Готовлю позиции чека…'
+    : 'Готовлю импорт…');
   goView('proposals');
   try {
     const plan = planImportStatementRows(parsed);
@@ -6272,7 +8195,17 @@ async function runImportPlanFromRows(parsed, { source = 'CSV', filename = '' } =
         toast(`Дамп ${dump.id || ''} · применяю импорт…`);
       } catch (err) {
         console.warn('import dump', err);
-        toast('Импорт остановлен: не удалось сохранить дамп. Проверьте сеть и повторите.');
+        setImportBusy(false);
+        await reportUserError({
+          source: source === 'RECEIPT' ? 'receipt' : 'import',
+          stage: 'import',
+          errorType: 'technical_failure',
+          title: 'Не получилось обработать данные',
+          userMessage: 'Не удалось сохранить страховочную копию перед импортом. Проверьте сеть и повторите.',
+          technicalMessage: err?.message || String(err),
+          error: err,
+          metadata: { sourceLabel: source, filename: filename || '' },
+        });
         return null;
       }
       mutate((st) => {
@@ -6305,6 +8238,12 @@ async function runImportPlanFromFile(file) {
   const busyTitle = isCsv ? 'Читаю CSV…' : 'Распознаю скрин / PDF… 10–20 сек';
   setImportBusy(true, busyTitle);
   goView('proposals');
+  const fileMeta = {
+    filename: String(file.name || '').slice(0, 120),
+    mimeType: String(file.type || '').slice(0, 80),
+    sizeBytes: Number(file.size) || 0,
+    sourceLabel: isCsv ? 'CSV' : 'PDF/image',
+  };
   try {
   let parsed;
   let sourceLabel = 'CSV';
@@ -6321,6 +8260,9 @@ async function runImportPlanFromFile(file) {
       if (alt && /Дата|Описание|сумма|магазин/i.test(alt.slice(0, 500))) text = alt;
     }
     parsed = parseStatementCsv(text);
+    if (!parsed.length) {
+      throw Object.assign(new Error('В CSV не найдено операций'), { userErrorKind: 'recognition_failed' });
+    }
   } else {
     const data = await parseStatementFileRemote(file);
     parsed = data.rows || [];
@@ -6329,14 +8271,28 @@ async function runImportPlanFromFile(file) {
       const why = (data.warnings && data.warnings.length)
         ? data.warnings.join(' · ')
         : 'Не удалось распознать операции в файле';
-      throw new Error(why);
+      throw Object.assign(new Error(why), { userErrorKind: 'recognition_failed' });
     }
   }
   setImportBusy(false);
   return runImportPlanFromRows(parsed, { source: sourceLabel, filename: file.name || '' });
   } catch (err) {
     setImportBusy(false);
-    throw err;
+    const kind = err?.userErrorKind || classifyImportErrorKind(err);
+    await reportUserError({
+      source: isCsv ? 'import' : (/pdf/i.test(name) ? 'pdf' : 'photo'),
+      stage: 'recognition',
+      errorType: kind,
+      title: 'Не получилось обработать данные',
+      userMessage: kind === 'technical_failure'
+        ? 'Не удалось связаться с сервисом распознавания.'
+        : 'Не удалось распознать операции в файле.',
+      technicalMessage: err?.message || String(err),
+      error: err,
+      recommendations: defaultTipsForErrorKind(kind),
+      metadata: fileMeta,
+    });
+    return null;
   }
 }
 
@@ -6352,16 +8308,61 @@ function planImportStatementRows(parsed) {
   const defaultAcc = preferAccountId('');
   const autoItems = [];
   const reviewItems = [];
+  const possibleDupItems = [];
+  const receiptFields = (row) => ({
+    productName: row.productName || '',
+    receiptMerchant: row.receiptMerchant || '',
+    purchaseId: row.purchaseId || '',
+    sourceType: row.sourceType || '',
+    receiptInfo: row.receiptInfo || null,
+    fiscalId: row.fiscalId || (row.receiptInfo && row.receiptInfo.fiscalId) || '',
+    qty: row.qty,
+    unit: row.unit || '',
+    unitPrice: row.unitPrice ?? row.price,
+    price: row.unitPrice ?? row.price,
+    amountStatus: row.amountStatus || '',
+    receiptLine: row.receiptLine || null,
+  });
+  // Exact by fiscal/receipt number: whole source already known → skip every line.
+  const fiscalIds = new Set(
+    (parsed || [])
+      .map((r) => String(r.fiscalId || (r.receiptInfo && r.receiptInfo.fiscalId) || '').trim())
+      .filter(Boolean)
+  );
+  const knownFiscal = collectKnownFiscalIds();
+  const fiscalExact = [...fiscalIds].some((id) => knownFiscal.has(normForSearch(id)));
+
   for (const row of parsed) {
     const hint = accountHintFromBank(row.bank);
     const kind = row.kind || (Number(row.amount) > 0 ? 'unclear' : 'expense');
-    const hardFp = opHardFingerprint(row.date, row.store, row.amount, row.comment, hint);
-    const sk = opSoftKey(row.date, row.store, row.amount);
-    const skNorm = opSoftNormKey(row.date, row.store, row.amount);
-    // Training mode: keep hard matches as source operations; the user resolves them.
-    if (rowMatchesKnownHard(row, knownHard) || rowMatchesRecordedOp(row)) {
+    const idStore = rowIdentityStore(row);
+    const hardFp = opHardFingerprint(row.date, idStore, row.amount, row.comment || row.productName, hint);
+    const sk = opSoftKey(row.date, idStore, row.amount);
+    const skNorm = opSoftNormKey(row.date, idStore, row.amount);
+    const isReceiptLine = !!(row.productName || row.sourceType === 'receipt');
+
+    // A) Уверенный дубль — НЕ в Разбор / обучение.
+    if (fiscalExact) {
       skippedHard++;
-      reviewItems.push({
+      continue;
+    }
+    const classified = classifyImportRowDuplicate(row);
+    if (
+      classified.bucket === 'confident'
+      || rowMatchesKnownHard(row, knownHard)
+      || rowMatchesRecordedOp(row)
+    ) {
+      skippedHard++;
+      continue;
+    }
+
+    addOpFingerprintAliases(knownHard, row.date, idStore, row.amount, row.comment || row.productName, hint);
+
+    // B) Возможное совпадение — вопрос до обучения, не обычная карточка.
+    if (classified.bucket === 'possible') {
+      softDup++;
+      const bestRow = classified.best && classified.best.expense;
+      possibleDupItems.push({
         id: nextId++,
         date: row.date,
         store: row.store,
@@ -6370,15 +8371,30 @@ function planImportStatementRows(parsed) {
         comment: row.comment,
         bank: row.bank || null,
         fingerprint: hardFp,
-        duplicateHint: 'exact',
+        duplicateHint: 'similar',
+        softDup: true,
+        similarTo: bestRow
+          ? {
+              opId: bestRow.opId,
+              expense: bestRow.expense,
+              cost: bestRow.cost ?? bestRow.price,
+              date: bestRow.date,
+            }
+          : null,
+        matchBest: classified.best,
         placementHint: row.placementHint || null,
+        ...receiptFields(row),
       });
+      if (isReceiptLine) {
+        soft.add(sk);
+        soft.add(skNorm);
+      }
       continue;
     }
-    addOpFingerprintAliases(knownHard, row.date, row.store, row.amount, row.comment, hint);
-    // Soft key = same day + |amount| + store (ignoring comment). Already known → skip.
+
+    // Soft keys: повтор той же строки в файле/очереди → skip, не обучение.
     let softHit = soft.has(sk) || soft.has(skNorm);
-    if (!softHit) {
+    if (!softHit && !isReceiptLine) {
       for (const s of storeNameVariants(row.store)) {
         for (const a of amountSignVariants(row.amount)) {
           if (soft.has(opSoftKey(row.date, s, a)) || soft.has(opSoftNormKey(row.date, s, a))) {
@@ -6389,30 +8405,24 @@ function planImportStatementRows(parsed) {
         if (softHit) break;
       }
     }
-    for (const s of storeNameVariants(row.store)) {
-      for (const a of amountSignVariants(row.amount)) {
-        soft.add(opSoftKey(row.date, s, a));
-        soft.add(opSoftNormKey(row.date, s, a));
+    if (isReceiptLine) {
+      soft.add(sk);
+      soft.add(skNorm);
+    } else {
+      for (const s of storeNameVariants(row.store)) {
+        for (const a of amountSignVariants(row.amount)) {
+          soft.add(opSoftKey(row.date, s, a));
+          soft.add(opSoftNormKey(row.date, s, a));
+        }
       }
     }
     if (softHit) {
-      softDup++;
-      reviewItems.push({
-        id: nextId++,
-        date: row.date,
-        store: row.store,
-        amount: row.amount,
-        kind,
-        comment: row.comment,
-        bank: row.bank || null,
-        fingerprint: hardFp,
-        duplicateHint: 'strong',
-        placementHint: row.placementHint || null,
-      });
+      skippedHard++;
       continue;
     }
+
+    // C) Новые записи → Разбор.
     const canon = canonicalStoreName(row.store) || row.store;
-    // Positive / unclear never auto-confirm — ask or drawer.
     if (kind !== 'expense' || Number(row.amount) >= 0) {
       reviewItems.push({
         id: nextId++,
@@ -6423,6 +8433,22 @@ function planImportStatementRows(parsed) {
         comment: row.comment,
         bank: row.bank || null,
         fingerprint: hardFp,
+        ...receiptFields(row),
+      });
+      continue;
+    }
+    if (isReceiptLine) {
+      reviewItems.push({
+        id: nextId++,
+        date: row.date,
+        store: row.store,
+        amount: row.amount,
+        kind: 'expense',
+        comment: row.comment,
+        bank: row.bank || null,
+        fingerprint: hardFp,
+        placementHint: row.placementHint || null,
+        ...receiptFields(row),
       });
       continue;
     }
@@ -6457,18 +8483,36 @@ function planImportStatementRows(parsed) {
       bank: row.bank || null,
       fingerprint: hardFp,
       placementHint: row.placementHint || null,
+      ...receiptFields(row),
     });
   }
   return {
     autoItems,
     reviewItems,
+    possibleDupItems,
     skipped: skippedHard,
     skippedHard,
     softDup,
-    total: parsed.length,
+    total: (parsed || []).length,
     filename: '',
     status: 'preview',
+    fiscalExact: !!fiscalExact,
   };
+}
+
+function collectKnownFiscalIds() {
+  const set = new Set();
+  ensurePurchases();
+  for (const p of state.purchases || []) {
+    const id = String(p.fiscalId || '').trim();
+    if (id) set.add(normForSearch(id));
+  }
+  ensureImportedOps();
+  for (const op of state.importedOps || []) {
+    const id = String(op.fiscalId || (op.receiptInfo && op.receiptInfo.fiscalId) || '').trim();
+    if (id) set.add(normForSearch(id));
+  }
+  return set;
 }
 function applyImportPlan(plan) {
   ensureImportedOps();
@@ -6500,6 +8544,19 @@ function applyImportPlan(plan) {
   for (const op of plan.reviewItems) {
     state.importedOps.push(normalizeSourceOperation(op, { sourceType }));
     added++;
+  }
+  if (added > 0) {
+    const sample = plan.reviewItems[0] || plan.autoItems[0] || {};
+    const store = String(sample.store || sample.receiptMerchant || '').trim();
+    let label = 'разбор операций';
+    if (plan.source === 'RECEIPT' || sourceType === 'receipt') {
+      label = store ? `разбор чека · ${store}` : 'разбор чека';
+    } else if (plan.source === 'CLIPBOARD') {
+      label = 'разбор из буфера';
+    } else {
+      label = plan.filename ? `разбор выписки · ${plan.filename}` : 'разбор выписки';
+    }
+    rememberRazborResume({ source: plan.source || sourceType, label, totalHint: added });
   }
   pushAudit({
     type: 'import_applied',
@@ -6977,18 +9034,41 @@ function buildValetTutorItems(plan) {
     const canon = canonicalStoreName(it.store) || it.store;
     const unclear = isUnclearRow(it);
     const telecom = matchTelecomCarrier(it.store || '');
-    let top = unclear ? null : topOutcome(canon) || topOutcome(it.store);
+    const productName = String(it.productName || '').trim();
+    const isReceiptLine = !!(productName || it.sourceType === 'receipt');
+    let top = null;
+    // AD-010.1: product lines learn/propose by product, not by store auto.
+    if (!unclear && productName) {
+      top = topOutcome(productName);
+      if (top) {
+        // Для позиции чека «Расход» всегда имя товара; категорию берём из памяти или подсказки.
+        top = {
+          ...top,
+          expense: productName,
+          category: top.category || it.placementHint?.category || 'Разобрать',
+        };
+      } else if (it.placementHint && it.placementHint.category) {
+        top = {
+          wallet: it.placementHint.wallet || 'personal',
+          category: it.placementHint.category,
+          expense: productName,
+          accountId: it.placementHint.accountId || '',
+        };
+      }
+    } else if (!unclear) {
+      top = topOutcome(canon) || topOutcome(it.store);
+    }
     // Explicit placement from Wallet-list paste (Бизнес — Инструмент — …)
     if (!unclear && !top && it.placementHint && it.placementHint.category) {
       top = {
         wallet: it.placementHint.wallet || 'personal',
         category: it.placementHint.category,
-        expense: it.placementHint.expense || canon,
+        expense: productName || it.placementHint.expense || canon,
         accountId: it.placementHint.accountId || '',
       };
     }
     // Telecom: memory on «МТС» + phone from the bank line as expense when needed
-    if (!unclear && !top && telecom) {
+    if (!isReceiptLine && !unclear && !top && telecom) {
       const h = heuristicSuggest(it.store, it.comment || '');
       if (h) {
         top = {
@@ -6998,7 +9078,7 @@ function buildValetTutorItems(plan) {
           accountId: '',
         };
       }
-    } else if (!unclear && top && telecom) {
+    } else if (!isReceiptLine && !unclear && top && telecom) {
       const phone = telecom.phone || extractPhoneDigits(it.store || '');
       if (phone && (!top.expense || top.expense === telecom.store || top.expense === canon)) {
         top = { ...top, expense: phone };
@@ -7006,12 +9086,13 @@ function buildValetTutorItems(plan) {
     }
     const amb = unclear
       ? { kind: 'none', label: 'непонятная сумма (+)', seen: 0, outcomesN: 0 }
-      : merchantAmbiguity(canon);
+      : merchantAmbiguity(productName || canon);
     const identified = !!(top && !it.softDup && !unclear);
     flat.push({
       ...it,
       store: canon,
       storeRaw: it.store,
+      productName,
       kind: unclear ? 'unclear' : rowKind(it),
       identified,
       guess: identified
@@ -7025,51 +9106,40 @@ function buildValetTutorItems(plan) {
       ambiguity: amb,
     });
   }
-  return groupValetTutorItems(flat);
+  // AD-010.1: единица работы в Разборе = один расход. Без агрегации в группы.
+  return flat.map(wrapAsTutorItem);
 }
 
-/** One card = same store + same proposed placement (or both without guess). */
-function groupValetTutorItems(flat) {
-  const map = new Map();
-  for (const it of flat) {
-    const canon = canonicalStoreName(it.store) || it.store;
-    const g = it.guess;
-    const guessKey = g
-      ? [g.wallet || 'personal', g.category || '', g.expense || '', g.accountId || ''].join('|')
-      : 'none';
-    const soft = it.softDup ? '1' : '0';
-    const kindBucket = isUnclearRow(it) ? 'unclear' : 'expense';
-    const key = [storeKey(canon), guessKey, soft, kindBucket].join('::');
-    if (!map.has(key)) {
-      map.set(key, {
-        store: canon,
-        storeRaw: it.store,
-        identified: !!it.identified,
-        guess: g ? { ...g } : null,
-        ambiguity: it.ambiguity,
-        softDup: !!it.softDup,
-        kind: kindBucket,
-        ops: [],
-      });
-    }
-    const grp = map.get(key);
-    grp.ops.push(it);
-    // if any op in group was identified, keep true
-    if (it.identified) grp.identified = true;
-  }
-  const groups = [...map.values()].map((grp) => {
-    const sum = grp.ops.reduce((s, o) => s + Math.abs(Number(o.amount) || 0), 0);
-    return {
-      ...grp,
-      count: grp.ops.length,
-      sum,
-      // primary fields for teach modal title
-      date: grp.ops[0]?.date,
-      amount: grp.sum,
-    };
-  });
-  groups.sort((a, b) => b.sum - a.sum || a.store.localeCompare(b.store, 'ru'));
-  return groups;
+/**
+ * Одна карточка Валета = один расход (`ops.length === 1`).
+ * Массивы внутри карточки запрещены как единица UX (массовое «Верно · все N»).
+ */
+function wrapAsTutorItem(it) {
+  const op = { ...it };
+  delete op.ops;
+  delete op.count;
+  delete op.sum;
+  const product = String(op.productName || '').trim();
+  const canon = canonicalStoreName(op.store) || op.store;
+  return {
+    ...op,
+    store: product || canon,
+    storeRaw: op.storeRaw || op.store,
+    receiptMerchant: op.receiptMerchant || (product ? (op.storeRaw || op.store) : ''),
+    productName: product,
+    purchaseId: op.purchaseId || '',
+    sourceType: op.sourceType || '',
+    identified: !!op.identified,
+    guess: op.guess ? { ...op.guess } : null,
+    ambiguity: op.ambiguity,
+    softDup: !!op.softDup,
+    kind: op.kind || (isUnclearRow(op) ? 'unclear' : 'expense'),
+    ops: [op],
+    count: 1,
+    sum: Math.abs(Number(op.amount) || 0),
+    date: op.date,
+    amount: op.amount,
+  };
 }
 
 function formatPlacement(p) {
@@ -7135,39 +9205,79 @@ function closeTutorPanelSoon() {
 }
 
 async function startValetImportTutor(plan) {
+  // Before any clickable dialog (doubt / possible dup): drop import overlay,
+  // otherwise z-index 200 blocks modals and the await hangs forever.
+  setImportBusy(false);
+
+  // Safety: any leftover math doubt must be asked (never auto-fixed).
+  const allPlanRows = [
+    ...(plan.autoItems || []),
+    ...(plan.reviewItems || []),
+    ...(plan.possibleDupItems || []),
+  ];
+  if (allPlanRows.some((r) => r.amountStatus === 'doubt')) {
+    const resolved = await resolveReceiptAmountDoubtsOnRows(allPlanRows);
+    const resolvedIds = new Set(resolved.map((r) => r.id));
+    const keep = (list) => (list || []).map((r) => {
+      if (r.amountStatus !== 'doubt') return r;
+      return resolved.find((x) => x.id === r.id) || null;
+    }).filter(Boolean);
+    plan.autoItems = keep(plan.autoItems);
+    plan.reviewItems = keep(plan.reviewItems);
+    plan.possibleDupItems = keep(plan.possibleDupItems);
+    // Dropped doubts (skipped) count as skipped
+    plan.skippedHard = (plan.skippedHard || 0) + (allPlanRows.length - resolvedIds.size);
+  }
+
+  // B) Возможные дубли — спросить ДО обучения (существующая модалка Отмена/Добавить).
+  if (!plan._fromResume && (plan.possibleDupItems || []).length) {
+    const { added, skipped } = await resolvePossibleDupItems(plan);
+    plan.skippedHard = (plan.skippedHard || 0) + skipped;
+    plan.skipped = plan.skippedHard;
+    if (added.length) {
+      plan.reviewItems = [...(plan.reviewItems || []), ...added];
+    }
+    plan.possibleDupItems = [];
+    plan.softDup = 0;
+  }
+
   const items = buildValetTutorItems(plan);
   const opCount = items.reduce((s, g) => s + (g.ops?.length || 1), 0);
-  goView('proposals');
   if (!items.length) {
+    goView('proposals');
     const hard = plan.skippedHard ?? plan.skipped ?? 0;
     clearTutorCards();
     setTutorStatus(
       [
-        `В файле ${plan.total || 0} строк (${plan.source || 'файл'}).`,
-        hard ? `Все уже в базе (hard-дубли: ${hard}) — новых нет.` : 'Новых операций после дедупа нет.',
+        hard
+          ? `Найдено 0 новых записей (${plan.source || 'файл'}). Уже в базе: ${hard} из ${plan.total || 0}.`
+          : `Найдено 0 новых записей (${plan.source || 'файл'}).`,
         `В базе знакомых магазинов: ${countKnownMerchants()}.`,
       ].join('\n'),
       { done: true }
     );
-    toast(hard ? `Новых нет · hard-дубли ${hard}` : 'Новых операций нет');
+    toast(hard ? `Найдено 0 новых · уже есть ${hard}` : 'Найдено 0 новых записей');
     return;
   }
 
-  try {
-    await createServerDump(
-      'import',
-      `перед обучением импорта ${plan.filename || plan.source || ''} (${opCount} новых)`
-    );
-  } catch (err) {
-    console.warn('import dump', err);
-    toast('Импорт остановлен: не удалось сохранить дамп. Проверьте сеть и повторите.');
-    return;
+  if (!plan._fromResume) {
+    try {
+      await createServerDump(
+        'import',
+        `перед обучением импорта ${plan.filename || plan.source || ''} (${opCount} новых)`
+      );
+    } catch (err) {
+      console.warn('import dump', err);
+      toast('Импорт остановлен: не удалось сохранить дамп. Проверьте сеть и повторите.');
+      return;
+    }
   }
 
   const identifiedOps = items.reduce(
     (s, g) => s + (g.identified && g.guess ? g.ops.length : 0),
     0
   );
+  // Ставим tutor ДО goView/renderProposals — иначе render снова зовёт resume.
   valetTutor = {
     plan,
     items,
@@ -7183,25 +9293,118 @@ async function startValetImportTutor(plan) {
     },
     busy: false,
   };
+  _razborUnlocked = true;
+
+  const firstStore = String(items[0]?.receiptMerchant || items[0]?.store || '').trim();
+  let resumeLabel = 'разбор операций';
+  if (plan.source === 'RECEIPT' || plan.source === 'receipt' || (plan._fromResume && items.some((g) => g.sourceType === 'receipt' || g.productName))) {
+    resumeLabel = firstStore ? `разбор чека · ${firstStore}` : 'разбор чека';
+  } else if (plan.source === 'CLIPBOARD') {
+    resumeLabel = 'разбор из буфера';
+  } else {
+    resumeLabel = plan.filename
+      ? `разбор выписки · ${plan.filename}`
+      : 'разбор выписки';
+  }
+  if (plan._fromResume && state.razborResume?.label) {
+    resumeLabel = state.razborResume.label;
+  }
+  rememberRazborResume({
+    source: plan.source || '',
+    label: resumeLabel,
+    totalHint: opCount,
+  });
+  saveState();
 
   closeImportPreview();
   clearTutorCards();
+  const resumeBit = plan._fromResume ? 'Продолжаем с того места, где остановились.' : '';
   setTutorStatus(
     [
-      `Обнаружено ${opCount} новых записей в ${items.length} группах (${plan.source || 'файл'}${plan.filename ? ', ' + plan.filename : ''}).`,
-      `Из них определил: ${identifiedOps}.`,
-      plan.skippedHard || plan.skipped
-        ? `Дубли пропущены: ${plan.skippedHard ?? plan.skipped}.`
+      plan._fromResume
+        ? `Продолжаем: ещё ${opCount} расходов.`
+        : `Найдено ${opCount} новых записей (${plan.source || 'файл'}${plan.filename ? ', ' + plan.filename : ''}).`,
+      identifiedOps ? `Из них определил: ${identifiedOps}.` : '',
+      !plan._fromResume && (plan.skippedHard || plan.skipped)
+        ? `Уже в базе (пропущено): ${plan.skippedHard ?? plan.skipped}.`
         : '',
-      plan.softDup ? `Из них soft (дата+сумма+магазин): ${plan.softDup}.` : '',
+      !plan._fromResume && plan.softDup ? `Сомнительные (похожие): ${plan.softDup} — спрошу до обучения.` : '',
       `В базе знакомых магазинов: ${valetTutor.knownAtStart}.`,
       '',
-      'Однотипные магазины — одной карточкой. Подтверди или поправь группу.',
+      resumeBit || 'Подтверди или поправь в Разборе. При сомнении Валет всегда спросит.',
     ]
       .filter(Boolean)
       .join('\n')
   );
   showValetTutorCard();
+}
+
+/** Имя товара для позиции чека, если в очереди лежит уже сохранённая операция. */
+function productNameFromImportedOp(op) {
+  const direct = String(op.productName || '').trim();
+  if (direct) return direct;
+  const bank = op.bank || {};
+  if (bank.receiptItem || op.sourceType === 'receipt') {
+    return String(op.comment || bank.desc || '').trim();
+  }
+  return '';
+}
+
+/** Собрать план для tutor из живого хвоста очереди (без повторного applyImportPlan). */
+function planFromLiveImportedOps(liveOps) {
+  const live = liveOps || liveRazborOps();
+  const reviewItems = live.map((op) => {
+    const productName = productNameFromImportedOp(op);
+    return {
+      ...op,
+      plannedOpId: op.id,
+      productName,
+      receiptMerchant: productName ? op.store : (op.receiptMerchant || ''),
+      storeRaw: op.storeRaw || op.store,
+      softDup: !!op.softDup,
+      placementHint: op.placementHint || null,
+    };
+  });
+  const meta = state.razborResume || {};
+  const hasReceipt = reviewItems.some(
+    (o) => o.sourceType === 'receipt' || o.productName || (o.bank && o.bank.receiptItem)
+  );
+  return {
+    autoItems: [],
+    reviewItems,
+    skippedHard: 0,
+    skipped: 0,
+    softDup: reviewItems.filter((o) => o.softDup).length,
+    total: reviewItems.length,
+    source: meta.source || (hasReceipt ? 'RECEIPT' : 'RESUME'),
+    filename: '',
+    _fromResume: true,
+  };
+}
+
+/** AD-010.1: «Продолжить» = снова карточки Валета, не старый список. */
+let _razborResumeInFlight = false;
+async function resumeValetImportTutor() {
+  if (_razborResumeInFlight) return;
+  _razborUnlocked = true;
+  const live = liveRazborOps();
+  if (!live.length) {
+    clearRazborResumeIfIdle();
+    clearTutorCards();
+    renderProposals();
+    return;
+  }
+  if (valetTutor && Array.isArray(valetTutor.items) && valetTutor.items.length) {
+    showValetTutorCard();
+    return;
+  }
+  _razborResumeInFlight = true;
+  try {
+    const plan = planFromLiveImportedOps(live);
+    await startValetImportTutor(plan);
+  } finally {
+    _razborResumeInFlight = false;
+  }
 }
 
 function showValetTutorCard() {
@@ -7211,16 +9414,11 @@ function showValetTutorCard() {
   }
   const i = valetTutor.index;
   const item = valetTutor.items[i];
-  // Drop already-resolved ops if we partially confirmed the group.
-  if (Array.isArray(item.ops)) {
-    item.ops = item.ops.filter((o) => !o._tutorDone);
-    if (!item.ops.length) {
-      valetTutor.index += 1;
-      showValetTutorCard();
-      return;
-    }
-    item.count = item.ops.length;
-    item.sum = item.ops.reduce((s, o) => s + Math.abs(Number(o.amount) || 0), 0);
+  // Safety: empty card (should not happen after 1:1 wrap) → skip.
+  if (Array.isArray(item.ops) && !item.ops.length) {
+    valetTutor.index += 1;
+    showValetTutorCard();
+    return;
   }
   const n = i + 1;
   const total = valetTutor.items.length;
@@ -7233,10 +9431,17 @@ function showValetTutorCard() {
   card.className = 'valet-card';
   card.dataset.tutorIndex = String(i);
 
-  const ops = item.ops || [item];
-  const store = item.store || item.storeRaw || '—';
+  // AD-010.1: one card = one expense. Never multi-op mass actions.
+  const ops = item.ops && item.ops.length ? item.ops.slice(0, 1) : [item];
+  const o = ops[0];
+  item.ops = ops;
+  item.count = 1;
+  item.sum = Math.abs(Number(o.amount) || 0);
+  const productName = String(item.productName || o.productName || '').trim();
+  const merchant = String(item.receiptMerchant || o.receiptMerchant || '').trim();
+  const store = productName || item.store || item.storeRaw || '—';
   const amb = item.ambiguity || { kind: 'unknown', label: '', seen: 0 };
-  const unclear = item.kind === 'unclear' || ops.some((o) => isUnclearRow(o));
+  const unclear = item.kind === 'unclear' || isUnclearRow(o);
   const badgeClass = unclear
     ? 'unclear'
     : amb.kind === 'unambiguous'
@@ -7244,12 +9449,8 @@ function showValetTutorCard() {
       : amb.kind === 'ambiguous'
         ? 'warn'
         : 'none';
-  const transfer = !unclear && (ops.some((o) => isLikelyTransfer(o)) || isLikelyTransfer(item));
-  const perOp = ops.length > 1;
+  const transfer = !unclear && !productName && (isLikelyTransfer(o) || isLikelyTransfer(item));
 
-  const countBit = ops.length > 1
-    ? ` · ${ops.length} оп. · сумма ${unclear ? formatSignedAmount(item.sum || 0) : money(item.sum || 0)}`
-    : '';
   let titleStore = store;
   if (unclear) {
     titleStore = `${store} — что это?`;
@@ -7260,62 +9461,23 @@ function showValetTutorCard() {
 
   const titleEl = document.createElement('div');
   titleEl.className = 'vc-title';
-  titleEl.textContent = `Группа ${n} из ${total}. ${titleStore}${countBit}`;
+  titleEl.textContent = `Расход ${n} из ${total}. ${titleStore}`;
   card.appendChild(titleEl);
 
-  const opsHost = document.createElement('div');
-  opsHost.className = perOp ? 'vc-ops' : '';
-  ops.forEach((o, idx) => {
-    const soft = o.softDup ? ' · soft-дубль' : '';
-    if (!perOp) {
-      const line = document.createElement('div');
-      line.className = 'vc-line';
-      line.textContent = `· ${formatTutorOpLine(o)}${soft}`;
-      opsHost.appendChild(line);
-      return;
-    }
-    const row = document.createElement('div');
-    row.className = 'vc-op-row';
-    row.dataset.opIdx = String(idx);
-    const text = document.createElement('span');
-    text.className = 'vc-op-text';
-    text.textContent = `· ${formatTutorOpLine(o)}${soft}`;
-    const btns = document.createElement('span');
-    btns.className = 'vc-op-btns';
-    const ok = document.createElement('button');
-    ok.type = 'button';
-    ok.className = 'vc-op-ok';
-    ok.title = unclear ? 'Доход (заглушка)' : (item.guess ? 'Принять' : 'Принять (нет предложения)');
-    ok.textContent = '✓';
-    if (!unclear && !item.guess) ok.disabled = true;
-    ok.addEventListener('click', () => handleTutorOpLine(item, idx, 'ok', card));
-    const drawer = document.createElement('button');
-    drawer.type = 'button';
-    drawer.className = 'vc-op-drawer';
-    drawer.title = 'В ящик';
-    drawer.textContent = 'Я';
-    drawer.addEventListener('click', () => handleTutorOpLine(item, idx, 'drawer', card));
-    const bad = document.createElement('button');
-    bad.type = 'button';
-    bad.className = 'vc-op-bad';
-    bad.title = 'Удалить — при повторной выписке не показывать';
-    bad.textContent = '✕';
-    bad.addEventListener('click', () => handleTutorOpLine(item, idx, 'delete', card));
-    const assign = document.createElement('button');
-    assign.type = 'button';
-    assign.className = 'vc-op-assign';
-    assign.title = 'Назначить эту строку';
-    assign.textContent = 'Н';
-    assign.addEventListener('click', () => handleTutorOpLine(item, idx, 'assign', card));
-    btns.appendChild(ok);
-    btns.appendChild(drawer);
-    btns.appendChild(bad);
-    btns.appendChild(assign);
-    row.appendChild(text);
-    row.appendChild(btns);
-    opsHost.appendChild(row);
-  });
-  card.appendChild(opsHost);
+  if (productName && merchant) {
+    const shop = document.createElement('div');
+    shop.className = 'vc-line vc-muted';
+    shop.textContent = `Магазин: ${merchant}`;
+    card.appendChild(shop);
+  }
+
+  const soft = o.softDup
+    ? (o.duplicateHint === 'similar' || o.similarTo ? ' · похожая запись — спрошу' : ' · возможный дубль')
+    : '';
+  const line = document.createElement('div');
+  line.className = 'vc-line';
+  line.textContent = `· ${formatTutorOpLine(o)}${soft}`;
+  card.appendChild(line);
 
   if (transfer) {
     const badge = document.createElement('span');
@@ -7360,15 +9522,6 @@ function showValetTutorCard() {
   badge.textContent = unclear ? 'непонятная сумма' : (amb.label || '');
   card.appendChild(badge);
 
-  if (perOp) {
-    const hint = document.createElement('div');
-    hint.className = 'vc-line vc-muted';
-    hint.textContent = unclear
-      ? 'По строкам: ✓ доход, Я в ящик, ✕ удалить, Н назначить.'
-      : 'По строкам: ✓ принять, Я в ящик, ✕ удалить, Н назначить.';
-    card.appendChild(hint);
-  }
-
   const actions = document.createElement('div');
   actions.className = 'vc-actions';
   appendTutorNavButtons(actions, i, total);
@@ -7378,7 +9531,7 @@ function showValetTutorCard() {
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'btn btn-del';
-    delBtn.textContent = ops.length > 1 ? `Удалить · все ${ops.length}` : 'Удалить';
+    delBtn.textContent = 'Удалить';
     delBtn.title = 'Убрать и не показывать при повторной выписке';
     delBtn.addEventListener('click', () => rejectTutorItem(item, card));
     actions.appendChild(delBtn);
@@ -7388,13 +9541,13 @@ function showValetTutorCard() {
     const incomeBtn = document.createElement('button');
     incomeBtn.type = 'button';
     incomeBtn.className = 'btn btn-ok';
-    incomeBtn.textContent = ops.length > 1 ? `Доход · все ${ops.length}` : 'Доход';
+    incomeBtn.textContent = 'Доход';
     incomeBtn.title = 'Скоро — пока заглушка';
     incomeBtn.addEventListener('click', () => stubIncomeTutorItem(item, card));
     const drawerBtn = document.createElement('button');
     drawerBtn.type = 'button';
     drawerBtn.className = 'btn';
-    drawerBtn.textContent = ops.length > 1 ? `В ящик · все ${ops.length}` : 'Убрать в ящик';
+    drawerBtn.textContent = 'Убрать в ящик';
     drawerBtn.addEventListener('click', () => sendTutorItemToDrawer(item, card, 'непонятная сумма'));
     actions.appendChild(incomeBtn);
     actions.appendChild(drawerBtn);
@@ -7406,7 +9559,7 @@ function showValetTutorCard() {
     const okBtn = document.createElement('button');
     okBtn.type = 'button';
     okBtn.className = 'btn btn-ok';
-    okBtn.textContent = ops.length > 1 ? `Верно · все ${ops.length}` : 'Верно';
+    okBtn.textContent = 'Верно';
     okBtn.addEventListener('click', async () => {
       const remember = !!card.querySelector('[data-remember]')?.checked;
       await confirmValetTutorItem(item, item.guess, { correctGuess: true, remember, card });
@@ -7414,18 +9567,18 @@ function showValetTutorCard() {
     const badBtn = document.createElement('button');
     badBtn.type = 'button';
     badBtn.className = 'btn btn-del';
-    badBtn.textContent = ops.length > 1 ? `Не верно · все ${ops.length}` : 'Не верно!';
+    badBtn.textContent = 'Не верно!';
     badBtn.addEventListener('click', () => openValetTeachModal(item, card));
     const assignBtn = document.createElement('button');
     assignBtn.type = 'button';
     assignBtn.className = 'btn';
-    assignBtn.textContent = ops.length > 1 ? `Назначить · все ${ops.length}` : 'Назначить';
+    assignBtn.textContent = 'Назначить';
     assignBtn.title = 'Назначить вручную';
     assignBtn.addEventListener('click', () => openValetTeachModal(item, card));
     const drawerBtn = document.createElement('button');
     drawerBtn.type = 'button';
     drawerBtn.className = 'btn';
-    drawerBtn.textContent = ops.length > 1 ? `В ящик · все ${ops.length}` : 'В ящик';
+    drawerBtn.textContent = 'В ящик';
     drawerBtn.title = 'Не помню — отложу';
     drawerBtn.addEventListener('click', () => sendTutorItemToDrawer(item, card, 'отложено'));
     actions.appendChild(okBtn);
@@ -7438,12 +9591,12 @@ function showValetTutorCard() {
     const assignBtn = document.createElement('button');
     assignBtn.type = 'button';
     assignBtn.className = 'btn btn-ok';
-    assignBtn.textContent = ops.length > 1 ? `Назначить · все ${ops.length}` : 'Назначить';
+    assignBtn.textContent = 'Назначить';
     assignBtn.addEventListener('click', () => openValetTeachModal(item, card));
     const drawerBtn = document.createElement('button');
     drawerBtn.type = 'button';
     drawerBtn.className = 'btn';
-    drawerBtn.textContent = ops.length > 1 ? `В ящик · все ${ops.length}` : 'В ящик';
+    drawerBtn.textContent = 'В ящик';
     drawerBtn.title = 'Не помню — отложу';
     drawerBtn.addEventListener('click', () => sendTutorItemToDrawer(item, card, 'отложено'));
     actions.appendChild(assignBtn);
@@ -7453,101 +9606,6 @@ function showValetTutorCard() {
 
   host.appendChild(card);
   card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function tutorSliceItem(item, opIndexes) {
-  const all = item.ops && item.ops.length ? item.ops : [item];
-  const idxs = Array.isArray(opIndexes) ? opIndexes : [opIndexes];
-  const ops = idxs.map((i) => all[i]).filter(Boolean);
-  if (!ops.length) return null;
-  return {
-    ...item,
-    ops,
-    count: ops.length,
-    sum: ops.reduce((s, o) => s + Math.abs(Number(o.amount) || 0), 0),
-    date: ops[0].date,
-    amount: ops[0].amount,
-    comment: ops[0].comment,
-    bank: ops[0].bank,
-    fingerprint: ops[0].fingerprint,
-  };
-}
-
-function markTutorOpsDone(item, opsDone) {
-  const all = item.ops && item.ops.length ? item.ops : null;
-  if (!all) return;
-  const set = new Set(opsDone);
-  for (const o of all) {
-    if (set.has(o)) o._tutorDone = true;
-  }
-  item.ops = all.filter((o) => !o._tutorDone);
-  item.count = item.ops.length;
-  item.sum = item.ops.reduce((s, o) => s + Math.abs(Number(o.amount) || 0), 0);
-}
-
-async function handleTutorOpLine(item, opIdx, action, card) {
-  if (!valetTutor || valetTutor.busy) return;
-  const ops = item.ops || [item];
-  const op = ops[opIdx];
-  if (!op) return;
-  const unclear = item.kind === 'unclear' || isUnclearRow(op);
-  const slice = tutorSliceItem(item, [opIdx]);
-  if (!slice) return;
-
-  const openAssign = () => {
-    openValetTeachModal(slice, card);
-    valetTeachCtx = { ...(valetTeachCtx || {}), item: slice, cardEl: card, parentItem: item, parentOps: [op] };
-  };
-
-  if (action === 'assign') {
-    openAssign();
-    return;
-  }
-
-  if (action === 'drawer') {
-    const ok = await sendTutorItemToDrawer(
-      slice,
-      card,
-      unclear ? 'непонятная сумма' : 'отложено',
-      { advance: false }
-    );
-    if (!ok) return;
-    markTutorOpsDone(item, [op]);
-    showValetTutorCard();
-    return;
-  }
-
-  if (action === 'delete' || action === 'bad') {
-    const ok = await rejectTutorItem(slice, card, { advance: false });
-    if (!ok) return;
-    markTutorOpsDone(item, [op]);
-    showValetTutorCard();
-    return;
-  }
-
-  // action === 'ok'
-  if (unclear) {
-    const ok = await stubIncomeTutorItem(slice, card, { advance: false });
-    if (!ok) return;
-    markTutorOpsDone(item, [op]);
-    showValetTutorCard();
-    return;
-  }
-
-  if (!item.guess) {
-    openAssign();
-    return;
-  }
-  const remember = !!card.querySelector('[data-remember]')?.checked;
-  const ok = await confirmValetTutorItem(slice, item.guess, {
-    correctGuess: true,
-    remember,
-    card,
-    advance: false,
-  });
-  if (!ok) return;
-  markTutorOpsDone(item, [op]);
-  showValetTutorCard();
 }
 
 async function rejectTutorItem(item, card, { advance = true } = {}) {
@@ -7595,12 +9653,18 @@ function openValetTeachModal(item, cardEl) {
   const ops = item.ops || [item];
   const title = document.getElementById('valetTeachTitle');
   const info = document.getElementById('valetTeachInfo');
-  const transfer = ops.some((o) => isLikelyTransfer(o)) || isLikelyTransfer(item);
+  const productName = String(item.productName || ops[0]?.productName || '').trim();
+  const receiptMerchant = String(item.receiptMerchant || ops[0]?.receiptMerchant || '').trim();
+  const transfer = !productName && (ops.some((o) => isLikelyTransfer(o)) || isLikelyTransfer(item));
   const storeName = canonicalStoreName(item.store || item.storeRaw) || item.store || '';
   if (title) {
-    const bare = String(storeName).replace(/^перевод\s+/i, '').trim() || storeName;
-    const label = transfer ? `Перевод ${bare}` : (storeName || 'магазин');
-    title.textContent = `Назначить: ${label}${ops.length > 1 ? ` (${ops.length} оп.)` : ''}`;
+    if (productName) {
+      title.textContent = `Назначить: ${productName}`;
+    } else {
+      const bare = String(storeName).replace(/^перевод\s+/i, '').trim() || storeName;
+      const label = transfer ? `Перевод ${bare}` : (storeName || 'магазин');
+      title.textContent = `Назначить: ${label}`;
+    }
   }
   if (info) {
     info.textContent = ops.map((o) => formatTutorOpLine(o)).join(' · ')
@@ -7615,13 +9679,25 @@ function openValetTeachModal(item, cardEl) {
   const cat = fillValetTeachCategories(walletEl?.value || 'personal', g.category);
   fillExpenseList(cat);
   const expEl = document.getElementById('valetTeachExpense');
-  if (expEl) expEl.value = g.expense || ((DATA.expensePresets && DATA.expensePresets[cat]) || [])[0] || '';
+  if (expEl) {
+    // Чек: в «Расход» — наименование товара с чека, не общая подкатегория ИИ.
+    expEl.value = productName
+      || g.expense
+      || ((DATA.expensePresets && DATA.expensePresets[cat]) || [])[0]
+      || '';
+  }
   const storeInput = document.getElementById('valetTeachStore');
-  if (storeInput) storeInput.value = String(item.storeRaw || storeName || '').trim();
+  if (storeInput) {
+    storeInput.value = String(
+      receiptMerchant || item.storeRaw || storeName || ''
+    ).trim();
+  }
   const noteEl = document.getElementById('valetTeachNote');
   if (noteEl) {
     const first = ops[0] || item;
-    noteEl.value = String(first.comment || first.note || g.note || '').trim();
+    noteEl.value = String(
+      productName || first.comment || first.note || g.note || ''
+    ).trim();
   }
   const objEl = document.getElementById('valetTeachObject');
   const custEl = document.getElementById('valetTeachCustomer');
@@ -7721,7 +9797,22 @@ async function confirmValetTutorItem(item, placement, { correctGuess, remember, 
   }
   if (valetTutor) valetTutor.busy = true;
   try {
-    const storeRaw = String(placement.store || item.store || item.storeRaw || '').trim();
+    const ops = item.ops && item.ops.length ? item.ops : [item];
+    const firstOp = ops[0] || item;
+    const productName = String(firstOp.productName || item.productName || '').trim();
+    const receiptMerchant = String(
+      placement.store
+      || firstOp.receiptMerchant
+      || item.receiptMerchant
+      || ''
+    ).trim();
+    const storeRaw = String(
+      receiptMerchant
+      || placement.store
+      || item.store
+      || item.storeRaw
+      || ''
+    ).trim();
     // Keep bank name when user typed a short alias in the modal
     const store = storeRaw || canonicalStoreName(item.store || item.storeRaw) || '';
     if (!store) {
@@ -7731,7 +9822,7 @@ async function confirmValetTutorItem(item, placement, { correctGuess, remember, 
     const chosen = {
       wallet: placement.wallet || 'personal',
       category: placement.category,
-      expense: placement.expense,
+      expense: placement.expense || productName || placement.category,
       accountId: preferAccountId(placement.accountId || ''),
       note: placement.note != null ? String(placement.note) : undefined,
       object: placement.object,
@@ -7745,27 +9836,38 @@ async function confirmValetTutorItem(item, placement, { correctGuess, remember, 
       toast('Выберите категорию');
       return false;
     }
-    const ops = item.ops && item.ops.length ? item.ops : [item];
+    const isReceiptLine = !!(productName || firstOp.sourceType === 'receipt' || item.sourceType === 'receipt');
+    const learnKey = productName || store;
     const batch = await createExpenseBatch(ops, (op) => ({
-      sourceType: sourceTypeFromLabel(op.sourceType || (item.fromDrawer ? 'manual' : 'excel')),
+      sourceType: sourceTypeFromLabel(
+        op.sourceType || item.sourceType || (item.fromDrawer ? 'manual' : 'excel')
+      ),
       sourceOperationId: op.id || op.plannedOpId,
       raw: op,
       opId: op.id || op.plannedOpId,
       wallet: chosen.wallet,
       date: op.date,
       amount: op.amount,
+      qty: op.qty ?? op.receiptLine?.qty,
+      unit: op.unit || op.receiptLine?.unit,
+      unitPrice: op.unitPrice ?? op.price ?? op.receiptLine?.price,
+      price: op.unitPrice ?? op.price ?? op.receiptLine?.price,
       accountId: chosen.accountId,
       category: chosen.category,
       expense: chosen.expense,
       store,
       note: chosen.note !== undefined
         ? chosen.note
-        : String(op.comment || op.note || '').trim(),
+        : String(op.productName || op.comment || op.note || '').trim(),
       object: chosen.wallet === 'business' ? chosen.object : undefined,
       customer: chosen.wallet === 'business' ? chosen.customer : undefined,
       fundId: chosen.fundId,
       proposed: item.guess || null,
       confirmedByUser: true,
+      purchaseId: op.purchaseId || item.purchaseId || '',
+      receiptInfo: op.receiptInfo || item.receiptInfo || null,
+      // AD-010.2: позиции чека тоже проходят дедуп (дата + сумма + имя товара).
+      skipDuplicateCheck: false,
     }));
     const processed = batch.results.filter((result) => result.ok).length;
 
@@ -7775,6 +9877,19 @@ async function confirmValetTutorItem(item, placement, { correctGuess, remember, 
       return false;
     }
 
+    for (const result of batch.results) {
+      if (!result.ok) continue;
+      attachExpenseToPurchase(
+        firstOp.purchaseId || item.purchaseId,
+        result.opId,
+        result.sourceOperationId
+      );
+    }
+    const purchase = purchaseById(firstOp.purchaseId || item.purchaseId);
+    if (purchase && purchase.status === 'open' && purchase.expenseOpIds.length) {
+      purchase.status = 'confirmed';
+    }
+
     await mutate(
       (st) => {
         if (item.fromDrawer && item.drawerId) {
@@ -7782,23 +9897,28 @@ async function confirmValetTutorItem(item, placement, { correctGuess, remember, 
           st.drawerOps = st.drawerOps.filter((o) => String(o.id) !== String(item.drawerId));
         }
         ensureCategory(chosen.wallet, chosen.category);
-        recordOutcome(store, chosen);
-        const canon = canonicalStoreName(store) || store;
-        if (storeKey(canon) !== storeKey(store)) recordOutcome(canon, chosen);
-        if (item.storeRaw && storeKey(item.storeRaw) !== storeKey(store)) {
-          recordOutcome(item.storeRaw, chosen);
-          learnMerchantAlias(store, item.storeRaw);
+        recordOutcome(learnKey, chosen);
+        const canonLearn = canonicalStoreName(learnKey) || learnKey;
+        if (storeKey(canonLearn) !== storeKey(learnKey)) recordOutcome(canonLearn, chosen);
+        // For receipt products do not teach the shop as "always this category".
+        if (!isReceiptLine) {
+          if (item.storeRaw && storeKey(item.storeRaw) !== storeKey(store)) {
+            recordOutcome(item.storeRaw, chosen);
+            learnMerchantAlias(store, item.storeRaw);
+          }
         }
         if (remember) {
-          setMerchantAuto(store, true);
-          if (storeKey(canon) !== storeKey(store)) setMerchantAuto(canon, true);
-          if (item.storeRaw && storeKey(item.storeRaw) !== storeKey(store)) {
+          setMerchantAuto(learnKey, true);
+          if (storeKey(canonLearn) !== storeKey(learnKey)) setMerchantAuto(canonLearn, true);
+          if (!isReceiptLine && item.storeRaw && storeKey(item.storeRaw) !== storeKey(store)) {
             setMerchantAuto(item.storeRaw, true);
           }
         }
         pushLearnLog({
           type: correctGuess ? 'tutor_confirm' : 'tutor_correct',
-          store,
+          store: learnKey,
+          merchant: store,
+          productName: productName || '',
           ...chosen,
           remember: !!remember,
           hadGuess: !!item.guess,
@@ -7835,7 +9955,16 @@ async function confirmValetTutorItem(item, placement, { correctGuess, remember, 
     return true;
   } catch (err) {
     console.error(err);
-    toast('Не удалось сохранить в БД: ' + (err.message || err));
+    await reportUserError({
+      source: 'import',
+      stage: 'confirm',
+      errorType: 'technical_failure',
+      title: 'Не получилось сохранить расход',
+      userMessage: 'Не удалось записать расход в базу. Проверьте сеть и повторите.',
+      technicalMessage: err?.message || String(err),
+      error: err,
+      recommendations: defaultTipsForErrorKind('technical_failure'),
+    });
     return false;
   } finally {
     if (valetTutor) valetTutor.busy = false;
@@ -7869,7 +9998,7 @@ async function finishValetImportTutor() {
   const lines = [
     'Итог обучения:',
     `Добавлено записей: ${s.confirmed}.`,
-    `Групп разобрано: ${valetTutor.stats.cards || '—'}.`,
+    `В обучении было расходов: ${s.total || '—'}.`,
     `Из них я определил правильно: ${s.correct}.`,
     `Обучился / поправил: ${s.confirmed - s.correct}.`,
     s.drawer ? `В ящик: ${s.drawer}.` : '',
@@ -7915,6 +10044,8 @@ async function finishValetImportTutor() {
 
   setTutorStatus(lines.join('\n') + recentBit, { done: true });
   clearTutorCards();
+  clearRazborResumeIfIdle();
+  saveState();
   goView('proposals');
   valetTutor = null;
   // Rebuild queryable tables once after the session (was skipped on each card).
@@ -8037,41 +10168,25 @@ async function commitImportPreview() {
 }
 
 function buildImportGroups() {
-  ensureImportedOps();
-  const live = state.importedOps.filter(o => !isGone(o.id));
-  const byStore = new Map();
-  for (const op of live) {
-    if (!byStore.has(op.store)) byStore.set(op.store, []);
-    byStore.get(op.store).push(op);
-  }
-  return [...byStore.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0], 'ru'))
-    .map(([name, ops]) => ({
-      name,
-      needsCheck: true,
-      ops: ops.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))),
-    }));
+  // AD-010.1 / AD-011: хвост импорта больше не рисуется старым списком групп.
+  // Продолжение — только карточки Валета (resumeValetImportTutor).
+  return [];
 }
 function proposalSections() {
-  const sections = DATA.sections.slice();
-  const groups = buildImportGroups();
-  if (groups.length) {
-    sections.push({
-      title: 'Импорт выписки',
-      wallet: 'personal',
-      category: 'Разобрать',
-      expense: 'Разобрать',
-      groups,
-    });
-  }
-  return sections;
+  // Статические секции bootstrap (если ещё есть живые id). Импорт сюда не подмешиваем.
+  return DATA.sections.slice();
 }
 
 function isGone(id) {
   return state.confirmedIds.has(id) || (state.deletedIds && state.deletedIds.has(id));
 }
 function remainingStats() {
+  // Очередь импорта (карточки Валета) + остатки старых bootstrap-секций.
   let n = 0, sum = 0;
+  for (const op of liveRazborOps()) {
+    n++;
+    sum += Number(op.amount) || 0;
+  }
   for (const sec of proposalSections())
     for (const g of sec.groups)
       for (const op of g.ops)
@@ -8152,6 +10267,143 @@ function goView(view, { activateNav = true } = {}) {
   if (view === 'valet') openValetScreen();
 }
 
+/** Live queue in Разбор (not yet confirmed / deleted). */
+function liveRazborOps() {
+  ensureImportedOps();
+  return (state.importedOps || []).filter((o) => o && !isGone(o.id));
+}
+
+function rememberRazborResume({ source = '', label = '', totalHint = 0 } = {}) {
+  const cleanLabel = String(label || '').trim();
+  const cleanSource = String(source || '').trim();
+  state.razborResume = {
+    label: cleanLabel,
+    source: cleanSource,
+    at: new Date().toISOString(),
+    totalHint: Number(totalHint) || 0,
+  };
+  // New unfinished wave → allow prompt again after reload / next visit.
+  _razborResumePromptKey = '';
+  // Пользователь только что сам запустил импорт — прятать от него результат не нужно.
+  _razborUnlocked = true;
+}
+
+function clearRazborResumeIfIdle() {
+  if (liveRazborOps().length) return;
+  state.razborResume = null;
+  _razborUnlocked = false;
+  _razborResumePromptKey = '';
+}
+
+function razborResumeFingerprint() {
+  const live = liveRazborOps();
+  if (!live.length) return '';
+  const ids = live.map((o) => String(o.id)).sort().join(',');
+  return `${live.length}|${ids}`;
+}
+
+function razborResumeSummary() {
+  const live = liveRazborOps();
+  if (!live.length) return null;
+  const meta = state.razborResume || {};
+  const stores = [...new Set(live.map((o) => String(o.store || '').trim()).filter(Boolean))];
+  const storeHint = stores.slice(0, 2).join(', ') + (stores.length > 2 ? '…' : '');
+  const hasReceipt = live.some((o) =>
+    sourceTypeFromLabel(o.sourceType) === 'receipt' || o.productName || (o.receiptInfo && o.receiptInfo.fiscalId)
+  );
+  let kind = 'разбор';
+  if (meta.label) kind = meta.label;
+  else if (hasReceipt) kind = storeHint ? `разбор чека · ${storeHint}` : 'разбор чека';
+  else if (/RECEIPT/i.test(meta.source || '')) kind = storeHint ? `разбор чека · ${storeHint}` : 'разбор чека';
+  else if (storeHint) kind = `разбор · ${storeHint}`;
+  else kind = 'разбор операций';
+  return {
+    count: live.length,
+    kind,
+    text: `Остался незавершённый процесс: ${kind} (ещё ${live.length}).`,
+    fingerprint: razborResumeFingerprint(),
+  };
+}
+
+let _razborResumePromptKey = '';
+let _razborResumeResolver = null;
+/** Хвост очереди скрыт, пока пользователь не ответил «Да» на «Продолжить?». */
+let _razborUnlocked = false;
+
+function unlockRazborQueue({ rerender = true } = {}) {
+  _razborUnlocked = true;
+  // «Да» / «Продолжить разбор» → только карточки Валета (AD-010.1).
+  resumeValetImportTutor().catch((err) => {
+    console.warn('resume tutor', err);
+    if (rerender) renderProposals();
+  });
+}
+
+function renderRazborLockedPlaceholder(root) {
+  const summary = razborResumeSummary();
+  const box = document.createElement('div');
+  box.className = 'empty';
+  const text = document.createElement('div');
+  text.textContent = summary
+    ? summary.text
+    : 'Есть незавершённый разбор.';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn btn-ok';
+  btn.style.marginTop = '10px';
+  btn.textContent = 'Продолжить разбор';
+  btn.addEventListener('click', () => unlockRazborQueue());
+  box.appendChild(text);
+  box.appendChild(btn);
+  root.appendChild(box);
+}
+
+function openRazborResumeModal(summary) {
+  return new Promise((resolve) => {
+    _razborResumeResolver = resolve;
+    const detail = document.getElementById('razborResumeDetail');
+    if (detail) detail.textContent = summary.text;
+    document.getElementById('razborResumeModal')?.classList.add('show');
+  });
+}
+
+function closeRazborResumeModal(answer) {
+  document.getElementById('razborResumeModal')?.classList.remove('show');
+  const resolve = _razborResumeResolver;
+  _razborResumeResolver = null;
+  if (typeof resolve === 'function') resolve(!!answer);
+}
+
+async function maybePromptRazborResume() {
+  clearRazborResumeIfIdle();
+  const summary = razborResumeSummary();
+  if (!summary) return false;
+  if (_razborUnlocked && valetTutor) return false;
+  if (_razborUnlocked && !liveRazborOps().length) return false;
+  if (_razborResumePromptKey === summary.fingerprint && !_razborUnlocked) {
+    // Уже сказали «Нет» на этот хвост — не долбим модалкой снова, только заглушка.
+    return false;
+  }
+  if (_razborUnlocked) {
+    await resumeValetImportTutor();
+    return true;
+  }
+  const proceed = await openRazborResumeModal(summary);
+  _razborResumePromptKey = summary.fingerprint;
+  if (proceed) await resumeValetImportTutor();
+  else renderProposals();
+  return true;
+}
+
+async function enterRazborView() {
+  goView('proposals');
+  await maybePromptRazborResume();
+}
+
+document.getElementById('razborResumeYes')?.addEventListener('click', () => closeRazborResumeModal(true));
+document.getElementById('razborResumeNo')?.addEventListener('click', () => closeRazborResumeModal(false));
+bindModalBackdropClose('razborResumeModal', () => closeRazborResumeModal(false));
+
 document.querySelectorAll('.topnav .navbtn').forEach(btn => {
   btn.addEventListener('click', () => {
     const view = btn.dataset.view;
@@ -8161,6 +10413,10 @@ document.querySelectorAll('.topnav .navbtn').forEach(btn => {
     }
     if (view === 'valet') {
       goView('valet', { activateNav: true });
+      return;
+    }
+    if (view === 'proposals') {
+      enterRazborView();
       return;
     }
     goView(view);
@@ -8422,10 +10678,10 @@ function appendValetMsg(role, text, meta, opts = {}) {
 }
 
 /** Show + persist critical system alerts in Valet chat (OpenRouter down, forced fallback, …). */
-async function notifyValetCritical(alerts, { goToValet = false } = {}) {
+async function notifyValetCritical(alerts, { goToValet = false, quiet = false } = {}) {
   const list = Array.isArray(alerts) ? alerts.filter(Boolean) : [];
   if (!list.length) return null;
-  if (goToValet) goView('valet');
+  if (goToValet && !quiet) goView('valet');
   try {
     const res = await fetch(WALLET_VALET_API + '/critical', {
       method: 'POST',
@@ -8442,7 +10698,8 @@ async function notifyValetCritical(alerts, { goToValet = false } = {}) {
       try { sessionStorage.setItem(VALET_CONVERSATION_KEY, _valetConversationId); } catch (_) {}
     }
     const messages = Array.isArray(data.messages) ? data.messages : [];
-    if (messages.length) {
+    // quiet = persist only (user-error modal already shown; don't spam Valet chat)
+    if (!quiet && messages.length) {
       for (const m of messages) {
         appendValetMsg('assistant', m.content || data.text || 'Критическая ошибка', 'критическая ошибка', {
           messageId: m.message_id,
@@ -8455,6 +10712,7 @@ async function notifyValetCritical(alerts, { goToValet = false } = {}) {
     return data;
   } catch (err) {
     console.warn('valet critical', err);
+    if (quiet) return null;
     // Still show in UI even if persist failed
     const fallback = list.map((a) => {
       const title = a.title || 'Критическая ошибка';
@@ -8713,11 +10971,20 @@ if ('serviceWorker' in navigator) {
 function makeRow(
   wallet,
   {opId, date, category, expense, store, amount, note, accountId, object, customer, fundId,
-    sourceOperationId, fingerprint}
+    sourceOperationId, fingerprint, purchaseId, qty, unit, unitPrice, price}
 ) {
+  const cost = absCost(amount);
+  const q = Number(qty);
+  const useQty = Number.isFinite(q) && q > 0 ? q : 1;
+  const u = String(unit || '').trim() || 'шт';
+  const up = Number(unitPrice ?? price);
   const row = {
-    opId, date: formatDate(date), category, expense, unit: 'шт', qty: 1,
-    price: absCost(amount), cost: absCost(amount), store,
+    opId, date: formatDate(date), category, expense,
+    unit: u,
+    qty: useQty,
+    price: Number.isFinite(up) && up > 0 ? absCost(up) : cost,
+    cost,
+    store,
     object: (object && String(object).trim()) || 'Гостевой 5×8',
     customer: (customer && String(customer).trim()) || 'Феруз',
     note: note || '',
@@ -8726,6 +10993,7 @@ function makeRow(
   if (fundId) row.fundId = String(fundId);
   if (sourceOperationId) row.sourceOperationId = String(sourceOperationId);
   if (fingerprint) row.fingerprint = String(fingerprint);
+  if (purchaseId) row.purchaseId = String(purchaseId);
   return row;
 }
 function accountById(id) {
@@ -8893,10 +11161,31 @@ function bankOrigLinesHtml(ops) {
 function renderProposals() {
   if (!state.deletedIds) state.deletedIds = new Set();
   ensureImportedOps();
+  clearRazborResumeIfIdle();
   ensureDrawerOps();
   renderDrawerPanel();
   const root = document.getElementById('proposalsRoot');
   root.innerHTML = '';
+  const liveImport = liveRazborOps();
+  // Незавершённый хвост: до «Да» — только вопрос; после «Да» — карточки Валета, не старый список.
+  if (liveImport.length && !_razborUnlocked) {
+    renderRazborLockedPlaceholder(root);
+    updateStats();
+    return;
+  }
+  if (liveImport.length && _razborUnlocked && !valetTutor) {
+    // Разблокировали, но tutor ещё не поднят (например после перерисовки) — поднимаем.
+    if (!_razborResumeInFlight) {
+      resumeValetImportTutor().catch((err) => console.warn('resume tutor', err));
+    }
+    updateStats();
+    return;
+  }
+  if (valetTutor) {
+    // Пока идёт обучение — proposalsRoot пустой; карточки живут в tutorCardHost.
+    updateStats();
+    return;
+  }
   for (const sec of proposalSections()) {
     const liveGroups = sec.groups.map(g => ({
       ...g, ops: g.ops.filter(o => !isGone(o.id)),
@@ -8977,10 +11266,6 @@ function renderProposals() {
               <div class="compare-val">${bankOrigLinesHtml(g.ops)}</div>
             </div>
           </div>
-          <div class="assign-fields" style="padding-top:0">
-            <button type="button" class="btn btn-ok btn-learn-auto" title="Включить авто для этого магазина">Авто</button>
-            <button type="button" class="btn btn-del btn-learn-ask" title="Всегда спрашивать">Спрашивать</button>
-          </div>
         </div>
         <div class="ops"><table>
           <thead><tr>
@@ -9044,25 +11329,6 @@ function renderProposals() {
       card.querySelector('.btn-confirm-group').addEventListener('click', () => confirmGroup(sec, g, card));
       card.querySelector('.btn-misc-group').addEventListener('click', () => confirmMiscGroup(g, card));
       card.querySelector('.btn-del-group').addEventListener('click', () => deleteProposalGroup(g, card));
-      card.querySelector('.btn-learn-auto')?.addEventListener('click', () => {
-        const store = g.storeLabel || g.name;
-        const wallet = card.querySelector('.as-wallet').value || 'personal';
-        const category = card.querySelector('.as-cat').value;
-        const expense = (card.querySelector('.as-exp').value || '').trim() || category;
-        const accountId = card.querySelector('.as-acc')?.value || '';
-        recordOutcome(store, { wallet, category, expense, accountId });
-        setMerchantAuto(store, true);
-        saveState();
-        renderProposals();
-        toast(`Авто: ${store} → ${category}/${expense}`);
-      });
-      card.querySelector('.btn-learn-ask')?.addEventListener('click', () => {
-        const store = g.storeLabel || g.name;
-        setMerchantAuto(store, false);
-        saveState();
-        renderProposals();
-        toast(`Всегда спрашивать: ${store}`);
-      });
       card.querySelectorAll('.btn-assign').forEach(btn => {
         btn.addEventListener('click', () => openAssignModal({
           mode: 'op', sec, g, cardEl: card, opId: Number(btn.dataset.opid),
@@ -9201,17 +11467,17 @@ function ensureCategory(wallet, name, color) {
     color: color || (w === 'business' ? '#64748B' : '#3B82F6'),
   });
 }
-/** Preselect a category in a SmartSelect field.
- * emptyDefault: leave the field blank so focus shows the full list (add-expense form). */
+/** Preselect a category field.
+ * Never auto-pick the most popular category (e.g. «Транспорт») — that trapped users.
+ * emptyDefault: leave blank when no selected (manual add-expense). */
 function setCategoryField(inputId, wallet, selected, { emptyDefault = false } = {}) {
   const el = document.getElementById(inputId);
   if (!el) return '';
-  const cats = catsForWallet(wallet);
-  let prefer = '';
-  if (selected && cats.some((c) => c.name === selected)) prefer = selected;
-  else if (!emptyDefault) prefer = (cats[0] && cats[0].name) || '';
+  const prefer = String(selected || '').trim();
+  // Свободный текст / подсказка ИИ — без подстановки cats[0].
   el.value = prefer;
-  return prefer;
+  if (!prefer && emptyDefault) el.value = '';
+  return el.value;
 }
 function fillEditRowCategories(wallet, selected) {
   ensureCategory(wallet, selected);
@@ -12241,6 +14507,8 @@ function smartBizCfg(field, fallback, label) {
 for (const form of ['manExp', 'editRow', 'modal', 'valetTeach']) {
   const byId = (suffix) => document.getElementById(form + suffix);
   attachSmartSelect(byId('Store'), SMART_STORE_CFG);
+  // Категория = как «Расход»: клик → список, «Н» → совпадения.
+  // Не автоподставляем популярную (Транспорт) в value — см. setCategoryField.
   attachSmartSelect(byId('Category'), smartCategoryCfg(form + 'Wallet'));
   attachSmartSelect(byId('Expense'), smartExpenseCfg(form + 'Category'));
   attachSmartSelect(byId('Object'), smartBizCfg('object', 'Гостевой 5×8', 'Создать объект'));
@@ -12481,6 +14749,35 @@ document.getElementById('importCsvBtn')?.addEventListener('click', () => {
   document.getElementById('importCsvInput').click();
 });
 
+function openReceiptSourceModal() {
+  document.getElementById('receiptSourceModal')?.classList.add('show');
+}
+function closeReceiptSourceModal() {
+  document.getElementById('receiptSourceModal')?.classList.remove('show');
+}
+function pickReceiptFile(mode) {
+  closeReceiptSourceModal();
+  const id = mode === 'camera' ? 'importReceiptCameraInput' : 'importReceiptInput';
+  const input = document.getElementById(id);
+  if (!input) return;
+  // Сброс value до click, чтобы повтор того же файла снова сработал.
+  input.value = '';
+  input.click();
+}
+document.getElementById('importReceiptBtn')?.addEventListener('click', openReceiptSourceModal);
+document.getElementById('receiptSourceCamera')?.addEventListener('click', () => pickReceiptFile('camera'));
+document.getElementById('receiptSourceGallery')?.addEventListener('click', () => pickReceiptFile('gallery'));
+document.getElementById('receiptSourceCancel')?.addEventListener('click', closeReceiptSourceModal);
+bindModalBackdropClose('receiptSourceModal', closeReceiptSourceModal);
+
+async function onReceiptFileChosen(e) {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (file) await runReceiptFromFile(file);
+}
+document.getElementById('importReceiptInput')?.addEventListener('change', onReceiptFileChosen);
+document.getElementById('importReceiptCameraInput')?.addEventListener('change', onReceiptFileChosen);
+
 function openImportPasteModal() {
   const ta = document.getElementById('importPasteText');
   if (ta && !ta.value.trim()) {
@@ -12587,12 +14884,7 @@ document.getElementById('importCsvInput')?.addEventListener('change', async (e) 
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
   if (!file) return;
-  try {
-    await runImportPlanFromFile(file);
-  } catch (err) {
-    console.error(err);
-    toast('Ошибка импорта: ' + (err.message || err));
-  }
+  await runImportPlanFromFile(file);
 });
 document.getElementById('valetAttachBtn')?.addEventListener('click', () => {
   document.getElementById('valetStatementInput')?.click();
@@ -12602,14 +14894,44 @@ document.getElementById('valetStatementInput')?.addEventListener('change', async
   e.target.value = '';
   if (!file) return;
   appendValetMsg('user', `Файл: ${file.name}`);
+  const name = String(file.name || '').toLowerCase();
+  const type = String(file.type || '').toLowerCase();
+  const isImage = type.startsWith('image/') || /\.(png|jpe?g|webp|gif|heic|heif)$/.test(name);
   try {
-    await runImportPlanFromFile(file);
-    appendValetMsg('assistant', 'Обучение по карточкам открыл во вкладке «Разбор».', 'импорт', {
-      allowRating: false,
-    });
+    if (isImage) {
+      // AD-010: фото чека → позиции → пакет, НЕ «один расход по магазину»
+      appendValetMsg(
+        'assistant',
+        'Это фото — разбираю как чек магазина: каждая позиция станет отдельным расходом после твоего подтверждения. Категория — у товара, не у магазина.',
+        'чек',
+        { allowRating: false }
+      );
+      await runReceiptFromFile(file);
+    } else {
+      const plan = await runImportPlanFromFile(file);
+      if (plan) {
+        appendValetMsg('assistant', 'Обучение по карточкам открыл во вкладке «Разбор».', 'импорт', {
+          allowRating: false,
+        });
+      }
+    }
   } catch (err) {
     console.error(err);
-    appendValetMsg('assistant', 'Не удалось распознать файл: ' + (err.message || err));
+    await reportUserError({
+      source: isImage ? 'receipt' : (/pdf/i.test(name) ? 'pdf' : 'import'),
+      stage: 'recognition',
+      errorType: classifyImportErrorKind(err),
+      title: 'Не получилось обработать данные',
+      userMessage: 'Не удалось распознать файл.',
+      technicalMessage: err?.message || String(err),
+      error: err,
+      recommendations: defaultTipsForErrorKind(classifyImportErrorKind(err)),
+      metadata: {
+        filename: String(file.name || '').slice(0, 120),
+        mimeType: String(file.type || '').slice(0, 80),
+        sizeBytes: Number(file.size) || 0,
+      },
+    });
   }
 });
 document.getElementById('importPreviewCancel')?.addEventListener('click', closeImportPreview);
@@ -12617,25 +14939,45 @@ document.getElementById('importPreviewConfirm')?.addEventListener('click', commi
 bindModalBackdropClose('importPreviewModal', closeImportPreview);
 document.getElementById('valetTeachCancel')?.addEventListener('click', closeValetTeachModal);
 bindModalBackdropClose('valetTeachModal', closeValetTeachModal);
+
+/** Не затирать «Расход»: для позиции чека это имя товара; иначе — то, что уже ввёл человек. */
+function valetTeachProductName() {
+  const item = valetTeachCtx?.item;
+  if (!item) return '';
+  const ops = item.ops || [item];
+  return String(item.productName || ops[0]?.productName || '').trim();
+}
+function refillValetTeachExpenseList(category, { forcePreset = false } = {}) {
+  fillExpenseList(category);
+  const expEl = document.getElementById('valetTeachExpense');
+  if (!expEl) return;
+  const product = valetTeachProductName();
+  if (product) {
+    // AD-010.1: позиция чека — «Расход» = товар; смена категории его не трогает.
+    expEl.value = product;
+    return;
+  }
+  const cur = String(expEl.value || '').trim();
+  if (cur && !forcePreset) return;
+  const presets = (DATA.expensePresets && DATA.expensePresets[category]) || [];
+  if (presets.length) expEl.value = presets[0];
+}
+
 document.getElementById('valetTeachWallet')?.addEventListener('change', (e) => {
   const wallet = e.target.value;
   syncValetTeachWalletFields(wallet);
   const cat = fillValetTeachCategories(wallet);
-  fillExpenseList(cat);
-  const presets = (DATA.expensePresets && DATA.expensePresets[cat]) || [];
-  if (presets.length) document.getElementById('valetTeachExpense').value = presets[0];
+  refillValetTeachExpenseList(cat);
 });
 document.getElementById('valetTeachCategory')?.addEventListener('change', (e) => {
-  fillExpenseList(e.target.value);
-  const presets = (DATA.expensePresets && DATA.expensePresets[e.target.value]) || [];
-  if (presets.length) document.getElementById('valetTeachExpense').value = presets[0];
+  refillValetTeachExpenseList(e.target.value);
 });
 document.getElementById('valetTeachSave')?.addEventListener('click', async () => {
   if (!valetTeachCtx) return;
   const saveBtn = document.getElementById('valetTeachSave');
   if (saveBtn?.dataset.busy === '1') return;
   const ctx = valetTeachCtx;
-  const { item, cardEl, parentItem, parentOps } = ctx;
+  const { item, cardEl } = ctx;
   const wallet = document.getElementById('valetTeachWallet')?.value || 'personal';
   const accountId = document.getElementById('valetTeachAccount')?.value || '';
   if (!accountId) { toast('Выберите счёт'); return; }
@@ -12663,7 +15005,6 @@ document.getElementById('valetTeachSave')?.addEventListener('click', async () =>
   }
   const placement = { wallet, category, expense, accountId, note, store, object, customer };
   const correctGuess = !!(item.guess && samePlacement(item.guess, placement));
-  const partial = !!(parentItem && parentOps && parentOps.length);
   if (saveBtn) {
     saveBtn.dataset.busy = '1';
     saveBtn.disabled = true;
@@ -12674,14 +15015,10 @@ document.getElementById('valetTeachSave')?.addEventListener('click', async () =>
       correctGuess,
       remember,
       card: cardEl,
-      advance: !partial,
+      advance: true,
     });
     if (!saved) return; // keep modal open so user can fix and retry
     closeValetTeachModal();
-    if (partial) {
-      markTutorOpsDone(parentItem, parentOps);
-      showValetTutorCard();
-    }
   } finally {
     if (saveBtn) {
       saveBtn.dataset.busy = '';
@@ -12704,7 +15041,15 @@ function escapeAttr(s) { return escapeHtml(s); }
 seedMerchantsFromHistory();
 updateImportHint();
 renderProposals();
-syncPostgresSoT();
+syncPostgresSoT().finally(() => {
+  try {
+    if (document.getElementById('view-proposals')?.classList.contains('active')) {
+      maybePromptRazborResume();
+    }
+  } catch (err) {
+    console.warn('razbor resume prompt', err);
+  }
+});
 if (state._migrateTransportCompound > 0) {
   toast(`Транспорт свёрнут: ${state._migrateTransportCompound}`);
 }

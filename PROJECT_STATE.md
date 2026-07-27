@@ -10,7 +10,7 @@
 
 **Контракт JSON:** `contextVersion`, `updatedAt`, `version`, `architectureRules[]` (жёсткие AD), `accepted` / `inProgress` / `nextActions`, `doNotDoNow`. Обновлять одновременно с этим файлом. Не копия roadmap — официальный машинный контекст.
 
-**Снимок:** 2026-07-26 · UI_BUILD **58** / schema 11 · contextVersion **1**. Roadmap — нумерованный аккордеон со статусом **Проверил**. **Фокус: стабилизация завершена.** Настройки и `/logs`: **Проверил 26.07.2026**. Контрольная точка **v58 в `main`**.
+**Снимок:** 2026-07-27 · UI_BUILD **78** / schema **12** · contextVersion **1**. **AD-011** + **Этап 1 reconciliation** (банк ≠ товар; `bank.comment` не productName). Разбор: **1 карточка = 1 расход**; ящик: «Вернуть назад». Purchase↔Bank — волна 2 после приёмки Этапа 1.
 
 ---
 
@@ -18,8 +18,8 @@
 
 | Файл | Статус |
 |------|--------|
-| `review_categorization.html` / `public/index.html` | UI_BUILD **58** · schema **11** · идентичны |
-| `public/sw.js` | `wallet-shell-v58` |
+| `review_categorization.html` / `public/index.html` | UI_BUILD **78** · schema **12** · идентичны |
+| `public/sw.js` | `wallet-shell-v78` |
 | `README.md` | создан: запуск, тесты, карта документации, раздел «UI Patterns → SmartSelect» |
 | `api/` | восстановлен из контейнера 2026-07-25 (`main.py`, `statement_parse.py`, `critical_alerts.py`, `valet_*.py`, `requirements.txt`) |
 | дамп-страховка | `data/dumps/makc/250726/` · revision 269 · reason `pre_repair_wave` |
@@ -48,6 +48,11 @@
 - Store combobox (v51): поле «Магазин» — searchable dropdown (популярные + алфавит, поиск по началу/части слова, кросс-алфавит translit, «Создать новый»). Подключено к `manExpStore` / `editRowStore` / `modalStore`.
 - Merchant Learning (структура, v51): `count` / `lastUsed` / `aliases[]` на merchant; `recordMerchantUsage` в `recordOutcome`; `learnMerchantAlias` при импортной коррекции. Дедуп пока не меняется (алиасы — только поиск/подсказка).
 - SmartSelect (v53): комбобокс магазина выделен в универсальный `attachSmartSelect(input, cfg)` с настройками `source / searchFields / displayField / aliases / popularity / allowCreate / onCreate / onSelect`. Подключены Магазин, Категория, Расход, Объект, Заказчик во всех четырёх формах (`manExp*`, `editRow*`, `modal*`, `valetTeach*`). Категория была `<select>` → стала поиск с подсказками; создание новой идёт через `ensureCategory()`. Популярность считается по строкам Ledger (`directoryUsage`), поэтому старые данные ранжируются без миграции. Выбор строки шлёт `change`, зависимая логика форм не тронута. Не переведены `.as-cat` / `.as-exp` в карточках разбора.
+- **AD-010 (2026-07-26):** сущность «Покупка» обязательна; банк = деньги; чек = состав.
+- **AD-010.1 (2026-07-26):** единый поток обучения — выписка / скрин / чек; пакетный экран чека отменён.
+- **Чеки волна 1 (v61):** кнопка «Чек»; `/receipt/parse`; позиции → `runImportPlanFromRows` / tutor; `purchases[]` (schema 12). Дружба с банком — не в этой волне.
+- **Ошибки импорта (v74):** `reportUserError()` — модалка + безопасная запись в тот же `/logs` (без фото/сумм/ключей); частичное распознавание → Продолжить/Отмена.
+- **Позиция чека (v75):** `normalize_receipt_line_item` / `normalizeReceiptLineItem` — unit/qty/price/amount; нарушение математики → doubt → вопрос в Разборе; поля доходят до `createExpense`/`makeRow`.
 
 ---
 
@@ -56,7 +61,9 @@
 - Миграция Фазы 1: повторный запуск не меняет payload; нет дублей funds/creditLimits; legacy сохранён; personal/business не изменены.
 - `scripts/test_gateway_regressions.py`: PASS.
 - `scripts/test_smart_select.js`: PASS (поиск, популярность из Ledger, алиасы и кросс-алфавит, 20 000 строк — сборка и поиск ~0,4 с). Запуск: `docker run --rm -v "$PWD":/w -w /w node:20-alpine node scripts/test_smart_select.js` (node на хосте не установлен).
-- JavaScript parse (tree-sitter) для source/public: 0 ошибок.
+- `scripts/test_user_error_handler.js`: PASS (sanitize метаданных, классификация, лог не блокирует модалку).
+- `scripts/test_ad011_source_dedup.js`: PASS.
+- `scripts/test_receipt_parse.py` + `scripts/test_receipt_line_math.js`: PASS (Магнит перец ok/doubt без автопочинки, штучный, conflict).
 - IDE lints: 0.
 
 ## Известные проблемы
@@ -70,10 +77,19 @@
 - Расход из Личного / Бизнеса: **принято 25.07.2026 (v52)**.
 - SmartSelect: **Проверил 25.07.2026 (v54)** — пустая категория, «з» ≠ «Жура», «оз»→Ozon.
 - Настройки: **Проверил 26.07.2026 (v58)** — AI Training, отчёт Валета (переключатели + журнал сверки), свободные, фонды, лимиты.
-- Yandex AI Studio: в локальном `.env` подготовлены `YANDEX_AI_STUDIO_API_KEY` / `FOLDER_ID` / `BASE_URL` / `MODEL` (учебный ключ; в Git не коммитится). Подключение в код API — ещё план.
+- Yandex AI Studio: **основной** на разборе чека (OCR → YandexGPT). Цепочка: **Яндекс → Timeweb → OpenRouter** (Qwen / Llama Scout / Nova Lite).
+- **AD-011 (2026-07-26):** единый конвейер источников (банк/чек/…) → Разбор → `createExpense()`; без отдельных путей записи.
+- **v76:** инвариант AD-010.1 — одна карточка Валета = один расход; убрана агрегация `groupValetTutorItems` и кнопки «Верно · все N».
+- **v77:** в ящике кнопка «Вернуть назад» — отмена случайного «В ящик», расход снова в Разбор.
+- **PDF-справка Т‑Банк:** парсер больше не берёт «последнее число» (хвост карты 0507≠7); блоки + сумма с ₽ → тот же `normalize_row`, что CSV.
+- v68: при входе в Разбор, если очередь не пуста — модалка «Незавершённый разбор… Продолжить? Да/Нет» (оба ведут в обычный Разбор; уже записанное остаётся).
+- Новые идеи 26.07.2026: настраиваемый дневной лимит расходов на ИИ со счётчиком и жёсткой остановкой; нижнее мобильное меню с распределением пунктов между верхом и низом.
 - `/logs`: **Проверил 26.07.2026** — админка обучения Валета (логи / вопросы / KB).
 
 ## Следующий шаг
 
-1. Выбрать следующую большую волну: чеки через LLM / merchantId / Assistant.
-2. Чеки как `sourceOperation` через Gateway — наиболее вероятный кандидат.
+1. Приёмка v76: одна карточка = один расход (нет «Группа» / «Верно · все N»; resume с середины).
+2. Приёмка волны 1 + AD-011 (v67) — «Проверил»: повтор источника → «N новых»; похожие → вопрос.
+3. Добавить дневной финансовый лимит ИИ, счётчик и остановку при достижении порога.
+4. Волна 2: дружба с выпиской на уровне Покупки.
+5. Потом: Receipt Learning / merchantId / Assistant.

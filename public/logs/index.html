@@ -160,14 +160,33 @@ async function loadLogs(){
         if(r.overdue_24h) flags.push('<span class="flag red">просрочено 24ч</span>');
         if(r.hallucination_flag) flags.push('<span class="flag orange">галюцинация</span>');
         if(r.message_kind && r.message_kind!=='normal') flags.push(`<span class="flag">${esc(r.message_kind)}</span>`);
+        if(r.user_error) flags.push('<span class="flag red">ошибка UX</span>');
         if(r.rating===1) flags.push('<span class="flag green">👍</span>');
         if(r.rating===-1) flags.push('<span class="flag red">👎</span>');
         const rating = r.rating==null ? '—' : (r.rating===1?'👍':'👎') + (r.rating_comment?`<div class="msg">${esc(r.rating_comment)}</div>`:'');
+        const ue = r.user_error;
+        let msgHtml = `<div class="msg">${esc(r.content)}</div>`;
+        if(ue){
+          const bits = [
+            ue.source && `источник: ${ue.source}`,
+            ue.stage && `этап: ${ue.stage}`,
+            ue.error_type && `тип: ${ue.error_type}`,
+            ue.technical_message && `техн.: ${ue.technical_message}`,
+          ].filter(Boolean);
+          if(bits.length){
+            msgHtml += `<div class="hint" style="margin-top:6px">${bits.map(esc).join(' · ')}</div>`;
+          }
+          const meta = ue.metadata || {};
+          const metaBits = Object.entries(meta).map(([k,v])=>`${k}=${v}`);
+          if(metaBits.length){
+            msgHtml += `<div class="hint">${esc(metaBits.join(' · '))}</div>`;
+          }
+        }
         const cls = r.overdue_24h ? 'overdue' : (r.attention ? 'attn' : '');
         return `<tr class="${cls}" data-id="${r.id}">
           <td>${esc(fmt(r.created_at))}</td>
           <td>${esc(r.role)}</td>
-          <td class="msg">${esc(r.content)}</td>
+          <td>${msgHtml}</td>
           <td>${rating}</td>
           <td><div class="flags">${flags.join('')}</div></td>
           <td class="row-actions">

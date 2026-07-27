@@ -703,6 +703,7 @@ def list_dumps(username: str, limit: int = 20):
 from fastapi import File, UploadFile  # noqa: E402
 
 from statement_parse import parse_statement_upload  # noqa: E402
+from receipt_parse import parse_receipt_upload  # noqa: E402
 
 
 @app.post("/api/v1/users/{username}/statement/parse")
@@ -727,6 +728,35 @@ async def statement_parse(username: str, file: UploadFile = File(...)):
         "source": parsed.get("source"),
         "rows": rows,
         "count": len(rows),
+        "warnings": parsed.get("warnings") or [],
+        "critical_alerts": parsed.get("critical_alerts") or [],
+        "meta": parsed.get("meta") or {},
+    }
+
+
+@app.post("/api/v1/users/{username}/receipt/parse")
+async def receipt_parse(username: str, file: UploadFile = File(...)):
+    """Extract structured receipt (AD-010 Wave 1). Never writes expenses — client confirms via Gateway."""
+    with db_connect() as conn, conn.cursor() as cur:
+        user_id_by_name(cur, username)
+    data = await file.read()
+    if len(data) > 15 * 1024 * 1024:
+        raise HTTPException(413, "file too large (max 15 MB)")
+    if not data:
+        raise HTTPException(400, "empty file")
+    try:
+        parsed = await parse_receipt_upload(data, file.filename or "", file.content_type or "")
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(422, f"receipt parse failed: {exc}") from exc
+    receipt = parsed.get("receipt") or {}
+    return {
+        "username": username,
+        "ok": bool(parsed.get("ok")),
+        "source": "receipt",
+        "receipt": receipt,
+        "itemCount": len(receipt.get("items") or []),
         "warnings": parsed.get("warnings") or [],
         "critical_alerts": parsed.get("critical_alerts") or [],
         "meta": parsed.get("meta") or {},
@@ -798,7 +828,8 @@ def _log_critical_alerts(
     """Persist critical alerts as Valet assistant messages; return logged items for UI.
 
     Dedupes by alert code within the same conversation (6h window) so greeting
-    probes don't spam the chat.
+    probes don't spam the chat. Codes starting with ``user_error:`` are never
+    deduped (each client incident must appear in /logs).
     """
     if not alerts:
         return []
@@ -823,8 +854,10 @@ def _log_critical_alerts(
     for alert in alerts:
         if not isinstance(alert, dict):
             continue
+        alert = _sanitize_critical_alert(alert)
         code = str(alert.get("code") or "")
-        if code and code in recent_codes:
+        is_user_error = code.startswith("user_error:") or isinstance(alert.get("user_error"), dict)
+        if code and code in recent_codes and not is_user_error:
             continue
         text = format_alert_message(alert)
         mid = _log_valet_message(
@@ -841,6 +874,63 @@ def _log_critical_alerts(
         if code:
             recent_codes.add(code)
     return logged
+
+
+_USER_ERROR_META_ALLOW = frozenset(
+    {
+        "filename",
+        "mimeType",
+        "sizeBytes",
+        "httpStatus",
+        "provider",
+        "engine",
+        "model",
+        "recognizedCount",
+        "rawCount",
+        "validCount",
+        "failedCount",
+        "confidence",
+        "sourceLabel",
+        "stage",
+        "errorType",
+        "ok",
+    }
+)
+
+
+def _sanitize_critical_alert(alert: dict[str, Any]) -> dict[str, Any]:
+    """Drop secrets / receipt body / amounts from persisted user_error payloads."""
+    out = dict(alert)
+    ue = out.get("user_error")
+    if not isinstance(ue, dict):
+        return out
+    clean: dict[str, Any] = {
+        "timestamp": str(ue.get("timestamp") or "")[:40],
+        "source": str(ue.get("source") or "")[:40],
+        "stage": str(ue.get("stage") or "")[:40],
+        "error_type": str(ue.get("error_type") or "")[:60],
+        "user_message": str(ue.get("user_message") or "")[:500],
+        "technical_message": str(ue.get("technical_message") or "")[:500],
+        "stack": str(ue.get("stack") or "")[:2000],
+        "session_id": str(ue.get("session_id") or "")[:80],
+        "user": str(ue.get("user") or "")[:64],
+    }
+    meta_in = ue.get("metadata") if isinstance(ue.get("metadata"), dict) else {}
+    meta_out: dict[str, Any] = {}
+    for k, v in meta_in.items():
+        if k not in _USER_ERROR_META_ALLOW:
+            continue
+        if v is None:
+            continue
+        if isinstance(v, str):
+            meta_out[k] = v[:200]
+        elif isinstance(v, (int, float, bool)):
+            meta_out[k] = v
+    clean["metadata"] = meta_out
+    out["user_error"] = clean
+    if not out.get("detail"):
+        out["detail"] = clean["user_message"]
+    return out
 
 
 @app.post("/api/v1/users/{username}/valet/critical")
@@ -1475,7 +1565,7 @@ def admin_valet_logs(limit: int = 300, username: str | None = None):
                 vm.id, vm.created_at, u.username, vm.conversation_id, vm.role, vm.content,
                 vm.rating, vm.rating_comment, vm.is_dont_know, vm.needs_attention,
                 vm.hallucination_flag, vm.message_kind, vm.open_question_id,
-                vm.provider, vm.model, vm.status, vm.error,
+                vm.provider, vm.model, vm.status, vm.error, vm.meta,
                 oq.status AS question_status, oq.created_at AS question_created_at
             FROM valet_messages vm
             JOIN valet_conversations vc ON vc.id = vm.conversation_id
@@ -1489,9 +1579,12 @@ def admin_valet_logs(limit: int = 300, username: str | None = None):
         )
         items = []
         for r in cur.fetchall():
-            q_created = r[18]
-            waiting = r[17] in ("waiting", "drafting", "ready", "delivered", "closed_loop")
-            overdue = bool(r[8] or r[9]) and r[17] == "waiting" and is_overdue(q_created)
+            meta = r[17] if isinstance(r[17], dict) else {}
+            crit = meta.get("critical_alert") if isinstance(meta, dict) else None
+            user_error = crit.get("user_error") if isinstance(crit, dict) else None
+            q_created = r[19]
+            waiting = r[18] in ("waiting", "drafting", "ready", "delivered", "closed_loop")
+            overdue = bool(r[8] or r[9]) and r[18] == "waiting" and is_overdue(q_created)
             items.append(
                 {
                     "id": r[0],
@@ -1511,9 +1604,12 @@ def admin_valet_logs(limit: int = 300, username: str | None = None):
                     "model": r[14],
                     "status": r[15],
                     "error": r[16],
-                    "question_status": r[17],
+                    "meta": meta or None,
+                    "user_error": user_error,
+                    "critical_alert": crit,
+                    "question_status": r[18],
                     "overdue_24h": overdue,
-                    "attention": bool(r[9] or r[8] or r[10] or (r[6] == -1) or overdue),
+                    "attention": bool(r[9] or r[8] or r[10] or (r[6] == -1) or overdue or user_error),
                 }
             )
     # group by username for UI convenience

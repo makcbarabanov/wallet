@@ -29,10 +29,14 @@ docker compose up -d --build wallet-api
 
 ```bash
 python3 scripts/test_gateway_regressions.py
+python3 scripts/test_receipt_parse.py
 docker run --rm -v "$PWD":/w -w /w node:20-alpine node scripts/test_smart_select.js
+docker run --rm -v "$PWD":/w -w /w node:20-alpine node scripts/test_ad011_source_dedup.js
 ```
 
-Первый проверяет архитектурные инварианты шлюза расходов, защиту от дублей и разметку ключевых форм. Второй — поведение SmartSelect: поиск, популярность, алиасы, большие списки.
+Первый — инварианты шлюза расходов. `test_receipt_parse` — нормализация чека. SmartSelect — поиск по справочникам. `test_ad011_source_dedup` — единый дедуп источников (повтор чека / частично / похожие / fiscalId).
+
+Wallet использует **единый механизм обработки источников расходов**: источник → распознавание → предложения → Разбор → подтверждение → `createExpense()` (AD-011). Чек, выписка, скрин и будущие каналы отличаются только на входе.
 
 ## Документация
 

@@ -33,6 +33,24 @@ def make_alert(
 
 
 def format_alert_message(alert: dict[str, Any]) -> str:
+    ue = alert.get("user_error")
+    if isinstance(ue, dict):
+        title = alert.get("title") or ue.get("user_message") or "Ошибка обработки"
+        lines = [f"⚠️ {title}"]
+        msg = (ue.get("user_message") or alert.get("detail") or "").strip()
+        if msg and msg != title:
+            lines.append(msg[:500])
+        src = str(ue.get("source") or "").strip()
+        stage = str(ue.get("stage") or "").strip()
+        et = str(ue.get("error_type") or "").strip()
+        tag = "/".join(p for p in (src, stage, et) if p)
+        if tag:
+            lines.append(f"[{tag}]")
+        tech = (ue.get("technical_message") or "").strip()
+        if tech:
+            lines.append(f"Технически: {tech[:300]}")
+        return "\n".join(lines)
+
     title = alert.get("title") or "Критическая ошибка"
     lines = [f"⚠️ {title}"]
     detail = (alert.get("detail") or "").strip()
