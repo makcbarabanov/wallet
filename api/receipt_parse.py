@@ -59,6 +59,7 @@ RECEIPT_VISION_PROMPT = """Ты извлекаешь данные с фото М
   Пример штучного: qty=1, price=129.99, amount=129.99.
   Если видишь «1КГ» / «кг» в названии — это единица цены, не количество = 1 кг.
 - если есть только price и qty — amount можно не заполнять (сервер посчитает);
+- date = дата чека DD.MM.YYYY или YYYY-MM-DD; если дата плохо читается / год неясен — оставь date пустым "". НИКОГДА не угадывай год;
 - total = итого к оплате; если не видно — сумма items;
 - confidence от 0 до 1;
 - КРИТИЧНО: не выдумывай позиции. Если это не чек / нечитаемо — верни:
@@ -327,7 +328,21 @@ def _normalize_item_category(category: str, name: str) -> str:
 def normalize_receipt_payload(raw: dict[str, Any], *, engine: str, model: str) -> dict[str, Any]:
     err = raw.get("error")
     merchant = str(raw.get("merchant") or raw.get("store") or "").strip()
-    date_iso = _date_to_iso(str(raw.get("date") or ""))
+    date_raw = str(raw.get("date") or "").strip()
+    date_iso = _date_to_iso(date_raw)
+    date_status = "ok"
+    if not date_iso:
+        date_status = "missing"
+    else:
+        try:
+            from datetime import date as _date
+
+            y = int(date_iso[:4])
+            if y != _date.today().year:
+                date_status = "anomalous_year"
+        except ValueError:
+            date_status = "missing"
+            date_iso = ""
     total = _num(raw.get("total") or raw.get("totalAmount"))
     fiscal_id = str(raw.get("fiscalId") or raw.get("receiptNumber") or raw.get("fiscal_id") or "").strip()
     confidence = _num(raw.get("confidence"))
@@ -397,12 +412,18 @@ def normalize_receipt_payload(raw: dict[str, Any], *, engine: str, model: str) -
         warnings.append("Чек прочитан, но позиции не найдены — проверьте итог вручную.")
     if confidence < 0.45:
         warnings.append("Низкая уверенность распознавания — проверьте позиции перед подтверждением.")
+    if date_status == "missing":
+        warnings.append("Дата чека не распознана — нужно указать вручную.")
+    elif date_status == "anomalous_year":
+        warnings.append(f"Дата чека выглядит необычно ({date_iso}) — подтвердите или исправьте.")
 
     return {
         "ok": True,
         "receipt": {
             "merchant": merchant or "Магазин",
             "date": date_iso,
+            "dateRaw": date_raw,
+            "dateStatus": date_status,
             "totalAmount": total or 0,
             "currency": str(raw.get("currency") or "RUB"),
             "fiscalId": fiscal_id,

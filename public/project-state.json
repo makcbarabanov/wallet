@@ -1,13 +1,13 @@
 {
   "contextVersion": 1,
   "project": "Wallet",
-  "updatedAt": "2026-07-27",
+  "updatedAt": "2026-07-28",
   "role": "official_machine_context",
   "description": "Canonical machine context for Arden and other AI tools. Not a visual roadmap copy: short contract of version, hard architecture rules, accepted work, and next actions.",
   "version": {
-    "uiBuild": 82,
-    "schemaVersion": 13,
-    "serviceWorkerCache": "wallet-shell-v81",
+    "uiBuild": 93,
+    "schemaVersion": 14,
+    "serviceWorkerCache": "wallet-shell-v93",
     "activePhase": "Phase 2",
     "aiMode": "training"
   },
@@ -83,21 +83,36 @@
   ],
   "currentFocus": {
     "status": "acceptance_required",
-    "item": "Уточнение = reconciliation link (UI_BUILD 81)",
-    "build": 81,
+    "item": "False Razbor resume id-type fix (UI_BUILD 93)",
+    "build": 93,
     "acceptance": [
-      "Уточнение: Да, это одна запись → связь сохраняется",
-      "Повторный импорт той же операции → skip без Уточнения",
-      "Другой магазин на ту же сумму → не подхватывает чужую связь",
-      "Чекбокс карты *0507 ↔ счёт при подтверждении",
-      "Header v81"
+      "Open Разбор → 0 unfinished ops",
+      "No resume prompt",
+      "Ledger row counts and account balances unchanged"
     ],
     "refs": [
-      "AD-010.2",
-      "AD-011"
+      "AD-010.1"
     ]
   },
   "accepted": [
+    {
+      "item": "False Razbor resume (id string vs number)",
+      "status": "implemented_awaiting_acceptance",
+      "note": "normId/idSetHas; live queue requires action; pruneSettledRazborQueue; markImportedOpSettled; resume cleared rev 644",
+      "build": 93
+    },
+    {
+      "item": "Valet Проверка дублей",
+      "status": "implemented_awaiting_acceptance",
+      "note": "findDuplicateCandidates scan; reconciliationLinks on confirm; settings toggle",
+      "build": 88
+    },
+    {
+      "item": "Mobile bottom nav + FAB fan",
+      "status": "implemented_awaiting_acceptance",
+      "note": "Top: main tabs; bottom: settings/stores/+/cats/accounts/drawer; fan reuses existing actions",
+      "build": 83
+    },
     {
       "item": "Stage 1 unified reconciliation layer",
       "status": "implemented_awaiting_acceptance",
@@ -225,21 +240,55 @@
     "fund movement history",
     "open legacy proposal-group UI (Неучёл/group cards) as the resume path for an unfinished import",
     "create a second confirmation screen for any new source type",
-    "separate PDF-only dedup or MTS merchant exception list"
+    "separate PDF-only dedup or MTS merchant exception list",
+    "implement smart drawerOps lifecycle / import finish UX / post-import integrity before fresh statement is loaded successfully"
   ],
   "nextActions": [
+    {
+      "action": "Accept v93 on device: Разбор shows 0 unfinished, no resume",
+      "why": "False resume from confirmedIds string vs importedOps number ids"
+    },
+    {
+      "action": "Treat any new account fact≠wallet drift as a new discrepancy after baseline_checkpoint_0",
+      "why": "Checkpoint 0 fixed 2026-07-28; old ~4k drift not investigated and must not reopen the baseline"
+    },
+    {
+      "action": "Continue debt lifecycle check (дал → вернули) if still in progress",
+      "why": "Simple debt money-flow v1 shipped; user testing"
+    },
+    {
+      "action": "Later: smart drawerOps lifecycle",
+      "why": "Zombie drawer rows when expense already in ledger; show «Расход уже создан», keep audit"
+    },
+    {
+      "action": "Later: clean import/Razbor lifecycle («Импорт завершён»)",
+      "why": "Clear temps without manual cleanup before next import"
+    },
+    {
+      "action": "Later: post-import integrity check",
+      "why": "Every bank op: in ledger / explicit non-expense / waiting with explanation"
+    },
+    {
+      "action": "Accept mobile bottom nav on phone (UI_BUILD 83)",
+      "why": "User requested split top/bottom nav and FAB quick access"
+    },
     "Accept v81: Да одна запись → silent skip next import",
     "Accept Stage 1 / MTS 850 if not yet",
     "Wave 2 Purchase↔Bank only after reconciliation acceptance",
     "Accept Stage 1 reconciliation (UI_BUILD 78): MTS 850 PDF/CSV → skip; receipt regress OK",
-    "Re-audit CSV/PDF/receipt vs Ledger after device check",
-    "Accept drawer restore (UI_BUILD 77)",
-    "Accept tutor one-card-one-expense (UI_BUILD 76)",
-    "Accept receipt line math (UI_BUILD 75)",
-    "Accept user-error modal + /logs (UI_BUILD 74)"
+    "Re-audit CSV/PDF/receipt vs Ledger after device check"
   ],
-  "focus": "Accept Уточнение→reconciliation link v81",
-  "knownIssues": [],
+  "focus": "Accept v93: Разбор must not resurrect settled import ops",
+  "knownIssues": [
+    {
+      "id": "drawer-zombies",
+      "note": "drawerOps can stay open after expense exists in ledger another way — roadmap: smart drawer (not coding now)"
+    },
+    {
+      "id": "pre-baseline0-account-drift",
+      "note": "Historical account reconciliation mismatch before checkpoint 0 is intentionally not investigated"
+    }
+  ],
   "links": {
     "roadmap": "https://wallet.islanddream.ru/roadmap",
     "projectStateJson": "https://wallet.islanddream.ru/project-state.json",

@@ -150,16 +150,16 @@ footer ul{padding-left:18px; margin:6px 0 0}
   <div class="wrap">
     <h1>Wallet Roadmap</h1>
     <p class="sub">Короткий статус сверху. Нажми строку — откроются подробности. Новая архитектура здесь не создаётся.</p>
-    <div class="updated">Обновлено: <b>27 июля 2026</b> · UI_BUILD 78 · contextVersion 1</div>
+    <div class="updated">Обновлено: <b>28 июля 2026</b> · UI_BUILD 93 · contextVersion 1</div>
     <div class="stats">
-      <div class="stat"><div class="k">UI_BUILD</div><div class="v">78<small>reconciliation</small></div></div>
-      <div class="stat"><div class="k">schema</div><div class="v">12<small>sw v77</small></div></div>
+      <div class="stat"><div class="k">UI_BUILD</div><div class="v">93<small>id/resume</small></div></div>
+      <div class="stat"><div class="k">schema</div><div class="v">14<small>sw v93</small></div></div>
       <div class="stat"><div class="k">Фаза</div><div class="v" style="font-size:1rem">Фаза 2<small>стабилизация</small></div></div>
       <div class="stat"><div class="k">ИИ</div><div class="v" style="font-size:1rem">Training<small>Assistant позже</small></div></div>
     </div>
     <div class="focus">
-      🟡 Разбор: одна карточка = один расход (v76)
-      <span>Убраны группы в очереди Валета. v75: цена×кол-во. OCR: Яндекс → Timeweb → OpenRouter×3.</span>
+      🟡 Проверить: Разбор без ложного resume
+      <span>v93: id string/number + фильтр «уже в кошельке». Resume снят (rev 644). Ledger не трогали.</span>
     </div>
     <div class="legend">
       <span class="l-check">✔️ Проверил</span>
@@ -179,6 +179,24 @@ footer ul{padding-left:18px; margin:6px 0 0}
   <p class="sec-note">Основа — этот список. Детали внутри аккордеона.</p>
 
   <div class="acc">
+
+    <details class="item wip">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
+        <span class="title">Разбор: ложный resume из‑за типов id<small>ждёт «Проверил» · UI_BUILD 93</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Баг: <span class="path">confirmedIds</span> хранил <code>"900003"</code>, операции — <code>900003</code> → очередь считалась живой.</li>
+          <li>Единое сравнение id: <span class="path">normId</span> / <span class="path">idSetHas</span> (<code>String(id).trim()</code>).</li>
+          <li>Живая очередь только если операция ещё требует действия; уже в ledger / confirmed — не в resume.</li>
+          <li>При открытии Разбора — последний фильтр <span class="path">pruneSettledRazborQueue</span>; после записи расхода — <span class="path">markImportedOpSettled</span>.</li>
+          <li>Состояние: ложный resume очищен (rev 644); ledger и ящик без изменений.</li>
+        </ul>
+      </div></div>
+    </details>
 
     <details class="item ok">
       <summary>
@@ -572,6 +590,42 @@ footer ul{padding-left:18px; margin:6px 0 0}
       <summary>
         <span class="num" aria-hidden="true"></span>
         <span class="mark">🟡</span>
+        <span class="title">Валет: Проверка дублей<small>ждёт «Проверил» · UI_BUILD 88</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Переключатель в Настройках → Отчёт Валета → «Проверка дублей».</li>
+          <li>Кнопка на вкладке Валет → список подозрительных пар (дата, сумма, магазин, почему).</li>
+          <li>«Это одна запись» → <span class="path">reconciliationLinks</span>; «Это разные» → скрыть пару.</li>
+          <li>Без автоудаления и объединения. Отчёты / бюджет / сводки не менялись.</li>
+        </ul>
+        <div class="check"><b>Как проверить → «Проверил»</b>Настройки → включить → Валет → Проверка дублей → связать пару → повторный импорт той же операции не спрашивает.</div>
+      </div></div>
+    </details>
+
+    <details class="item wip" open>
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
+        <span class="title">Мобилка: нижняя панель + веер «+»<small>ждёт «Проверил» · UI_BUILD 83</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <ul>
+          <li>Сверху: Wallet · Разбор · Личный · Бизнес · Доход · Долги.</li>
+          <li>Снизу: Настр. · Магаз. · <b>+</b> · Катег. · Счета · Ящик(+цифра) · v83.</li>
+          <li>Веер «+»: Расход · Выписка · Скрин (чек/банк) · Буфер — те же сервисы, ничего не убрано с Разбора.</li>
+          <li>Ящик снизу → Разбор + прокрутка к ящику. Только ширина ≤820px.</li>
+        </ul>
+        <div class="check"><b>Как проверить → «Проверил»</b>Телефон → v83 внизу справа → «+» открывает веер → Расход/Выписка/Скрин/Буфер работают; Ящик показывает бейдж и ведёт к панели.</div>
+      </div></div>
+    </details>
+
+    <details class="item wip" open>
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">🟡</span>
         <span class="title">Этап 1: единый reconciliation<small>ждёт «Проверил» · UI_BUILD 78 · AD-010.2</small></span>
         <span class="chev">›</span>
       </summary>
@@ -620,13 +674,56 @@ footer ul{padding-left:18px; margin:6px 0 0}
       </div></div>
     </details>
 
+    <details class="item plan" id="smart-drawer">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">⚪</span>
+        <span class="title">Умный Ящик (lifecycle drawerOps)<small>потом · код сейчас не менять</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <p><b>Проблема.</b> Ящик — место для отложенных операций. Если расход позже создаётся вручную или другим импортом, старая запись остаётся «ожидающей» (зомби) и провоцирует двойной расход.</p>
+        <p><b>Решение.</b> При открытии Ящика сверять каждую запись с ledger. Если расход уже есть — статус «Расход уже создан», убрать из активных задач, сохранить историю происхождения. Не удалять молча без аудита.</p>
+        <p><b>Цель.</b> В Ящике только реально нерешённые операции.</p>
+      </div></div>
+    </details>
+
+    <details class="item plan" id="import-lifecycle">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">⚪</span>
+        <span class="title">Чистый жизненный цикл Разбора импорта<small>потом · код сейчас не менять</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <p><b>Проблема.</b> После нескольких циклов импорта остаются зависшие кандидаты, временные решения и старые сессии. Непонятно: новая задача или старый хвост.</p>
+        <p><b>Решение.</b> Явное «Импорт завершён»: очистить временные состояния, оставить историю и созданные расходы. Перед новым импортом — чистый цикл без ручной уборки.</p>
+        <p><b>Цель.</b> Новый импорт не наследует состояние старых разборов.</p>
+      </div></div>
+    </details>
+
+    <details class="item plan" id="import-integrity">
+      <summary>
+        <span class="num" aria-hidden="true"></span>
+        <span class="mark">⚪</span>
+        <span class="title">Контроль целостности после импорта<small>потом · код сейчас не менять</small></span>
+        <span class="chev">›</span>
+      </summary>
+      <div class="panel"><div class="panel-inner">
+        <p><b>После каждого импорта</b> автоматическая проверка: каждая банковская операция либо уже в ledger, либо явно исключена как нерасход, либо ждёт решения с понятным объяснением. Скрытых «где-то лежит» быть не должно.</p>
+      </div></div>
+    </details>
+
   </div>
 </section>
 
 <section>
   <h2 id="next">Следующие действия</h2>
-  <p class="sec-note">AD-010 принят. Код чеков — после плана реализации.</p>
+  <p class="sec-note">Сейчас приоритет — не разработка улучшений Ящика/Разбора, а чистое состояние перед новым импортом. Задачи выше зафиксированы; вернёмся к ним после успешной загрузки свежей выписки.</p>
   <ol class="steps">
+    <li><b>Проверить v93: Разбор без ложного resume</b><span>Открыть Разбор → 0 незавершённых; балансы как были.</span></li>
+    <li class="done"><b>✅ Фикс ложного resume (v93)</b><span>normId + фильтр ledger/confirmed · resume снят · rev 644.</span></li>
+    <li><b>Загрузить свежую банковскую выписку</b><span>Разбор=0, Ящик=0. Новый чистый цикл.</span></li>
     <li class="done"><b>✔️ Проверил: Фонды, Gateway, NSP, Магазин, Git, v52</b><span>Ты проверил и одобрил · 25.07.2026.</span></li>
     <li class="done"><b>✔️ Проверил: SmartSelect v54</b><span>Пустая категория, «з» ≠ «Жура», «оз» → Ozon · 25.07.2026.</span></li>
     <li class="done"><b>✔️ Проверил: Настройки v58</b><span>Отчёт Валета, журнал сверки, фонды/лимиты · 26.07.2026.</span></li>
@@ -641,11 +738,18 @@ footer ul{padding-left:18px; margin:6px 0 0}
     <li class="done"><b>✅ Одна карточка = один расход (v76)</b><span>без групп и «Верно · все N» · ждёт «Проверил».</span></li>
     <li class="done"><b>✅ Ящик: вернуть назад (v77)</b><span>отмена случайного «В ящик» · ждёт «Проверил».</span></li>
     <li class="done"><b>✅ Этап 1 reconciliation (v78)</b><span>банк ≠ товар; МТС 850 → skip · ждёт «Проверил».</span></li>
+    <li class="done"><b>✅ Мобилка: низ + веер «+» (v83)</b><span>быстрый доступ без удаления кнопок Разбора · ждёт «Проверил».</span></li>
+    <li class="done"><b>✅ Валет: Проверка дублей (v88)</b><span>настройка + пары → reconciliationLinks · ждёт «Проверил».</span></li>
+    <li><b>Проверить v88: Проверка дублей</b><span>Настройки → Валет → связать пару → импорт не спрашивает снова.</span></li>
+    <li><b>Проверить v83 на телефоне</b><span>Нижняя панель, веер «+», Ящик с цифрой, версия под «+».</span></li>
     <li><b>Проверить v78: МТС 850 PDF/CSV → skip</b><span>Не новая карточка; повторный чек по-прежнему skip.</span></li>
     <li><b>Проверить v76 + волну 1 + AD-011 + v74/v75</b><span>«Расход N из M»; «N новых»; окно ошибки; Магнит перец = 98.27.</span></li>
     <li class="done"><b>✅ OCR: Яндекс → Timeweb → OpenRouter×3</b><span>Основные провайдеры подключены · 26.07.2026.</span></li>
     <li><b>Ограничить дневные расходы на ИИ</b><span>Лимит, счётчик и остановка платных запросов при достижении порога.</span></li>
     <li><b>Потом: волна 2 Purchase↔Bank</b><span>Только после приёмки Этапа 1 и повторного аудита CSV/PDF/чек.</span></li>
+    <li><b>Потом: Умный Ящик</b><span>Сверка с ledger → «Расход уже создан»; без зомби. Код — после свежей выписки.</span></li>
+    <li><b>Потом: цикл «Импорт завершён»</b><span>Чистый старт без ручной очистки временных состояний.</span></li>
+    <li><b>Потом: контроль целостности после импорта</b><span>Каждая банковская операция: в ledger / исключена / ждёт с объяснением.</span></li>
     <li class="done" style="opacity:.7"><b>Потом: обучение по товарам / merchantId / Assistant</b><span>После волн чеков.</span></li>
   </ol>
 </section>

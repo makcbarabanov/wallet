@@ -154,6 +154,41 @@ def test_conflict_asks():
     assert abs(it["amount"] - 120) < 0.01  # not silently changed to 100
 
 
+def test_anomalous_year_date_status():
+    out = normalize_receipt_payload(
+        {
+            "merchant": "Пятёрочка",
+            "date": "22.05.2024",
+            "total": 357,
+            "confidence": 0.9,
+            "items": [{"name": "Товар", "amount": 357, "category": "Продукты"}],
+        },
+        engine="test",
+        model="unit",
+    )
+    assert out["ok"] is True
+    assert out["receipt"]["date"].startswith("2024-05-22")
+    assert out["receipt"]["dateStatus"] == "anomalous_year"
+    assert any("необычно" in w.lower() or "2024" in w for w in out["warnings"])
+
+
+def test_missing_date_status():
+    out = normalize_receipt_payload(
+        {
+            "merchant": "Пятёрочка",
+            "date": "",
+            "total": 10,
+            "confidence": 0.8,
+            "items": [{"name": "Пакет", "amount": 10, "category": "Продукты"}],
+        },
+        engine="test",
+        model="unit",
+    )
+    assert out["ok"] is True
+    assert out["receipt"]["date"] == ""
+    assert out["receipt"]["dateStatus"] == "missing"
+
+
 if __name__ == "__main__":
     test_three_items()
     test_per_item_categories_not_store_level()
@@ -164,8 +199,11 @@ if __name__ == "__main__":
     test_piece_item()
     test_multi_piece()
     test_conflict_asks()
+    test_anomalous_year_date_status()
+    test_missing_date_status()
     print("receipt_parse OK")
     print("- 3 items → structured receipt")
     print("- per-item categories (not store-level)")
     print("- magnet chili ok / confused→doubt (no autofix)")
     print("- piece / multi / conflict")
+    print("- anomalous year / missing date → dateStatus")

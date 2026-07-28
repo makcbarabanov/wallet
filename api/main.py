@@ -169,7 +169,7 @@ def sync_normalized(cur, user_id: int, payload: dict[str, Any]) -> None:
             if bucket in ("imported", "deleted"):
                 amount = float(r.get("amount") if r.get("amount") is not None else -abs(cost))
                 if bucket == "imported" and amount > 0 and str(r.get("kind") or "") == "expense":
-                    amount = -amount
+                amount = -amount
             else:
                 amount = -abs(cost)
             date_s = str(r.get("date") or "")
@@ -202,36 +202,36 @@ def sync_normalized(cur, user_id: int, payload: dict[str, Any]) -> None:
         if not batch:
             return
         cur.executemany(
-            """
-            INSERT INTO operations (
-                user_id, client_op_id, bucket, status, occurred_at,
-                category_name, expense, store, amount, comment,
-                account_id, object_name, customer, bank, fingerprint, source, meta
-            ) VALUES (
-                %s,%s,%s,%s,%s,
-                %s,%s,%s,%s,%s,
-                %s,%s,%s,%s,%s,'ui',%s::jsonb
-            )
-            ON CONFLICT (user_id, client_op_id) DO UPDATE SET
-                bucket = EXCLUDED.bucket,
-                status = EXCLUDED.status,
-                occurred_at = EXCLUDED.occurred_at,
-                category_name = EXCLUDED.category_name,
-                expense = EXCLUDED.expense,
-                store = EXCLUDED.store,
-                amount = EXCLUDED.amount,
-                comment = EXCLUDED.comment,
-                account_id = EXCLUDED.account_id,
-                object_name = EXCLUDED.object_name,
-                customer = EXCLUDED.customer,
-                bank = EXCLUDED.bank,
-                fingerprint = EXCLUDED.fingerprint,
-                source = EXCLUDED.source,
-                meta = EXCLUDED.meta,
-                updated_at = now()
-            """,
+                """
+                INSERT INTO operations (
+                    user_id, client_op_id, bucket, status, occurred_at,
+                    category_name, expense, store, amount, comment,
+                    account_id, object_name, customer, bank, fingerprint, source, meta
+                ) VALUES (
+                    %s,%s,%s,%s,%s,
+                    %s,%s,%s,%s,%s,
+                    %s,%s,%s,%s,%s,'ui',%s::jsonb
+                )
+                ON CONFLICT (user_id, client_op_id) DO UPDATE SET
+                    bucket = EXCLUDED.bucket,
+                    status = EXCLUDED.status,
+                    occurred_at = EXCLUDED.occurred_at,
+                    category_name = EXCLUDED.category_name,
+                    expense = EXCLUDED.expense,
+                    store = EXCLUDED.store,
+                    amount = EXCLUDED.amount,
+                    comment = EXCLUDED.comment,
+                    account_id = EXCLUDED.account_id,
+                    object_name = EXCLUDED.object_name,
+                    customer = EXCLUDED.customer,
+                    bank = EXCLUDED.bank,
+                    fingerprint = EXCLUDED.fingerprint,
+                    source = EXCLUDED.source,
+                    meta = EXCLUDED.meta,
+                    updated_at = now()
+                """,
             batch,
-        )
+            )
 
     insert_ops(payload.get("personal") or [], "personal", "confirmed")
     insert_ops(payload.get("business") or [], "business", "confirmed")
@@ -420,8 +420,8 @@ def sync_normalized(cur, user_id: int, payload: dict[str, Any]) -> None:
                 psycopg.types.json.Json(
                     {k: d.get(k) for k in ("softDup", "at", "from") if d.get(k) is not None}
                 ),
-            ),
-        )
+        ),
+    )
 
 
 @app.get("/api/health")
@@ -503,7 +503,7 @@ def put_state(username: str, body: StatePut):
             )
 
         if body.normalize:
-            sync_normalized(cur, uid, payload)
+        sync_normalized(cur, uid, payload)
         cur.execute(
             """
             INSERT INTO user_app_state (user_id, payload, source, revision, updated_at)

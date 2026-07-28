@@ -7,6 +7,7 @@ import io
 import json
 import os
 import re
+from datetime import date
 from typing import Any
 
 import httpx
@@ -80,6 +81,20 @@ def _date_to_iso(raw: str) -> str:
     return s
 
 
+def assess_date_status(date_iso: str, *, today: date | None = None) -> str:
+    """ok | missing | anomalous_year — never invent a date here."""
+    if not (date_iso or "").strip():
+        return "missing"
+    today = today or date.today()
+    try:
+        y = int(str(date_iso)[:4])
+    except ValueError:
+        return "missing"
+    if y != today.year:
+        return "anomalous_year"
+    return "ok"
+
+
 def normalize_row(
     *,
     date: str,
@@ -87,6 +102,7 @@ def normalize_row(
     amount: float,
     comment: str = "",
     bank: dict[str, Any] | None = None,
+    allow_missing_date: bool = False,
 ) -> dict[str, Any] | None:
     store = (store or "").strip()
     if not store:
@@ -97,7 +113,8 @@ def normalize_row(
     # expense < 0; positive amounts keep as unclear (income / refund / hold)
     kind = "expense" if amt < 0 else "unclear"
     date_iso = _date_to_iso(date) if date else ""
-    if not date_iso:
+    date_status = assess_date_status(date_iso)
+    if date_status == "missing" and not allow_missing_date:
         return None
     b = bank or {}
     return {
@@ -106,6 +123,7 @@ def normalize_row(
         "amount": amt,
         "kind": kind,
         "comment": (comment or "").strip(),
+        "dateStatus": date_status,
         "bank": {
             "desc": b.get("desc") or store,
             "category": b.get("category") or "",
@@ -570,8 +588,9 @@ VISION_PROMPT = """Ты извлекаешь операции из скринш�
 - бери ВСЕ операции со знаком суммы как на экране: расходы amount отрицательный (−690), поступления/возвраты — положительный (+5555, +690);
 - переводы людям (ФИО вроде «Наталья Ф.») и категория «Переводы» — ВКЛЮЧАЙ, category="Переводы";
 - пропускай только явные переводы между своими счетами / пополнением своих карт;
-- если даты нет — пропусти строку;
 - category копируй с экрана (Супермаркеты, Каршеринг, Переводы, Фастфуд…);
+- ДАТА — критическое поле. Если дата плохо читается / год неясен / есть несколько вариантов — оставь date пустой строкой "". НИКОГДА не угадывай год (например 2024 вместо 2026);
+- если даты нет на экране — date="";
 - КРИТИЧНО: не выдумывай операции. Если на изображении нет читаемых строк — верни строго [];
 - если ничего не видно — верни [].
 """
@@ -629,6 +648,7 @@ def _rows_from_vision_text(text: str, *, engine: str, model: str) -> dict[str, A
                 "card": card,
                 "opDateRaw": str(item.get("date") or ""),
             },
+            allow_missing_date=True,
         )
         if nr:
             out.append(nr)

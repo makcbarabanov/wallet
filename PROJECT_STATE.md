@@ -10,7 +10,7 @@
 
 **Контракт JSON:** `contextVersion`, `updatedAt`, `version`, `architectureRules[]` (жёсткие AD), `accepted` / `inProgress` / `nextActions`, `doNotDoNow`. Обновлять одновременно с этим файлом. Не копия roadmap — официальный машинный контекст.
 
-**Снимок:** 2026-07-27 · UI_BUILD **78** / schema **12** · contextVersion **1**. **AD-011** + **Этап 1 reconciliation** (банк ≠ товар; `bank.comment` не productName). Разбор: **1 карточка = 1 расход**; ящик: «Вернуть назад». Purchase↔Bank — волна 2 после приёмки Этапа 1.
+**Снимок:** 2026-07-28 · UI_BUILD **93** / schema **14** · contextVersion **1**. **Контрольная точка 0** по счетам. v93: ложный resume Разбора из‑за string/number id — починен; resume снят (rev 644); ledger не трогали. Дата при импорте чека/скрина по-прежнему спрашивается при аномалии (v91+).
 
 ---
 
@@ -18,8 +18,8 @@
 
 | Файл | Статус |
 |------|--------|
-| `review_categorization.html` / `public/index.html` | UI_BUILD **78** · schema **12** · идентичны |
-| `public/sw.js` | `wallet-shell-v78` |
+| `review_categorization.html` / `public/index.html` | UI_BUILD **93** · schema **14** · идентичны |
+| `public/sw.js` | `wallet-shell-v93` |
 | `README.md` | создан: запуск, тесты, карта документации, раздел «UI Patterns → SmartSelect» |
 | `api/` | восстановлен из контейнера 2026-07-25 (`main.py`, `statement_parse.py`, `critical_alerts.py`, `valet_*.py`, `requirements.txt`) |
 | дамп-страховка | `data/dumps/makc/250726/` · revision 269 · reason `pre_repair_wave` |
@@ -88,7 +88,8 @@
 
 ## Следующий шаг
 
-1. Приёмка v76: одна карточка = один расход (нет «Группа» / «Верно · все N»; resume с середины).
+1. Приёмка v93: Разбор без ложного resume (0 незавершённых).
+2. Приёмка v76: одна карточка = один расход (нет «Группа» / «Верно · все N»; resume с середины).
 2. Приёмка волны 1 + AD-011 (v67) — «Проверил»: повтор источника → «N новых»; похожие → вопрос.
 3. Добавить дневной финансовый лимит ИИ, счётчик и остановку при достижении порога.
 4. Волна 2: дружба с выпиской на уровне Покупки.
